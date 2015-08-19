@@ -1,0 +1,7 @@
+This script should be executed after successful execution of scale_down.py of vEPC scripts
+To execute the script, ssh into 10.204.110.40 and go the directory /root/vEPC_scripts and enter the following command:
+	$ python vEPC_termination.py
+This script terminates the initial deployment of vEPC including networks created for it
+After completely terminate the vEPC-1, it prompts the user if it wants to delete aggregate groups too
+If user selects yes, aggregates groups are also deleted and script exits with success message
+

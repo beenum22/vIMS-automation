@@ -1,0 +1,9 @@
+This script should be executed after initial deployment of vEPC has been done
+If this script is executed before initial deployment of vEPC, it will exit with a message saying that initial deployment script should be executed first
+To execute the script, ssh into 10.204.110.40 and go the directory /root/vEPC_scripts and enter the following command:
+	$ python scale_out.py
+When this script runs, it checks whether the system has already been scaled up. If its already done, it prompts the user that whether it wants to terminate the existing vEPC scaled up deployment
+If user chooses not to terminate the existing vEPC scaled up deployment, the script exits
+If user opts to terminate the previous scale up instance and need to re-scale it, script terminates the previous instances
+After terminating previous instances, script starts scaling up the vEPC by creating new components in compute node 2
+
