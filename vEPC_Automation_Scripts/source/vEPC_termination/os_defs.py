@@ -4,6 +4,20 @@ import time
 import readline
 import json
 
+def get_port_id_by_ip(port_ip, neutron):
+	p=neutron.list_ports()
+	for port in p['ports']:
+		if port['fixed_ips'][0]['ip_address'] == port_ip:
+			return port['id']
+	return 'port-not-found'
+
+def get_port_device_id_by_ip(port_ip, neutron):
+	p=neutron.list_ports()
+	for port in p['ports']:
+		if port['fixed_ips'][0]['ip_address'] == port_ip:
+			return port['device_id']
+	return 'port-not-found'
+
 #to check if vm instance already exist
 def is_server_exists(vm_name, nova):
 	server_exists = False
@@ -13,25 +27,35 @@ def is_server_exists(vm_name, nova):
 			break
 	return server_exists
 
-def clear_instance(vm_name, nova, auto_delete):
+def clear_instance(vm_name, nova, auto_delete, configurations, neutron):
 	if is_server_exists(vm_name, nova):
-		inp='yes'
-		if(inp == 'yes'):
-			delete_instance(vm_name=vm_name, nova=nova)
+		delete_instance(vm_name, nova, configurations, neutron)
 			
 # Delete a VM named vm_name
-def delete_instance(vm_name, nova):
+def delete_instance(vm_name, nova, configurations, neutron):
 	servers_list = nova.servers.list()
 	server_del = vm_name
+	server_ip = ''
 	server_exists = False
 	
+	net_name = configurations['networks']['net-int-name']
+	
 	for s in servers_list:
-	   if s.name == server_del:
-	       server_exists = True
-	       break
+		if s.name == server_del:
+			server_exists = True
+			break
 	if server_exists:
-		nova.servers.delete(s)
 		print("[" + time.strftime("%H:%M:%S")+ "] Terminating "+vm_name+"...")
+		server = nova.servers.find(name=vm_name).addresses
+		try:			
+			server_ip = server[net_name][1]['addr']
+			floating_ip_id = get_port_device_id_by_ip(server_ip, neutron)
+			neutron.delete_floatingip(floating_ip_id)
+		except:
+			print "[" + time.strftime("%H:%M:%S")+ "] \tNo floating IP exists for " + vm_name	
+		
+		nova.servers.delete(s)
+		
 		deleted = False
 		while not deleted:
 			deleted = True
@@ -42,7 +66,8 @@ def delete_instance(vm_name, nova):
 			time.sleep(1)
 		time.sleep(2)
 	else:
-	      print("[" + time.strftime("%H:%M:%S")+ "] "+vm_name + " not found, already deleted")
+		print("[" + time.strftime("%H:%M:%S")+ "] "+vm_name + " not found, already deleted")
+	#neutron.delete_port(del_port)
 
 # Fetch network ID of network netname
 def get_network_id(netname, neutron):
@@ -163,7 +188,31 @@ def del_image(glance, img_name):
 			#print image.name + ' - ' + image.id
 		except StopIteration:
 			break
+#----------------------------------#
+#----------clear IP files-----------------#
+def clear_IP_files():
 	
+	file = 'source/vEPC_deploy/ip_files/'
+	
+	clear_file = file + 'range_nexthop.txt'	
+	file_open = open(clear_file, 'w')
+	file_open.close()
+	
+	clear_file = file + 's1_assigned_ips.txt'	
+	file_open = open(clear_file, 'w')
+	file_open.close()
+	
+	clear_file = file + 'sgi_assigned_ips.txt'	
+	file_open = open(clear_file, 'w')
+	file_open.close()
+	
+	clear_file = file + 'sgi_available_ips.txt'	
+	file_open = open(clear_file, 'w')
+	file_open.close()
+	
+	clear_file = file + 's1_available_ips.txt'	
+	file_open = open(clear_file, 'w')
+	file_open.close()
 	
 
 

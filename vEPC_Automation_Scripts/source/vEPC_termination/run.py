@@ -35,26 +35,26 @@ if is_server_exists('VCM-SDB-3', nova):
 
 configurations['auto-del'] = 'yes'
 configurations['deploy-ems'] = 'yes'
-try:
-	for i in range(0, 7):
-		instance_name = configurations['vcm-cfg']['name-prefix']+name_list[i]+"-1"
-		instance_name2 = configurations['vcm-cfg']['name-prefix']+name_list[i]+"-2"
-		clear_instance(instance_name, nova, configurations['auto-del'])
-		clear_instance(instance_name2, nova, configurations['auto-del'])
-	clear_network('S1', neutron, configurations)
-	clear_network('SGi', neutron, configurations)
-	while True:
-		chk = raw_input("[" + time.strftime("%H:%M:%S")+ "] Do you also want to terminate EMS ? <yes/no> ")
-		if chk == 'no' or chk == 'yes':
-			break
-		else:
-			print("Illegal input")
-		
-	if chk == 'yes':
-		clear_instance(configurations['vcm-cfg']['ems-vm-name'], nova, configurations['auto-del'])
-except:
-	print("[" + time.strftime("%H:%M:%S")+ "] vEPC initial deployment doesn't exist ...")
-	sys.exit()
+#try:
+for i in range(0, 7):
+	instance_name = configurations['vcm-cfg']['name-prefix']+name_list[i]+"-1"
+	instance_name2 = configurations['vcm-cfg']['name-prefix']+name_list[i]+"-2"
+	clear_instance(instance_name, nova, configurations['auto-del'], configurations, neutron)
+	clear_instance(instance_name2, nova, configurations['auto-del'], configurations, neutron)
+clear_network('S1', neutron, configurations)
+clear_network('SGi', neutron, configurations)
+while True:
+	chk = raw_input("[" + time.strftime("%H:%M:%S")+ "] Do you also want to terminate EMS ? <yes/no> ")
+	if chk == 'no' or chk == 'yes':
+		break
+	else:
+		print("Illegal input")
+	
+if chk == 'yes':
+	clear_instance(configurations['vcm-cfg']['ems-vm-name'], nova, configurations['auto-del'], configurations, neutron)
+# except:
+	# print("[" + time.strftime("%H:%M:%S")+ "] vEPC initial deployment doesn't exist ...")
+	# sys.exit()
 
 print("[" + time.strftime("%H:%M:%S")+ "] vEPC Termination complete ...")
 
@@ -64,11 +64,13 @@ while True:
 	    break
 	else:
 	    print("Illegal input")
-
-print("[" + time.strftime("%H:%M:%S")+ "] Deleting Aggregates : ")
-del_agg(nova)
-print("[" + time.strftime("%H:%M:%S")+ "] Successful ... ")
-
+if chk == 'yes':
+	print("[" + time.strftime("%H:%M:%S")+ "] Deleting Aggregates : ")
+	del_agg(nova)
+	print("[" + time.strftime("%H:%M:%S")+ "] Successful ... ")
+#------clearing IP files-----#
+clear_IP_files()
+#-----------------------------#
 while True:
 	chk = raw_input("[" + time.strftime("%H:%M:%S")+ "] Do you want to delete Images of VCM and EMS ? <yes/no> ")
 	if chk == 'no':

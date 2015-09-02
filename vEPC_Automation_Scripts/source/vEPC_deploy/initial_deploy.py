@@ -52,6 +52,12 @@ nova = nvclient.Client(**creds)
 # Get authorized instance of neutron client
 neutron = ntrnclient.Client(**credsks)
 
+create_IP_file('s1', configurations)
+create_IP_file('sgi', configurations)
+
+write_cfg_file('Dell-VCM.cfg', configurations)
+
+
 #-----VCM and EMS image------#
 keystone = ksClient.Client(**credsks)
 glance_endpoint = keystone.service_catalog.url_for(service_type='image', endpoint_type='publicURL')
@@ -83,15 +89,19 @@ try:
 except:
 	pass #print("SSH rule already exists")
 
-#terminate instances if already exist
+#check if instances already exist
 for i in range(0, 7):
 	instance_name = configurations['vcm-cfg']['name-prefix']+name_list[i]+"-1"
-	clear_instance(instance_name, nova, configurations['auto-del'])
+	if is_server_exists(instance_name, nova):
+		print("[" + time.strftime("%H:%M:%S")+ "] vEPC components exist. Please run vEPC Termination script first and then re-try...")
+		sys.exit()
 
-#terminate instances 2 if already exist
+#check if instances 2 already exist
 for i in range(0, 7):
 	instance_name = configurations['vcm-cfg']['name-prefix']+name_list[i]+"-2"
-	clear_instance(instance_name, nova, configurations['auto-del'])
+	if is_server_exists(instance_name, nova):
+		print("[" + time.strftime("%H:%M:%S")+ "] vEPC components exist. Please run vEPC Termination script first and then re-try...")
+		sys.exit()
 
 #----------------creating host aggregates--------------
 create_agg(nova)
@@ -104,12 +114,12 @@ print("[" + time.strftime("%H:%M:%S")+ "] Starting vEPC deployment ...")
 create_network(network_name = configurations['networks']['s1-name'], neutron=neutron, configurations=configurations)
 create_network(network_name = configurations['networks']['sgi-name'], neutron=neutron, configurations=configurations)
 '''
-ports_file_write('s1_u', 's1_u.txt', configurations['networks']['s1-cidr'], neutron)
-ports_file_write('s1_u2', 's1_u2.txt', configurations['networks']['s1-cidr'], neutron)
-ports_file_write('s1_mme', 's1_mme.txt', configurations['networks']['s1-cidr'], neutron)
-ports_file_write('s1_mme2', 's1_mme2.txt', configurations['networks']['s1-cidr'], neutron)
-ports_file_write('sgi', 'sgi.txt', configurations['networks']['sgi-cidr'], neutron)
-ports_file_write('sgi2', 'sgi2.txt', configurations['networks']['sgi-cidr'], neutron)
+#ports_file_write('s1_u', 's1_u.txt', configurations['networks']['s1-cidr'], neutron)
+#ports_file_write('s1_u2', 's1_u2.txt', configurations['networks']['s1-cidr'], neutron)
+#ports_file_write('s1_mme', 's1_mme.txt', configurations['networks']['s1-cidr'], neutron)
+#ports_file_write('s1_mme2', 's1_mme2.txt', configurations['networks']['s1-cidr'], neutron)
+#ports_file_write('sgi', 'sgi.txt', configurations['networks']['sgi-cidr'], neutron)
+#ports_file_write('sgi2', 'sgi2.txt', configurations['networks']['sgi-cidr'], neutron)
 '''
 
 os.system("chmod +x source/vEPC_deploy/at/cloud-config/*")
@@ -175,10 +185,12 @@ for i in range(0, 7):
 	ssh.close()
 
 #--------------------------------#
+(s1_mme1, s1_u1) = get_assigned_IP_from_file('s1')
+sgi1 = get_assigned_IP_from_file('sgi')
 # Update ports to allow addresses < portsS1 => 0 == s1_mme(1.4)[1.20], 1 == s1_u(1.5)[1.21] >
-update_neutron_port(neutron, get_port_id('s1_u', neutron), configurations['allowed-ip-s1u'], 'S1-u')
-update_neutron_port(neutron, get_port_id('s1_mme', neutron), configurations['allowed-ip-s1mme'], 'S1-mme')
-update_neutron_port(neutron, get_port_id('sgi', neutron), configurations['allowed-ip-sgi'], 'SGi')
+update_neutron_port(neutron, get_port_id('s1_u', neutron), s1_u1, 'S1-u')
+update_neutron_port(neutron, get_port_id('s1_mme', neutron), s1_mme1, 'S1-mme')
+update_neutron_port(neutron, get_port_id('sgi', neutron), sgi1, 'SGi')
 
 # start VCM services on VEM and SDB
 vcm_start(ssh, instance_list[0].ip, instance_list[0].name)
@@ -281,6 +293,7 @@ for i in range(0, 7):
 	print("[" + time.strftime("%H:%M:%S")+ "] \t Running deploy_script..." )
 	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("./deploy_script --vnfc "+name_list[i]+" --instance_id 2 --internal_if eth0")
 	ssh_stdout.readlines()
+	'''
 	if i == 0 or i == 6 or i == 4:
 		print("[" + time.strftime("%H:%M:%S")+ "] \t Copying config file...")
 		sftp = ssh.open_sftp()
@@ -301,21 +314,23 @@ for i in range(0, 7):
 		elif i == 6:
 			sftp.put(LOCAL_PATH_MME_CFG, REMOTE_PATH_MME_CFG)
 		sftp.close()
+	'''
 	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('./validate_deploy.sh')
 	ssh_stdout.readlines()
 	ssh.close()
 #---------------------#
-
+(s1_mme1, s1_u1) = get_assigned_IP_from_file('s1')
+sgi1 = get_assigned_IP_from_file('sgi')
 # Update ports to allow addresses configurations['allowed-ip2']
-update_neutron_port(neutron, get_port_id('s1_u2', neutron), configurations['allowed-ip-s1u'], 'S1-u2')
-update_neutron_port(neutron, get_port_id('s1_mme2', neutron), configurations['allowed-ip-s1mme'], 'S1-mme2')
-update_neutron_port(neutron, get_port_id('sgi2', neutron), configurations['allowed-ip-sgi'], 'SGi2')
+update_neutron_port(neutron, get_port_id('s1_u2', neutron), s1_u1, 'S1-u2')
+update_neutron_port(neutron, get_port_id('s1_mme2', neutron), s1_mme1, 'S1-mme2')
+update_neutron_port(neutron, get_port_id('sgi2', neutron), sgi1, 'SGi2')
 #------------------------------#
 
 # start VCM services on VEM and SDB
 vcm_start(ssh, instance_list2[0].ip, instance_list2[0].name)
 vcm_start(ssh, instance_list2[1].ip, instance_list2[1].name)
-
+'''
 #------------configuring vcm-vem-2--------------------#
 print("[" + time.strftime("%H:%M:%S")+ "] Configuring VCM-VEM-2...")
 time.sleep(30)
@@ -340,6 +355,7 @@ while(True):
 # Source the configuration file Dell-VCM.cfg for VEM-2
 source_config(ssh)
 #-----------------------#
+'''
 
 # Start VCM services on rest of components
 for i in range(2, 7):
@@ -347,6 +363,7 @@ for i in range(2, 7):
 
 # Run LTE provisioning script on VCM-2
 ssh.connect(instance_list2[4].ip, username='root', password='root123')
+'''
 sftp_client = ssh.open_sftp()
 remote_file = sftp_client.open("/opt/VCM/etc/scripts/runLteProv.sh", 'r')
 
@@ -377,10 +394,14 @@ while True:
 		# Must be stdout
 		print channel.recv(1024)
 channel.close()
+'''
 ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("service opensafd restart")
 print(ssh_stdout.readlines())
 ssh.close()
 #---------------------------------------VCM-2 deploy end------------------------------------------#
+#------------------------------------------------------------------------------------------------#
+
+#-----------------------------EMS Deploy-----------------------------#
 if not (is_server_exists('EMS', nova)):
 	if configurations['deploy-ems'] == 'yes':
 		# Deploy EMS so that it's ready by the time vEPC is setup
@@ -415,3 +436,8 @@ server = nova.servers.find(name="EMS").addresses
 ems_ip = server[net_name][1]['addr']
 
 print("[" + time.strftime("%H:%M:%S")+ "] EMS GUI can be started from the browser with url http://"+ems_ip+":8980/vcmems/")
+#------------------EMS deploy end-------------------------#
+
+
+
+

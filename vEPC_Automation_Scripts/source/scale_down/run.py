@@ -43,7 +43,7 @@ if k_val >= 3:
 	print("[" + time.strftime("%H:%M:%S")+ "] Starting scale-down ...")
 	for j in range (0, 3):
 		instance_name = configurations['vcm-cfg']['name-prefix']+name_list[j]+"-" + str(k_val)
-		clear_instance(instance_name, nova, configurations['auto-del'])
+		clear_instance(instance_name, nova, configurations, neutron)
 	clear_network_ports(k_val, neutron, configurations)
 	print("[" + time.strftime("%H:%M:%S")+ "] Scale-down Complete ... Now exiting ...")	
 	input_configurations(k_val)

@@ -177,18 +177,7 @@ def hostname_config(ssh, cmp_name, ip, vm_name, file_name, REMOTE_PATH_HOSTNAME)
 	print( "[" + time.strftime("%H:%M:%S")+ "] \t Copying host-name file..." )
 	sftp = ssh.open_sftp()
 	sftp.put("source/vEPC_deploy/hostnames/host_"+file_name, REMOTE_PATH_HOSTNAME)
-	'''
-	if 'DPE-1' in vm_name:
-		sftp.put("source/vEPC_deploy/hostnames/ifcfg-s1_u.txt", "/etc/sysconfig/network-scripts/ifcfg-eth1")
-		sftp.put("source/vEPC_deploy/hostnames/ifcfg-sgi.txt", "/etc/sysconfig/network-scripts/ifcfg-eth2")
-	elif 'DPE-2' in vm_name:
-		sftp.put("source/vEPC_deploy/hostnames/ifcfg-s1_u2.txt", "/etc/sysconfig/network-scripts/ifcfg-eth1")
-		sftp.put("source/vEPC_deploy/hostnames/ifcfg-sgi2.txt", "/etc/sysconfig/network-scripts/ifcfg-eth2")
-	elif 'RIF-1' in vm_name:
-		sftp.put("source/vEPC_deploy/hostnames/ifcfg-s1_mme.txt", "/etc/sysconfig/network-scripts/ifcfg-eth1")
-	elif 'RIF-2' in vm_name:
-		sftp.put("source/vEPC_deploy/hostnames/ifcfg-s1_mme2.txt", "/etc/sysconfig/network-scripts/ifcfg-eth1")
-	'''
+	
 	if(vm_name == 'EMS'):
 		sftp.put("source/vEPC_deploy/hostnames/ems.txt", "/etc/hosts")
 		print("[" + time.strftime("%H:%M:%S")+ "] Rebooting EMS to allow host-name changes to take effect")
@@ -273,6 +262,14 @@ def create_network(network_name, neutron, configurations):
 		elif inp == 'no':
 			print "[" + time.strftime("%H:%M:%S")+ "] Please delete the network " +network_name+' and re-run the script'
 			sys.exit()
+	start_pool=''
+	end_pool=''
+	if(network_name == configurations['networks']['sgi-name']):
+		start_pool = configurations['networks']['sgi_pool_start']
+		end_pool = configurations['networks']['sgi_pool_end']
+	elif (network_name == configurations['networks']['s1-name']):
+		start_pool = configurations['networks']['s1_pool_start']
+		end_pool = configurations['networks']['s1_pool_end']
 		
 	cidr = get_network_cidr(network_name, configurations)
 	# try:
@@ -285,13 +282,13 @@ def create_network(network_name, neutron, configurations):
 	print("[" + time.strftime("%H:%M:%S")+ "] Network %s created for %s" % (network_id, network_name))
 	
 	body_create_subnet = {'subnets': [{'name':network_name,'cidr': cidr,
-						'ip_version': 4, 'network_id': network_id, 'enable_dhcp':'True', 'gateway_ip': None}]}
+						'ip_version': 4, 'network_id': network_id, 'enable_dhcp':'True', 'gateway_ip': None,
+						"allocation_pools": [ {
+								"start": start_pool,
+								"end": end_pool }]}]}
  
 	subnet = neutron.create_subnet(body=body_create_subnet)
 	print("[" + time.strftime("%H:%M:%S")+ "] Created subnet %s" % cidr)
-	
-	#body_create_subnet = {'subnets': [{'name':network_name, 'cidr': cidr, 'gateway_ip':None}]}
-	#gw_disable = neutron.update_subnet(body=body_create_subnet)
 	
 	ports = []
 	if(network_name == configurations['networks']['s1-name']):
@@ -415,6 +412,18 @@ def input_configurations():
 	inp = file_read.readline()
 	inp = inp.split("\"")
 	configurations['os-creds']['os-authurl'] = inp[1]
+	
+	inp = file_read.readline()
+	inp = inp.split("\"")
+	configurations['os-creds']['os-user-name'] = inp[1]
+	
+	inp = file_read.readline()
+	inp = inp.split("\"")
+	configurations['os-creds']['os-tenant-name'] = inp[1]
+	
+	inp = file_read.readline()
+	inp = inp.split("\"")
+	configurations['os-creds']['os-pass'] = inp[1]
 
 	inp = file_read.readline()
 	inp = inp.split("\"")
@@ -434,62 +443,27 @@ def input_configurations():
 	
 	inp = file_read.readline()
 	inp = inp.split("\"")
+	configurations['networks']['s1_pool_start'] = inp[1]
+	configurations['networks']['s1_pool_end'] = inp[3]
+	
+	inp = file_read.readline()
+	inp = inp.split("\"")
+	configurations['networks']['sgi_pool_start'] = inp[1]
+	configurations['networks']['sgi_pool_end'] = inp[3]
 
-	vcm_cfg_file_read = open('Dell-VCM.cfg', 'r').readlines()
-	vcm_cfg_file_write = open('Dell-VCM.cfg', 'w')
-
-	for line in vcm_cfg_file_read:
-		if line.startswith("range"):
-			new_line = "range " + inp[1] + '\n'
-			vcm_cfg_file_write.write(new_line)
-			inp = file_read.readline()
-			inp = inp.split("\"")
-			
-		elif line.startswith("nexthop address"):
-			new_line = "nexthop address " + inp[1] + '\n'
-			vcm_cfg_file_write.write(new_line)
-			inp = file_read.readline()
-			inp = inp.split("\"")
-		
-		elif line.startswith("bind s1-mme"):
-			new_line = "bind s1-mme ipv4-address " + inp[1] + " interface eth1\n"
-			vcm_cfg_file_write.write(new_line)
-			new_line = inp[1].split(" ")
-			configurations['allowed-ip-s1mme'] = new_line[0]
-			inp = file_read.readline()
-			inp = inp.split("\"")
-		
-		elif line.startswith("gtpu bind s1u-sgw"):
-			new_line = "gtpu bind s1u-sgw " + inp[1] + " interface eth1\n"
-			vcm_cfg_file_write.write(new_line)
-			new_line = inp[1].split(" ")
-			configurations['allowed-ip-s1u'] = new_line[0]
-			inp = file_read.readline()
-			inp = inp.split("\"")
-		elif line.startswith("sgi-endpoint bind"):
-			new_line = "sgi-endpoint bind " + inp[1] + " interface eth2\n"
-			vcm_cfg_file_write.write(new_line)
-			new_line = inp[1].split(" ")
-			configurations['allowed-ip-sgi'] = new_line[0]
-			inp = file_read.readline()
-			inp = inp.split("\"")
-		
-		elif line.startswith("ethernet port 2"):
-			new_line = "ethernet port 2 address " + inp[1] +'\n'
-			vcm_cfg_file_write.write(new_line)
-			inp = file_read.readline()
-			inp = inp.split("\"")
-		else:
-			vcm_cfg_file_write.write(line)
+	#vcm_cfg_file_read = open('range_nexthop.txt', 'r').readlines()
+	param_file_write = open('source/vEPC_deploy/ip_files/range_nexthop.txt', 'w')
+	
+	inp = file_read.readline()
+	param_file_write.write(inp)
+	
+	inp = file_read.readline()
+	param_file_write.write(inp)
+	
 	json_file.close()
 	with open('configurations.json', 'w') as outfile:
 		json.dump(configurations, outfile)
-	vcm_cfg_file_write.close()
-	'''
-	inp = file_read.readline()
-	inp = inp.split("\"")
-	configurations['max_scale_out_val'] = inp[1]
-	'''
+	param_file_write.close()
 	
 	file_read.close()
 #--------------------------------------------------------#
@@ -631,5 +605,178 @@ def create_image(glance, img_name):
 	image = glance.images.upload(image.id, open(IMAGE_PATH, 'rb'))
 	#print ('Successfully added image')
 #--------------------------------------------------------#
+#--------------find available IPs-----#
+
+def get_available_IP(net_addr, mask, pool):
+	
+	list_ips = ''
+	net_addr = net_addr.split(".")
+	netw_addr = net_addr[0] + '.' + net_addr[1] + '.' + net_addr[2] + '.'
+	rng = 255 - mask
+	max_ip = 255 - mask - pool
+	pool = pool + 1
+	for i in range (pool, rng):
+		ip = netw_addr + str(i)
+		list_ips = list_ips + ip + '\n'
+	
+	return list_ips	
+
+#-----------------------------------------#
+
+#--------create availaible IPs file-------#
+def create_IP_file(netname, configurations):
+	
+	net_cidr = ''
+	if netname == 's1':
+		net_cidr = configurations['networks']['s1-cidr']
+	elif netname == 'sgi':
+		net_cidr = configurations['networks']['sgi-cidr']
+	
+	net_addr = calculate_subnet_address('network_add', net_cidr)
+	subnet_mask = calculate_subnet_address('mask', net_cidr)
+	subnet_mask = subnet_mask.split('.')
+	pool = ''
+	
+	filename = 'source/vEPC_deploy/ip_files/'
+	if 's1' in netname:
+		filename = filename + 's1_available_ips.txt'
+		s1_e = configurations['networks']['s1_pool_end'].split('.')
+		pool =  int(s1_e[3])
+	elif 'sgi' in netname:
+		filename = filename + 'sgi_available_ips.txt'
+		sgi_e = configurations['networks']['sgi_pool_end'].split('.')
+		pool =  int(sgi_e[3])# - int(sgi_s[3])
+		
+	ip_list = get_available_IP(net_addr, int(subnet_mask[3]), pool)
+	
+	target = open(filename, 'w')
+	#target.truncate()
+	target.write(ip_list)
+	target.close()
+#-----------------------------------#
+#------- getting available IP for DELL VCM config file-----#
+def get_IP_from_file(f_name):
+	
+	filename = ''
+	
+	if (f_name == 's1'):
+		filename = 'source/vEPC_deploy/ip_files/s1_available_ips.txt'
+	elif (f_name == 'sgi'):
+		filename = 'source/vEPC_deploy/ip_files/sgi_available_ips.txt'
+
+	file_read = open(filename, 'r')
+	assigned_ip = file_read.readline()
+	
+	str1 = file_read.read()
+	file_read.close()
+	list_str = str1.split("\n")
+	
+	file_write = open(filename, 'w')
+
+	for i in range (0 , len(list_str)):
+		#new_line = file_read.readline()
+		new_line = list_str[i] + '\n'
+		file_write.write(new_line)
+	
+	file_read.close()
+	file_write.close()
+	
+	return assigned_ip
+#--------------------------------#
+#-------------------writing IP of VCM config to separate file---------#
+def write_cfg_file(cfg_file_name, configurations):
+	ip_filename = ''
+	sgi_ip = ''
+	
+	s1_ip_filename = 'source/vEPC_deploy/ip_files/s1_assigned_ips.txt'
+	sgi_ip_filename = 'source/vEPC_deploy/ip_files/sgi_assigned_ips.txt'
+	
+	s1_ip_file = open(s1_ip_filename, 'a')
+	sgi_ip_file = open(sgi_ip_filename, 'a')
+		
+	param_file_read = open('source/vEPC_deploy/ip_files/range_nexthop.txt', 'r')
+	
+	inp = param_file_read.readline()
+	inp = inp.split("\"")
+	
+	vcm_cfg_file_read = open(cfg_file_name, 'r').readlines()
+	vcm_cfg_file_write = open(cfg_file_name, 'w')
+	
+	for line in vcm_cfg_file_read:
+		if line.startswith("range"):
+			new_line = "range " + inp[1] + '\n'
+			vcm_cfg_file_write.write(new_line)
+			
+		elif line.startswith("nexthop address"):
+			inp = param_file_read.readline()
+			inp = inp.split("\"")
+			new_line = "nexthop address " + inp[1] + '\n'
+			vcm_cfg_file_write.write(new_line)
+		
+		elif line.startswith("bind s1-mme"):
+			s1_cidr = str(configurations['networks']['s1-cidr'])
+			s1_cidr = s1_cidr.split("/")
+			assigned_ip = get_IP_from_file('s1')
+			assigned_ip = assigned_ip.replace('\n', '')
+			new_line = "bind s1-mme ipv4-address " + assigned_ip + " mask " + s1_cidr[1] + " interface eth1\n"
+			vcm_cfg_file_write.write(new_line)
+			s1_ip_file.write(new_line)
+		
+		elif line.startswith("gtpu bind s1u-sgw"):
+			assigned_ip = get_IP_from_file('s1')
+			assigned_ip = assigned_ip.replace('\n', '')
+			new_line = "gtpu bind s1u-sgw " + assigned_ip + " mask " + s1_cidr[1] + " interface eth1\n"
+			vcm_cfg_file_write.write(new_line)
+			s1_ip_file.write(new_line)
+		
+		elif line.startswith("sgi-endpoint bind"):
+			sgi_cidr = str(configurations['networks']['sgi-cidr'])
+			sgi_cidr = sgi_cidr.split("/")
+			sgi_ip = get_IP_from_file('sgi')
+			sgi_ip = sgi_ip.replace('\n', '')
+			new_line = "sgi-endpoint bind " + sgi_ip + " mask " + sgi_cidr[1] + " interface eth2\n"
+			vcm_cfg_file_write.write(new_line)
+			sgi_ip_file.write(new_line)
+		
+		elif line.startswith("ethernet port 2"):
+			new_line = "ethernet port 2 address " + sgi_ip +  " mask " + sgi_cidr[1] + '\n'
+			vcm_cfg_file_write.write(new_line)
+			sgi_ip_file.write(new_line)
+		else:
+			vcm_cfg_file_write.write(line)
+	
+	vcm_cfg_file_write.close()
+	
+	s1_ip_file.close()
+	sgi_ip_file.close()
+	
+	param_file_read.close()
+#----------------------------------------------------------------#
+#-------------get assigned IP from file to update port ------#
+def get_assigned_IP_from_file(f_name):
+	file_name = ''
+	
+	if f_name == 's1':
+		file_name = 'source/vEPC_deploy/ip_files/s1_assigned_ips.txt'
+	elif f_name == 'sgi':
+		file_name = 'source/vEPC_deploy/ip_files/sgi_assigned_ips.txt'
+	
+	file_read = open(file_name, 'r')
+	
+	if f_name == 's1':
+		s1_mme = file_read.readline()
+		s1_mme = s1_mme.split(" ")
+		s1_u = file_read.readline()
+		s1_u = s1_u.split(" ")
+		
+		return (s1_mme[3], s1_u[3])
+	elif f_name == 'sgi':
+		sgi = file_read.readline()
+		sgi = sgi.split(" ")
+		
+		return sgi[2]
+	file_reade.close()
+#--------------------------------------------------#
+	
 	
 

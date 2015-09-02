@@ -1,0 +1,6 @@
+The script should run after successful execution of scale_up.py of vEPC scripts
+To execute the script, ssh into 10.204.110.42 and go the directory /root/vEPC_scripts and enter the following command:
+	$ python scale_down.py
+This script prompts the user if surely it needs to scale down the vEPC
+If user selects yes, script starts scaling down for unit value and terminates single instance of each SDB, CPE and DPE
+

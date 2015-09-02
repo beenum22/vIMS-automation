@@ -1,0 +1,2 @@
+sgi-endpoint bind 172.16.20.21 mask 26 interface eth2
+ethernet port 2 address 172.16.20.21 mask 26

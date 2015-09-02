@@ -71,7 +71,7 @@ def check_server(vm_name, nova, net_int_name, net_ext):
 			
 			return 'no_ip'
 		elif inp == "no":
-			print("[" + time.strftime("%H:%M:%S")+ "] "+vm_name+" not redeployed. Continuing with deployment...")
+			print("[" + time.strftime("%H:%M:%S")+ "] "+vm_name+" not re-deployed. Continuing with deployment...")
 			if(len(item.networks[net_int_name]) > 1):		# see if the server has a floating IP
 				return item.networks[net_int_name][1]
 			else:
@@ -199,7 +199,7 @@ def check_network(network_name, neutron, configurations):
 		#inp='yes'
 		#if(configurations['auto-del'] == 'no'):
 	if network_exists == 'net-not-found':
-	  print("[" + time.strftime("%H:%M:%S")+ "] Network " + network_name + ' must exist to continue ...')
+	  print("[" + time.strftime("%H:%M:%S")+ "] vEPC components are missing. Network S1 and SGi must exist to continue ...")
 	  print("[" + time.strftime("%H:%M:%S")+ "] Please run vEPC Initial Deployment script and then run scale-up")
 	  print("[" + time.strftime("%H:%M:%S")+ "] Aborting Deployment ...")
 	  sys.exit()

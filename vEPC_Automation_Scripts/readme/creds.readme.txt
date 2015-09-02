@@ -1,23 +1,16 @@
 This file needs to edited based on the parameters for successful execution of deployment scripts
 Parameters should entered in inverted commas. The order and format of parameters should not be changed
 
-1. Maximum value for scale out is to specify the number for which you want to scale out, it must be an integer value
-2. Authentication URL is of Openstack keystone authentication url (you can get by entering the command 'vi openrc' at control node in root folder)
-3. internal network name is of the name of the internal network in openstack
-4. external network name is of the name of the external network in openstack
-5. Subnet value for S1 network is the value of subnet to be used to assign IP t ports (s1_u, s1_mme, s1_u2, s1_mme2) within that range
-6. Subnet value for SGi network is the value of subnet to be used to assign IP to ports (sgi and sgi2) within that range
-7. IP address of s1_u port, should be from same subnet as of S1 network
-8. IP address of s1_mme port, should be from same subnet as of S1 network
-9. IP address of s1_u2 port, should be from same subnet as of S1 network
-10. IP address of s1_mme2 port, should be from same subnet as of S1 network
-11. IP address of sgi port, should be from same subnet as of SGi network
-12. IP address of sgi2 port, should be from same subnet as of SGi network
-13. Glance image name of VCM
-14. Glance image name of EMS
-15. Range of IP addresses to be allowed for IXIA traffic
-16. Nexthop address of VEM with MAC Address
-17. s1-mme IPv4 address
-18. Alias IP addresses to allow traffic on for S1_x ports with subnet mask 
-19. Alias IP addresses to allow traffic on for SGi ports with subnet mask
-20. Address of ethernet port 2
+Authentication URL is of Openstack keystone authentication url (you can get by entering the command 'vi openrc' at control node in root folder)
+Internal network name is of the name of the internal network in openstack
+External network name is of the name of the external network in openstack
+Subnet value for S1 network is the value of subnet to be used to assign IP to ports (s1_u, s1_mme, s1_u2, s1_mme2) within that range
+Subnet value for SGi network is the value of subnet to be used to assign IP to ports (sgi and sgi2) within that range
+Range of DHCP IP for S1 network
+Range of DHCP IP for SGi network
+Range of IP addresses to be allowed for IXIA traffic
+Nexthop address of VEM with MAC Address
+s1-mme IPv4 address
+Alias IP addresses to allow traffic on for S1_x ports with subnet mask 
+Alias IP addresses to allow traffic on for SGi ports with subnet mask
+Address of ethernet port 2
