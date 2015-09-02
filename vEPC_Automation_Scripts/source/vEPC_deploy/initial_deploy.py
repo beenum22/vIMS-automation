@@ -147,6 +147,9 @@ for i in range(0, 7):
 
 print("[" + time.strftime("%H:%M:%S")+ "] Instances deployment complete! Please wait for configurations..")
 time.sleep(30)
+#-------update vcm-mme-start file-----#
+mme_file_edit(configurations)
+#-------------------------------------#
 # start running scripts on VCM-1
 for i in range(0, 7):
 	print("[" + time.strftime("%H:%M:%S")+ "] Configuring " + instance_list[i].name)

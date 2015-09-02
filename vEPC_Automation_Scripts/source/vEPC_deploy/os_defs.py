@@ -777,6 +777,26 @@ def get_assigned_IP_from_file(f_name):
 		return sgi[2]
 	file_reade.close()
 #--------------------------------------------------#
+#------------ vcm mme start edit based on mme ip------#
+def mme_file_edit(configurations):
 	
+	file_name = 'source/vEPC_deploy/vcm-mme-start'
+	file_str = open(file_name, 'r').readlines()
+	file_write = open(file_name, 'w')
+	
+	s1_cidr = configurations['si-cidr']
+	s1_cidr = s1_cidr.split("/")
+	
+	mme_ip = get_port_ip("mme", neutron)
+	
+	for line in file_str:
+		if line.startswith("ifconfig eth1:1"):
+			new_line = "ifconfig eth1:1 " + mme_ip + "/" + s1_cidr[1] + " -arp\n"
+			file_write.write(new_line)
+		else:
+			file_write.write(line)
+	
+	file_write.close()
+#-------------------------------------------------------#
 	
 
