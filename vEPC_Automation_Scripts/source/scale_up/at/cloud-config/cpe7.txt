@@ -1,0 +1,4 @@
+#cloud-config
+manage_etc_hosts: True
+hostname: CPE-7
+fqdn: CPE-7.private.xyz

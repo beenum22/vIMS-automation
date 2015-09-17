@@ -1,2 +1,0 @@
-range_of_ixia_pool_vcm = "192.168.105.10 192.168.105.40"
-nexthop address = "172.17.2.30 00:AC:11:02:1E:00"

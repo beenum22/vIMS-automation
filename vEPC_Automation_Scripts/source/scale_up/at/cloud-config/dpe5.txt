@@ -2,15 +2,3 @@
 manage_etc_hosts: True
 hostname: DPE-5
 fqdn: DPE-5.private.xyz
-#cloud-config
-manage_etc_hosts: True
-hostname: DPE-5
-fqdn: DPE-5.private.xyz
-#cloud-config
-manage_etc_hosts: True
-hostname: DPE-5
-fqdn: DPE-5.private.xyz
-#cloud-config
-manage_etc_hosts: True
-hostname: DPE-5
-fqdn: DPE-5.private.xyz

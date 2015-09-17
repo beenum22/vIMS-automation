@@ -1,5 +1,5 @@
 This script should be executed after initial deployment of vEPC has been done
-If this script is executed before initial deployment of vEPC, it will exit with a message saying that initial deployment script should be executed first
-To execute the script, ssh into 10.204.110.40 and go the directory /root/vEPC_scripts and enter the following command:
+If this script is executed before initial deployment of vEPC, it will exit with a message saying that initial deployment script needs to be executed first
+To execute the script, go into the vEPC directory in control node where you have copied the scripts and enter the following command:
 	$ python scale_up.py
 Scale-up works on the basis of unit value i.e. it will deploy single instance of SDB, CPE and DPE each time it runs

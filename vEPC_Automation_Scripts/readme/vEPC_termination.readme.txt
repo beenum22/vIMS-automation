@@ -1,7 +1,6 @@
 This script should be executed after successful execution of scale_down.py of vEPC scripts
-To execute the script, ssh into 10.204.110.40 and go the directory /root/vEPC_scripts and enter the following command:
+To execute the script, go into the vEPC directory in control node where you have copied the scripts and enter the following command:
 	$ python vEPC_termination.py
-First the script checks if VCM and EMS images exist and if not creates both the images
 This script terminates the initial deployment of vEPC including networks created for it
 After completely terminate the vEPC, it prompts the user if it wants to delete EMS and based on the input (yes/no) performs the required action
 Then it prompts the user if it wants to delete aggregate groups too and based on the input (yes/no) performs the required action

@@ -1,7 +1,8 @@
 This script should be executed for initial deployment of vEPC i.e. before executing all other scripts.
-To execute the script, ssh into 10.204.110.42 and go the directory /root/vEPC_scripts and enter the following command:
+To execute the script, go into the vEPC directory in control node where you have copied the scripts and enter the following command:
 	$ python vEPC_deploy.py
-If vEPC is been deployed previously this script will start terminating the previous deployment and in the end delete the networks S1 and SGi
-After successful termination of vEPC, the script creates two new networks S1 and SGi
-Availability zones will be created on the basis of host-names of compute nodes and those zones will be added to host aggregate groups
+First the script checks if VCM and EMS images exist and if not creates both the images
+When the script runs, it checks if vEPC is been deployed previously it will prompt the user to run vEPC_termination.py and exits.
+Then it creates availability zones on the basis of host-names of compute nodes and those zones will be added to host aggregate groups
+After that it creates the networks S1 and SGi
 Now script will start deploying VCM-1 components on Compute 1 and VCM-2 components on Compute 2

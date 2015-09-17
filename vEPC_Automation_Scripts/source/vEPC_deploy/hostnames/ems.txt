@@ -1,4 +1,4 @@
-192.168.111.96		EMS
-10.204.110.77		EMS
+192.168.111.8		EMS
+10.204.110.69		EMS
 #127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
