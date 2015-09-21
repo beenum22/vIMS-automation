@@ -1,0 +1,31 @@
+package com.xflowresearch.nfv.s1ap;
+
+public class S1APDefinitions {
+
+	public enum procedureCode
+	{
+		HandoverPreparation ("00");
+
+		procedureCode: id-HandoverResourceAllocation (1)
+		procedureCode: id-HandoverNotification (2)
+		procedureCode: id-PathSwitchRequest (3)
+		procedureCode: id-HandoverCancel (4)
+		procedureCode: id-E-RABSetup (5)
+		procedureCode: id-E-RABModify (6)
+		procedureCode: id-E-RABRelease (7)
+		procedureCode: id-E-RABReleaseIndication (8)
+		procedureCode: id-InitialContextSetup (9)
+		procedureCode: id-Paging (10)
+		procedureCode: id-downlinkNASTransport (11)
+		procedureCode: id-initialUEMessage (12)
+		
+
+		private String hexValue;
+
+		private procedureCode(final String hexValue) {
+			this.hexValue = hexValue;
+		}
+
+	}
+
+}

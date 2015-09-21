@@ -1,0 +1,151 @@
+package com.xflowresearch.nfv.s1ap;
+
+public class S1APDefinitions {
+
+	public enum Type{
+		InitiatingMessage("00"),
+		SuccessfulOutcome ("20"),
+		UnsuccessfulOutcome ("40");
+		
+		private String hexValue;
+		private Type(final String hexValue) {
+			this.hexValue = hexValue;
+		}
+		public String getHexCode(){
+			return hexValue;
+		}
+	}
+	
+	
+	
+	
+	
+	
+	public enum ProcedureCode_dict
+	{
+		ProcedureCode_dict(){
+			
+		}
+		
+	     "id-HandoverPreparation",
+	     1 : "id-HandoverResourceAllocation",
+	     2 : "id-HandoverNotification",
+	     3 : "id-PathSwitchRequest",
+	     4 : "id-HandoverCancel",
+	     5 : "id-E-RABSetup",
+	     6 : "id-E-RABModify",
+	     7 : "id-E-RABRelease",
+	     8 : "id-E-RABReleaseIndication",
+	     9 : "id-InitialContextSetup",
+	    10 : "id-Paging",
+	    11 : "id-downlinkNASTransport",
+	    12 : "id-initialUEMessage",
+	    13 : "id-uplinkNASTransport",
+	    14 : "id-Reset",
+	    15 : "id-ErrorIndication",
+	    16 : "id-NASNonDeliveryIndication",
+	    17 : "id-S1Setup",
+	    18 : "id-UEContextReleaseRequest",
+	    19 : "id-DownlinkS1cdma2000tunneling",
+	    20 : "id-UplinkS1cdma2000tunneling",
+	    21 : "id-UEContextModification",
+	    22 : "id-UECapabilityInfoIndication",
+	    23 : "id-UEContextRelease",
+	    24 : "id-eNBStatusTransfer",
+	    25 : "id-MMEStatusTransfer",
+	    26 : "id-DeactivateTrace",
+	    27 : "id-TraceStart",
+	    28 : "id-TraceFailureIndication",
+	    29 : "id-ENBConfigurationUpdate",
+	    30 : "id-MMEConfigurationUpdate",
+	    31 : "id-LocationReportingControl",
+	    32 : "id-LocationReportingFailureIndication",
+	    33 : "id-LocationReport",
+	    34 : "id-OverloadStart",
+	    35 : "id-OverloadStop",
+	    36 : "id-WriteReplaceWarning",
+	    37 : "id-eNBDirectInformationTransfer",
+	    38 : "id-MMEDirectInformationTransfer",
+	    39 : "id-PrivateMessage",
+	    40 : "id-eNBConfigurationTransfer",
+	    41 : "id-MMEConfigurationTransfer",
+	    42 : "id-CellTrafficTrace",
+	    43 : "id-Kill",
+	    44 : "id-downlinkUEAssociatedLPPaTransport",
+	    45 : "id-uplinkUEAssociatedLPPaTransport",
+	    46 : "id-downlinkNonUEAssociatedLPPaTransport",
+	    47 : "id-uplinkNonUEAssociatedLPPaTransport",
+	    48 : "id-UERadioCapabilityMatch",
+	    
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+
+	public enum ProcedureCode
+	{
+		HandoverPreparation ("00"),
+		HandoverResourceAllocation ("01"),
+		HandoverNotification ("02"),
+		PathSwitchRequest ("03"),
+		HandoverCancel ("04"),
+		ERABSetup ("05"),
+		ERABModify ("06"),
+		ERABRelease ("07"),
+		ERABReleaseIndication ("08"),
+		InitialContextSetup ("09"),
+		Paging ("0A"),
+		downlinkNASTransport ("0B"),
+		initialUEMessage ("0C"),
+		uplinkNASTransport ("0D"),
+		Reset ("0E"),
+		ErrorIndication ("0F"),
+		NASNonDeliveryIndication ("10"),
+		S1Setup ("11"),
+		UEContextReleaseRequest ("12"),
+		DownlinkS1cdma2000tunneling ("13"),
+		UplinkS1cdma2000tunneling ("14"),
+		UEContextModification ("15"),
+		UECapabilityInfoIndication ("16"),
+		UEContextRelease ("17"),
+		eNBStatusTransfer ("18"),
+		MMEStatusTransfer ("19"),
+		DeactivateTrace ("1A"),
+		TraceStart ("1B"),
+		TraceFailureIndication ("1C"),
+		ENBConfigurationUpdate ("1D"),
+		MMEConfigurationUpdate ("1E"),
+		LocationReportingControl ("1F"),
+		LocationReportingFailureIndication ("20"),
+		LocationReport ("21"),
+		OverloadStart ("22"),
+		OverloadStop ("23"),
+		WriteReplaceWarning ("24"),
+		eNBDirectInformationTransfer ("25"),
+		MMEDirectInformationTransfer ("26"),
+		PrivateMessage ("27"),
+		eNBConfigurationTransfer ("28"),
+		MMEConfigurationTransfer ("29"),
+		CellTrafficTrace ("2A"),
+		Kill ("2B"),
+		downlinkUEAssociatedLPPaTransport ("2C"),
+		uplinkUEAssociatedLPPaTransport ("2D"),
+		downlinkNonUEAssociatedLPPaTransport("2E"),
+		uplinkNonUEAssociatedLPPaTransport("2F");
+
+		private String hexValue;
+		private ProcedureCode(final String hexValue) {
+			this.hexValue = hexValue;
+		}
+		public String getHexCode(){
+			return hexValue;
+		}
+
+	}
+
+}

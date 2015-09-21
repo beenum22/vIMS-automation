@@ -1,0 +1,11 @@
+package com.xflowresearch.nfv.sctpclient;
+
+public class S1AP {
+	
+	public byte[] generateNewPacket(){
+		
+		
+		return null;
+	}
+
+}

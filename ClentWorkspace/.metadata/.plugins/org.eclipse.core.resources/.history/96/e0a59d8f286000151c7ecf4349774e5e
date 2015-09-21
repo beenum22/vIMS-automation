@@ -1,0 +1,18 @@
+package com.xflowresearch.nfv.s1ap;
+
+public class S1APDefinitions {
+	
+	public enum procedureCode
+	{
+		HandoverPreparation ("00");
+		
+	
+		private String hexValue;
+		
+		 private procedureCode(final String hexValue) {
+		        this.hexValue = hexValue;
+		    }
+		 
+	}
+
+}

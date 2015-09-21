@@ -1,0 +1,9 @@
+package com.xflowresearch.nfv.s1ap;
+
+public class S1APDefinitions {
+	
+	enum header{
+		
+	}
+
+}

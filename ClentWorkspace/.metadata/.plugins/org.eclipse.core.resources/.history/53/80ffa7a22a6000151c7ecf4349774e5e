@@ -1,0 +1,67 @@
+package com.xflowresearch.nfv.s1ap;
+
+public class S1APDefinitions {
+
+	public enum procedureCode
+	{
+		HandoverPreparation ("00"),
+		HandoverResourceAllocation ("1"),
+		HandoverNotification ("2"),
+		PathSwitchRequest (3)
+		HandoverCancel (4)
+		E-RABSetup (5)
+		E-RABModify (6)
+		E-RABRelease (7)
+		E-RABReleaseIndication (8)
+		InitialContextSetup (9)
+		Paging (10)
+		downlinkNASTransport (11)
+		initialUEMessage (12)
+		uplinkNASTransport (13)
+		Reset (14)
+		ErrorIndication (15)
+		NASNonDeliveryIndication (16)
+		S1Setup (17)
+		UEContextReleaseRequest (18)
+		DownlinkS1cdma2000tunneling (19)
+		UplinkS1cdma2000tunneling (20)
+		UEContextModification (21)
+		UECapabilityInfoIndication (22)
+		UEContextRelease (23)
+		eNBStatusTransfer (24)
+		MMEStatusTransfer (25)
+		DeactivateTrace (26)
+		TraceStart (27)
+		TraceFailureIndication (28)
+		ENBConfigurationUpdate (29)
+		MMEConfigurationUpdate (30)
+		LocationReportingControl (31)
+		LocationReportingFailureIndication (32)
+		LocationReport (33)
+		OverloadStart (34)
+		OverloadStop (35)
+		WriteReplaceWarning (36)
+		eNBDirectInformationTransfer (37)
+		MMEDirectInformationTransfer (38)
+		PrivateMessage (39)
+		eNBConfigurationTransfer (40)
+		MMEConfigurationTransfer (41)
+		CellTrafficTrace (42)
+		Kill (43)
+		downlinkUEAssociatedLPPaTransport (44)
+		uplinkUEAssociatedLPPaTransport (45)
+		downlinkNonUEAssociatedLPPaTransport("46")
+		uplinkNonUEAssociatedLPPaTransport("47");
+		
+		
+		
+
+		private String hexValue;
+
+		private procedureCode(final String hexValue) {
+			this.hexValue = hexValue;
+		}
+
+	}
+
+}
