@@ -1,4 +1,0 @@
-#cloud-config
-manage_etc_hosts: True
-hostname: CPE-8
-fqdn: CPE-8.private.xyz

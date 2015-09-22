@@ -1,8 +1,0 @@
-#cloud-config
-manage_etc_hosts: True
-hostname: SDB-2
-fqdn: SDB-2.private.xyz
-#cloud-config
-manage_etc_hosts: True
-hostname: SDB-2
-fqdn: SDB-2.private.xyz

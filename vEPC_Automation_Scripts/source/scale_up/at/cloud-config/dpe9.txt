@@ -1,4 +1,0 @@
-#cloud-config
-manage_etc_hosts: True
-hostname: DPE-9
-fqdn: DPE-9.private.xyz

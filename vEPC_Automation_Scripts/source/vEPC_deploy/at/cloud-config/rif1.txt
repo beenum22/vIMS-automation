@@ -1,4 +1,0 @@
-#cloud-config
-manage_etc_hosts: True
-hostname: RIF-1
-fqdn: RIF-1.private.xyz

@@ -1,4 +1,0 @@
-#cloud-config
-manage_etc_hosts: True
-hostname: CPE-6
-fqdn: CPE-6.private.xyz
