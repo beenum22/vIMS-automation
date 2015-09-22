@@ -1,0 +1,4 @@
+#cloud-config
+manage_etc_hosts: True
+hostname: SDB-6
+fqdn: SDB-6.private.xyz

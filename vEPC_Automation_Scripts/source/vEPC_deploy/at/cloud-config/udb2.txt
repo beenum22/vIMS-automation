@@ -1,0 +1,4 @@
+#cloud-config
+manage_etc_hosts: True
+hostname: UDB-2
+fqdn: UDB-2.private.xyz

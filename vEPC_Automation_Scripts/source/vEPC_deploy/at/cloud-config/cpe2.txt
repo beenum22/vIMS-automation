@@ -1,0 +1,4 @@
+#cloud-config
+manage_etc_hosts: True
+hostname: CPE-2
+fqdn: CPE-2.private.xyz
