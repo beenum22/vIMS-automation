@@ -55,10 +55,12 @@ def deploy_instance(vm_name, nova, f_path, neutron, configurations, avl_zone, er
 		error_logger.error(error_msg)
 		error_logger.error(fault)
 		sys.exit()
-
+	net_name = configurations['networks']['net-int-name']
+	server = nova.servers.find(name=vm_name).addresses
+	private_ip = server[net_name][0]['addr']
 	while True:
 		try:
-			ins_ip = associate_ip(vm_name, nova, configurations['networks']['net-ext-name'], neutron, error_logger, logger_neutron)
+			ins_ip = associate_ip(vm_name, nova, configurations['networks']['net-ext-name'], neutron, error_logger, logger_neutron, private_ip)
 			if ins_ip is not 'not-assigned': 
 				return ins_ip 
 		except:
@@ -101,9 +103,12 @@ def deploy_EMS(ems_name, nova, neutron, configurations, avl_zone, error_logger, 
 		sys.exit()
 	info_msg = "Successfully deployed " + ems_name
 	logger_nova.info(info_msg)
+	net_name = configurations['networks']['net-int-name']
+	server = nova.servers.find(name=ems_name).addresses
+	private_ip = server[net_name][0]['addr']
 	while True:
 		try:
-			return associate_ip(ems_name, nova, configurations['networks']['net-ext-name'], neutron, error_logger, logger_neutron)
+			return associate_ip(ems_name, nova, configurations['networks']['net-ext-name'], neutron, error_logger, logger_neutron, private_ip)
 		except:
 			print("[" + time.strftime("%H:%M:%S")+ "] Floating IP assignment error. Retrying...")
 			error_logger.exception("Floating IP assignment error")
@@ -163,7 +168,7 @@ def delete_instance(vm_name, nova):
 	      print("[" + time.strftime("%H:%M:%S")+ "] Requested server not found")
 		  
 # Associate floating IP to server vm_name
-def associate_ip(vm_name, nova, net_ext, neutron, error_logger, logger_neutron):
+def associate_ip(vm_name, nova, net_ext, neutron, error_logger, logger_neutron, private_ip):
 	pool_id = get_network_id(net_ext,neutron)
 	param = {'floatingip': {'floating_network_id': pool_id}}
 	try:
@@ -177,7 +182,7 @@ def associate_ip(vm_name, nova, net_ext, neutron, error_logger, logger_neutron):
 	info_msg = "Associating floating IP " + instance_ip + " to " + vm_name
 	logger_neutron.info(info_msg)
 	try:
-		instance.add_floating_ip(instance_ip)
+		instance.add_floating_ip(instance_ip, private_ip)
 		print "[" + time.strftime("%H:%M:%S")+ "] Assigned IP: <" + instance_ip + "> to "+vm_name
 	except:
 		floating_ip_id = get_port_device_id_by_ip(instance_ip, neutron)
@@ -1089,7 +1094,7 @@ def check_resource(nova, node, temp_list, logger):
 	else:
 		#print('VCPUs required = ' + vcpus_available + '\nVCPUs available = ' + temp_list['free_disk_gb'])
 		info_msg = "VCPUs required = " + str(vcpus_available) + "VCPUs available = " + str(temp_list['free_disk_gb'])
-		longer.warning(info_msg)
+		logger.warning(info_msg)
 	info_msg = "Done checking Resources on " + node
 	logger.info(info_msg)
 	return resource_check
