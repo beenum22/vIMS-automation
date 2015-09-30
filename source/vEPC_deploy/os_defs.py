@@ -19,7 +19,8 @@ def deploy_instance(vm_name, nova, f_path, neutron, configurations, avl_zone, er
 	flavor = nova.flavors.find(name="m1.medium")
 	# DPE = SGi, S1 --- RIF = S1
 	net_id_int = get_network_id(netname=configurations['networks']['net-int-name'], neutron = neutron)
-	print("[" + time.strftime("%H:%M:%S")+ "] Deploying "+vm_name+"...")cloud_file = open("source/vEPC_deploy/at/cloud-config/" + f_path) # portsS1 => 0 == s1_mme(1.4)[1.20], 1 == s1_u(1.5)[1.21]
+	print("[" + time.strftime("%H:%M:%S")+ "] Deploying "+vm_name+"...")
+	cloud_file = open("source/vEPC_deploy/at/cloud-config/" + f_path) # portsS1 => 0 == s1_mme(1.4)[1.20], 1 == s1_u(1.5)[1.21]
 	try:
 		if "DPE-1" in vm_name:
 			instance = nova.servers.create(userdata = cloud_file, name=vm_name, image=image, flavor=flavor, nics=[{'net-id':net_id_int}, {'port-id':get_port_id('s1_u', neutron)}, {'port-id':get_port_id('sgi', neutron)}], availability_zone=avl_zone)
