@@ -146,7 +146,7 @@ def clear_network(network_name, neutron, configurations, error_logger, logger_ne
 		neutron.delete_network(get_network_id(network_name, neutron))
 		print("[" + time.strftime("%H:%M:%S")+ "] Network "+network_name+' deleted.')
 	except:
-		error_logger.exception("Network delete")
+		error_logger.exception("Unable to delete Network")
 		pass
 	
 	info_msg = "Successfully deleted network" + network_name
@@ -190,7 +190,7 @@ def del_agg(nova, error_logger, logger_nova):
 		nova.aggregates.delete(a_id[0].id)
 		logger_nova.info("Successfully deleted aggregate group A ")
 	except:
-		error_logger.exception("Deleting Aggregate group A")
+		error_logger.exception("Unable to Delete Aggregate group A")
 		pass
 	try:
 		logger_nova.info("Removing host A")
@@ -200,7 +200,7 @@ def del_agg(nova, error_logger, logger_nova):
 		nova.aggregates.delete(a_id[1].id)
 		logger_nova.info("Successfully deleted aggregate group B ")
 	except:
-		error_logger.exception("Deleting Aggregate group B")
+		error_logger.exception("Unable to Delete Aggregate group B")
 		pass
 	logger_nova.info("Successfully deleted aggregate groups ")
 #---------------------------------------#

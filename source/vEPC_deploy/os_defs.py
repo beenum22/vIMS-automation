@@ -11,16 +11,15 @@ import time
 # ======================= DEPLOY A VCM COMPONENT INSTANCE AND ASSIGN NETWORKS AND FLOATING IP TO IT ======================#
 
 def deploy_instance(vm_name, nova, f_path, neutron, configurations, avl_zone, error_logger, logger_nova, logger_neutron):
+	info_msg = "Deploying "+vm_name
+	logger_nova.info(info_msg)
 	logger_nova.info("Finding Image for instance")
 	image = nova.images.find(name=configurations['vcm-cfg']['vcm-img-name'])
 	logger_nova.info("Finding flavour for instance")
 	flavor = nova.flavors.find(name="m1.medium")
 	# DPE = SGi, S1 --- RIF = S1
 	net_id_int = get_network_id(netname=configurations['networks']['net-int-name'], neutron = neutron)
-	print("[" + time.strftime("%H:%M:%S")+ "] Deploying "+vm_name+"...")
-	info_msg = "Deploying "+vm_name
-	logger_nova.info(info_msg)
-	cloud_file = open("source/vEPC_deploy/at/cloud-config/" + f_path) # portsS1 => 0 == s1_mme(1.4)[1.20], 1 == s1_u(1.5)[1.21]
+	print("[" + time.strftime("%H:%M:%S")+ "] Deploying "+vm_name+"...")cloud_file = open("source/vEPC_deploy/at/cloud-config/" + f_path) # portsS1 => 0 == s1_mme(1.4)[1.20], 1 == s1_u(1.5)[1.21]
 	try:
 		if "DPE-1" in vm_name:
 			instance = nova.servers.create(userdata = cloud_file, name=vm_name, image=image, flavor=flavor, nics=[{'net-id':net_id_int}, {'port-id':get_port_id('s1_u', neutron)}, {'port-id':get_port_id('sgi', neutron)}], availability_zone=avl_zone)
@@ -33,7 +32,7 @@ def deploy_instance(vm_name, nova, f_path, neutron, configurations, avl_zone, er
 		else:
 			instance = nova.servers.create(userdata = cloud_file, name=vm_name, image=image, flavor=flavor, nics=[{'net-id':net_id_int}], availability_zone=avl_zone)
 	except:
-		error_msg = "Creating instance " + vm_name
+		error_msg = "Unable to create instance " + vm_name
 		error_logger.exception(error_msg)
 		print("[" + time.strftime("%H:%M:%S")+ "] Error occurred while deploying VM please see logs")
 		sys.exit()
@@ -49,7 +48,7 @@ def deploy_instance(vm_name, nova, f_path, neutron, configurations, avl_zone, er
 	time.sleep(2)
 	if(status == 'ERROR'):
 		print("[" + time.strftime("%H:%M:%S")+ "] Error occurred while deploying VM please check logs")
-		error_msg = "Creating instance " + vm_name
+		error_msg = "Unable to Create instance " + vm_name
 		error_logger.error(error_msg)
 		fault = instance.fault
 		error_logger.error(error_msg)
@@ -65,7 +64,7 @@ def deploy_instance(vm_name, nova, f_path, neutron, configurations, avl_zone, er
 				return ins_ip 
 		except:
 			print("[" + time.strftime("%H:%M:%S")+ "] Floating IP assignment error. Retrying...")
-			error_logger.exception("Assigning floating ip")
+			error_logger.exception("Unable to assign floating ip")
 			time.sleep(2)
 #-----------------------------------------------------------------------#
 # ======================= DEPLOY EMS INSTANCE AND ASSIGN NETWORK AND FLOATING IP TO IT ======================#
@@ -81,7 +80,7 @@ def deploy_EMS(ems_name, nova, neutron, configurations, avl_zone, error_logger, 
 	try:
 		instance = nova.servers.create(name=ems_name, image=image, flavor=flavor, nics=[{'net-id':net_id_int}], availability_zone=avl_zone)
 	except:
-		error_msg = "Creating instance " + ems_name
+		error_msg = "Unable to create instance " + ems_name
 		error_logger.exception(error_msg)
 		sys.exit()
 	# Poll at 5 second intervals, until the status is no longer 'BUILD'
@@ -95,7 +94,7 @@ def deploy_EMS(ems_name, nova, neutron, configurations, avl_zone, error_logger, 
 	time.sleep(2)
 	if(status == 'ERROR'):
 		print("[" + time.strftime("%H:%M:%S")+ "] Error occurred while deploying EMS please check logs")
-		error_msg = "Creating instance " + ems_name
+		error_msg = "Unable to creating instance " + ems_name
 		error_logger.error(error_msg)
 		fault = instance.fault
 		error_logger.error(error_msg)
@@ -111,7 +110,7 @@ def deploy_EMS(ems_name, nova, neutron, configurations, avl_zone, error_logger, 
 			return associate_ip(ems_name, nova, configurations['networks']['net-ext-name'], neutron, error_logger, logger_neutron, private_ip)
 		except:
 			print("[" + time.strftime("%H:%M:%S")+ "] Floating IP assignment error. Retrying...")
-			error_logger.exception("Floating IP assignment error")
+			error_logger.exception("Unable to assign Floating IP")
 			time.sleep(2)
 	
 def get_port_device_id_by_ip(port_ip, neutron):
@@ -430,7 +429,7 @@ def update_neutron_port(neutron, port_id, allowed_ip, port_nm, logger_neutron, e
 	try:
 		neutron.update_port(port_id, body=body_value)
 	except:
-		error_msg = "updating port" + port_id
+		error_msg = "Unable to update port" + port_id
 		error_logger.exception(error_msg)
 	info_msg = "Successfully updated port " + port_id
 	logger_neutron.info(info_msg)
@@ -836,7 +835,7 @@ def create_image(glance, img_name, logger_glance, error_logger):
 		logger_glance.info(info_msg)
 	except:
 		print ("[" + time.strftime("%H:%M:%S")+ "] Unable to create glance image, please check logs")
-		error_msg = "Creating image " + img_name
+		error_msg = "Unable to create image " + img_name
 		error_logger.exception(error_msg)
 		sys.exit()
 	#print ('Successfully added image')

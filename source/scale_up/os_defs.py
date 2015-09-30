@@ -28,7 +28,7 @@ def deploy_instance(k_val, vm_name, nova, f_path, neutron, configurations, avl_z
 		else:
 			instance = nova.servers.create(name=vm_name, image=image, flavor=flavor, nics=[{'net-id':net_id_int}], availability_zone=avl_zone)
 	except:
-		error_msg = "Creating instance " + vm_name
+		error_msg = "Unable to Create instance " + vm_name
 		error_logger.exception(error_msg)
 		print("[" + time.strftime("%H:%M:%S")+ "] Error occurred while deploying VM please see logs")
 		sys.exit()
@@ -64,7 +64,7 @@ def deploy_instance(k_val, vm_name, nova, f_path, neutron, configurations, avl_z
 				return ins_ip 
 		except:
 			print("[" + time.strftime("%H:%M:%S")+ "] Floating IP assignment error. Retrying...")
-			error_logger.exception("Assigning floating ip")
+			error_logger.exception("Unable to Assign floating ip")
 			time.sleep(2)
 
 def is_server_exists(vm_name, nova):
@@ -303,7 +303,7 @@ def update_neutron_port(neutron, port_id, allowed_ip, port_nm):
 	try:
 		neutron.update_port(port_id, body=body_value)
 	except:
-		error_msg = "updating port" + port_id
+		error_msg = "Unable to update port" + port_id
 		error_logger.exception(error_msg)
 	info_msg = "Successfully updated port " + port_id
 	logger_neutron.info(info_msg)
@@ -386,22 +386,22 @@ def create_agg(nova, error_logger):
 	try:
 	  agg_idA = nova.aggregates.create(get_aggnameA(), get_avlzoneA())
 	except:
-	  error_logger.exception("Creating Aggregate group A")
+	  error_logger.exception("Unable to Create Aggregate group A")
 	  pass
 	try:
 	  agg_idB = nova.aggregates.create(get_aggnameB(), get_avlzoneB())
 	except:
-	  error_logger.exception("Creating Aggregate group B")
+	  error_logger.exception("Unable to Create Aggregate group B")
 	  pass
 	try:
 	  nova.aggregates.add_host(aggregate=agg_idA, host=hostnA)
 	except:
-	  error_logger.exception("Adding host to Aggregate group A")
+	  error_logger.exception("Unable to Add host to Aggregate group A")
 	  pass
 	try:
 	  nova.aggregates.add_host(aggregate=agg_idB, host=hostnB)
 	except:
-	  error_logger.exception("Adding host to Aggregate group B")
+	  error_logger.exception("Unable to Add host to Aggregate group B")
 	  pass
 
 #-------create cloud file---------#

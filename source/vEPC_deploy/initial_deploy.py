@@ -259,7 +259,7 @@ try:
 	ssh = paramiko.SSHClient()
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 except:
-	error_logger.exception("Creating paramiko client instance")
+	error_logger.exception("Unable to create paramiko client instance")
 	print("[" + time.strftime("%H:%M:%S")+ "] Error creating paramiko client")
 	sys.exit()
 # wait for boot-up completion

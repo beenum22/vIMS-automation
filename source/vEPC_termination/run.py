@@ -70,13 +70,13 @@ try:
 	sess = session.Session(auth=auth)
 	nova = client.Client(nova_creds['version'], session=sess)
 except:
-	error_logger.exception("creating nova client instance")
+	error_logger.exception("Unable to create nova client instance")
 # Get authorized instance of neutron client
 logger_neutron.info("Getting authorized instance of neutron client")
 try:
 	neutron = ntrnclient.Client(**credsks)
 except:
-	error_logger.exception("creating neutron client instance")
+	error_logger.exception("Unable to create neutron client instance")
 
 for i in range(0, 3):
 	instance_name = configurations['vcm-cfg']['name-prefix'] + scale_up_list[i] + "-3"
