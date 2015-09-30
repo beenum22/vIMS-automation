@@ -1,0 +1,36 @@
+heat_template_version: 2014-10-16
+
+description: >
+  Security Group to use
+parameters:
+  name:
+    type: string
+    description: name of security group
+    default: vEPC
+resources:
+  security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name: {get_param: name}
+      description: Security group for all vEPC components
+      rules:
+        # All egress traffic
+        - direction: egress
+          ethertype: IPv4
+        - direction: egress
+          ethertype: IPv6
+        # ICMP
+        - protocol: icmp
+        # SSH
+        - protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+        # SNMP
+        - protocol: udp
+          port_range_min: 161
+          port_range_max: 161
+
+outputs:
+  security_group:
+    description: Security group for all vEPC components
+    value: { get_resource: security_group } 

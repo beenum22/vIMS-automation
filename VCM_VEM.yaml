@@ -1,0 +1,103 @@
+heat_template_version: 2014-10-16
+
+description: VCM-VEM
+
+parameters:
+  name:
+    type: string
+    label: name
+    description: name to be used for server
+    default: VCM-VEM
+  image:
+    type: string
+    label: Image name or ID
+    description: Image to be used for server.
+    default: VCM_IMG
+  flavor:
+    type: string
+    label: Flavor
+    description: Type of instance (flavor) to be used on the compute instance.
+    default: m1.medium
+  security_group_def:
+    type: string
+    default: default
+  public_network:
+    type: string
+    label: Public network name or ID
+    description: Public network to attach server to.
+    default: net04_ext
+  availability_zone:
+    type: string
+    label: availability_zone for VMs
+    default: nova
+  private_network:
+    type: string
+    label: Private network name or ID
+    description: Network to attach server to.
+    default: net04
+    
+  index:
+    type: number
+    description: Index of node in the cluster
+    default: 0
+
+resources:
+  port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: private_network }
+      security_groups:
+        - { get_param: security_group_def }
+  floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: { get_param: public_network }
+  floating_ip_assoc:
+    type: OS::Neutron::FloatingIPAssociation
+    properties:
+      floatingip_id: { get_resource: floating_ip }
+      port_id: { get_resource: port }
+
+  instance:
+    type: OS::Nova::Server
+    properties:
+      name: { str_replace: { params: { __index__: { get_param: index }, __name__: { get_param: name } }, template: __name__-__index__} }      
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      availability_zone : {get_param: availability_zone}
+      networks:
+        - port: { get_resource: port }
+
+      user_data:
+        str_replace:
+          params:
+            __index__ : { get_param: index }
+          template: |
+            #!/bin/bash
+
+            #cloud-config
+            manage_etc_hosts: True
+            hostname: VEM-__index__
+            fqdn: VEM-__index__.private.xyz
+
+
+outputs:
+  name:
+    description: server name
+    value: { get_attr: [instance, name] }
+    
+  floating_ip:
+    description: The floating IP address assigned to the server.
+    value: { get_attr: [floating_ip, floating_ip_address] }
+
+  private_ip:
+    description: private IP assigned to the server
+    value: { get_attr: [ instance, first_address ] }
+
+  port:
+    description: port id of the server
+    value: { get_resource: port }
+
+  id:
+    description: server id
+    value: { get_attr: [instance, show,id] }
