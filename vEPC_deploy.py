@@ -4,15 +4,20 @@ import time
 import readline
 import json
 from heatclient.v1.stacks import *
-import keystoneclient.v2_0.client as ksClient
 from heatclient.client import Client as Heat_Client
+import keystoneclient.v2_0.client as ksClient
 from collections import namedtuple
 from os_defs import *
-import yaml
 import logging
 import datetime
 import glanceclient
+import paramiko
 
+#----------------------------------#
+from keystoneclient.auth.identity import v2
+from keystoneclient import session
+from novaclient import client
+#----------------------------------#
 
 # global variables
 STACK_NAME = "vEPC_test"
@@ -54,23 +59,16 @@ fh.setLevel(logging.ERROR)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 fh.setFormatter(formatter)
 error_logger.addHandler(fh)
+#---------------------------------------------------------#
 
 InstanceObj = namedtuple("InstanceObj", "name ip")
 InstanceObj2 = namedtuple("InstanceObj", "name ip")
 instance_list = []
 instance_list2 = []
-
+#------------------ input configurations ------------------#
 input_configurations(error_logger, logger)
 configurations = get_configurations(logger, error_logger)
 
-
-
-
-create_IP_file('s1', configurations, logger)
-create_IP_file('sgi', configurations, logger)
-
-
-'''
 try:
 	create_IP_file('s1', configurations, logger)
 except:
@@ -79,14 +77,14 @@ try:
 	create_IP_file('sgi', configurations, logger)
 except:
 	error_logger.exception("Unable to create sgi IP file")
-'''
 
 write_cfg_file('Dell-VCM.cfg', configurations)
-#-----VCM and EMS image------#
 
 cred = get_keystone_creds(configurations)
 
 logger.info("Getting authorized instance of keystone client")
+
+#------------------ Glance Image creation ------------------#
 try:
 	keystone = ksClient.Client(**cred)
 except:
@@ -116,8 +114,32 @@ if not image_exists(glance, img_name, error_logger, logger_glance):
 	create_image(glance, img_name, logger_glance, error_logger)
 	print("[" + time.strftime("%H:%M:%S")+ "] Successfully created VCM image")
 
-#----------------------------------#
+#--------------------- nova client --------------------#
 
+logger_nova.info("Getting nova credentials")
+nova_creds = get_nova_creds(configurations)
+
+logger_nova.info("Getting authorized instance of nova client")
+try:
+	auth = v2.Password(auth_url=nova_creds['auth_url'],
+						   username=nova_creds['username'],
+						   password=nova_creds['password'],
+						   tenant_name=nova_creds['project_id'])
+	sess = session.Session(auth=auth)
+	nova = client.Client(nova_creds['version'], session=sess)
+except:
+	error_logger.exception("Unable to create nova client instance")
+	print ("[" + time.strftime("%H:%M:%S")+ "] Error creating nova client")
+	sys.exit()
+
+#--------------------- aggregate group creation --------------------#
+
+create_aggregate_groups(nova, error_logger, logger_nova)
+avl_zoneA = get_avlzoneA()
+avl_zoneB = get_avlzoneB()
+
+
+#--------------------- Heat stack creation --------------------#
 heat_endpoint = keystone.service_catalog.url_for(service_type='orchestration', endpoint_type='publicURL')
 heatclient = Heat_Client('1', heat_endpoint, token=keystone.auth_token)
 
@@ -133,7 +155,7 @@ while(cluster_details.status!= 'COMPLETE'):
 		print('Stack Creation failed')
 		sys.exit()
 
-
+#--------------------- getting IPs from heat client --------------------#
 for vm_name in name_list:
 	vm_ip = get_instance_floatingip(heatclient, STACK_NAME, vm_name)
 	instance_obj = InstanceObj(vm_name, vm_ip)

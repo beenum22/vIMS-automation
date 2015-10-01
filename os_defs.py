@@ -79,6 +79,14 @@ def get_keystone_creds(configurations):
     d['tenant_name'] = configurations['os-creds']['os-tenant-name']
     return d
 
+def get_nova_creds(configurations):
+	d = {}
+	d['username'] = configurations['os-creds']['os-user']
+	d['password'] = configurations['os-creds']['os-pass']
+	d['auth_url'] = configurations['os-creds']['os-authurl']
+	d['project_id'] = configurations['os-creds']['os-tenant-name']
+	d['version'] = "1.1"
+	return d
 
 # Get configurations from file
 def get_configurations(logger, error_logger):
@@ -409,6 +417,107 @@ def create_image(glance, img_name, logger_glance, error_logger):
 		error_msg = "Creating image " + img_name
 		error_logger.exception(error_msg)
 		sys.exit()
-	#print ('Successfully added image')
 
-#--------------------------------------------------------#
+
+#-----------------availability_zones and aggregate_group-------------------#
+def get_aggnameA():   
+	return 'GroupA'
+def get_aggnameB():
+	return 'GroupB'
+
+def get_avlzoneA():
+	return 'compute1'
+def get_avlzoneB():
+	return 'compute2'
+
+def check_aggregate(nova, agg_name, logger_nova):
+	logger_nova.info("Checking if aggregate group " + agg_name + " already exists")
+	list1 = nova.aggregates.list()
+	agg_name_exist = False
+	for x in list1:
+		if x.name == agg_name:
+			agg_name_exist = True
+			logger_nova.info("Aggregate group " + agg_name + " already exists")
+			return agg_name_exist
+	logger_nova.info("Aggregate group " + agg_name + " does not exists")
+	return agg_name_exist
+
+def get_aggregate_id(nova, agg_name, logger_nova):
+	logger_nova.info("getting ID of aggregate group " + agg_name)
+	list1 = nova.aggregates.list()
+	agg_id = 0
+	agg_name_exist = False
+	for x in list1:
+		if x.name == agg_name:
+			agg_id = x.id
+			logger_nova.info("Done getting ID of aggregate group " + agg_name)
+			logger_nova.info("ID of aggregate group " + agg_name + " " + str(agg_id))
+			return agg_id
+
+def check_host_added_to_aggregate(nova, agg_id, hostname, logger_nova):
+	host_added = False
+	list1 = nova.aggregates.get_details(agg_id)
+	logger_nova.info("Checking if " + hostname + " exists in aggregate group " + str(list1.name))
+	
+	nme = str(list1.hosts)
+	logger_nova.info("Getting hosts details " + nme + " (name from aggregate group)")
+	if(hostname in nme):
+		host_added = True
+		logger_nova.info("Done checking " + nme + " is already added to aggregate group " + str(list1.name))
+		return host_added
+	logger_nova.info("Done checking " + hostname + " does not exists in aggregate group " + str(list1.name))
+	return host_added
+
+def create_aggregate_groups(nova, error_logger, logger_nova):
+	logger_nova.info("Getting hypervisor list")
+	hyper_list = nova.hypervisors.list()
+	hostnA = hyper_list[0].service['host']
+	hostnB = hyper_list[1].service['host']
+	try:
+		if not check_aggregate(nova, get_aggnameA(), logger_nova):
+			logger_nova.info("Creating aggregate group A")
+			agg_idA = nova.aggregates.create(get_aggnameA(), get_avlzoneA())
+			logger_nova.info("Successfully created aggregate group B")
+			logger_nova.info("Adding host " + hostnA + " to Aggregate Group A")
+			nova.aggregates.add_host(aggregate=agg_idA, host=hostnA)
+			logger_nova.info("Successfully added host " + hostnA + " to Aggregate Group A")
+		else:
+			id = get_aggregate_id(nova, get_aggnameA(), logger_nova)
+			if not check_host_added_to_aggregate(nova, id, hostnA, logger_nova):
+				logger_nova.info("Adding host " + hostnA + " to Aggregate Group A")
+				#print("Compute 1 doesn't already added, trying to add...") #dont print in actual code, just for test
+				nova.aggregates.add_host(aggregate=id, host=hostnA)
+				logger_nova.info("Successfully added host " + hostnA + " to Aggregate Group A") 
+			else:
+				pass
+				#check
+	except:
+		error_logger.exception("Unable to create Aggregate Group A")
+		print("Unable to create Aggregate Group A, please check logs")
+		sys.exit()
+	try:
+		if not check_aggregate(nova, get_aggnameB(), logger_nova):
+			logger_nova.info("Creating aggregate group B")
+			agg_idB = nova.aggregates.create(get_aggnameB(), get_avlzoneB())
+			logger_nova.info("Successfully created aggregate group B")
+			logger_nova.info("Adding host " + hostnB + " to Aggregate Group B")
+			nova.aggregates.add_host(aggregate=agg_idB, host=hostnB)
+			logger_nova.info("Successfully Added host " + hostnB + " to Aggregate Group B")
+			
+		else:
+			id = get_aggregate_id(nova, get_aggnameB(), logger_nova)
+			if not check_host_added_to_aggregate(nova, id, hostnB, logger_nova):
+				logger_nova.info("Adding host " + hostnB + " to Aggregate Group B")
+				#print("Compute 2 doesn't already added, trying to add...") #dont print in actual code, just for test
+				nova.aggregates.add_host(aggregate=id, host=hostnB)
+				logger_nova.info("Successfully added host " + hostnB + " to Aggregate Group B")
+				#print("Successfull...") #dont print in actual code, just for test
+			else:
+				pass
+				#check
+	except:
+		error_logger.exception("Unable to Create Aggregate Group B")
+		print("Unable to create Aggregate Group B, please check logs")
+		sys.exit()
+
+#-----------------------------------------------------------------------#
