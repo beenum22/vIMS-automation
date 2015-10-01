@@ -1,0 +1,100 @@
+heat_template_version: 2014-10-16
+description: A simple auto scaling group.
+  
+parameters:
+  public_net_id:
+    type: string
+    description: ID of public network
+    constraints:
+      - custom_constraint: neutron.network
+        description: Must be a valid network ID
+  private_net_id:
+    type: string
+    description: ID of private network
+    constraints:
+      - custom_constraint: neutron.network
+        description: Must be a valid network ID
+resources:  
+  group:
+    type: OS::Heat::AutoScalingGroup
+    properties:
+      cooldown: 60
+      desired_capacity: 1
+      max_size: 10
+      min_size: 1
+      resource:
+        type: create_instance.yaml
+        properties:
+          public_net_id: { get_param: public_net_id }
+          private_net_id: { get_param: private_net_id }		  
+  scale_up_policy:
+    type: OS::Heat::ScalingPolicy
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: { get_resource: group }
+      cooldown: 60
+      scaling_adjustment: 1
+
+  scale_down_policy:
+    type: OS::Heat::ScalingPolicy
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: { get_resource: group }
+      cooldown: 60
+      scaling_adjustment: -1
+
+  cpu_alarm_high:
+    type: OS::Ceilometer::Alarm
+    properties:
+      meter_name: cpu_util
+      statistic: avg
+      period: 60
+      evaluation_periods: 1
+      threshold: 20
+      alarm_actions:
+        - {get_attr: [scale_up_policy, alarm_url]}
+      comparison_operator: gt
+
+  cpu_alarm_low:
+    type: OS::Ceilometer::Alarm
+    properties:
+      meter_name: cpu_util
+      statistic: avg
+      period: 60
+      evaluation_periods: 1
+      threshold: 1
+      alarm_actions:
+        - {get_attr: [scale_down_policy, alarm_url]}
+      comparison_operator: lt
+
+  network_alarm_high:
+    type: OS::Ceilometer::Alarm
+    properties:
+      meter_name: network.incoming.bytes.rate
+      statistic: avg
+      period: 60
+      evaluation_periods: 1
+      threshold: 8000
+      alarm_actions:
+        - {get_attr: [scale_up_policy, alarm_url]}
+      comparison_operator: gt
+
+  network_alarm_low:
+    type: OS::Ceilometer::Alarm
+    properties:
+      meter_name: network.incoming.bytes.rate
+      statistic: avg
+      period: 60
+      evaluation_periods: 1
+      threshold: 5000
+      alarm_actions:
+        - {get_attr: [scale_down_policy, alarm_url]}
+      comparison_operator: lt
+
+outputs:
+  instance_ip:
+    description: IP address of Instance
+    value: {get_attr: [group, outputs_list, instance_ip]}
+  size:
+    description: Size of group
+    value: {get_attr: [group, outputs_list, current_size]}
