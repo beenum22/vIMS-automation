@@ -168,3 +168,23 @@ for vm_name in name_list:
 	instance_obj = InstanceObj(vm_name, vm_ip)
 	instance_list2.append(instance_obj)
 	print vm_ip
+
+#--------------------- paramiko client creation --------------------#
+logger_ssh.info("Getting authorized client of paramiko")
+try:
+	ssh = paramiko.SSHClient()
+	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+except:
+	error_logger.exception("Creating paramiko client instance")
+	print("[" + time.strftime("%H:%M:%S")+ "] Error creating paramiko client")
+	sys.exit()
+
+time.sleep(30)
+
+#--------------------- Checking ping status --------------------#
+for i in range(0, 7):
+	#print(instance_list[i].ip + "    " + instance_list[i].name)
+	check_ping_status(instance_list[i].ip, instance_list[i].name, logger)
+for i in range(0, 7):
+	#print(instance_list[i].ip + "    " + instance_list[i].name)
+	check_ping_status(instance_list2[i].ip, instance_list[i].name, logger)

@@ -521,3 +521,28 @@ def create_aggregate_groups(nova, error_logger, logger_nova):
 		sys.exit()
 
 #-----------------------------------------------------------------------#
+# Check if server hostname can be pinged
+def check_ping(hostname, logger):
+    response = os.system("ping -c 1 " + hostname+" > /dev/null 2>&1")
+    # and then check the response...
+    if response == 0:
+        pingstatus = "Network Active"
+        logger.info("VM is up and running")
+    else:
+        pingstatus = "Network Error"
+        logger.warning("Host is unreachable")
+    return pingstatus
+def check_ping_status(hostname, vm_name, logger):
+	time_sleeping = 0
+	info_msg = "Checking ping status of " + vm_name
+	logger.info(info_msg)
+	while check_ping(hostname, logger) != 'Network Active':
+		if time_sleeping > 120:
+			print("[" + time.strftime("%H:%M:%S")+ "] Host unreachable, please check configuration. Exiting..")
+			logger.error("Host unreachable: exiting")
+			#sys.exit()
+		print("[" + time.strftime("%H:%M:%S")+ "] " + vm_name + " booting up, please wait...")
+		logger.info("Waiting for VM to boot up")
+		time.sleep(5)
+		time_sleeping += 5
+	print("[" + time.strftime("%H:%M:%S")+ "] " + vm_name+" booted up!")
