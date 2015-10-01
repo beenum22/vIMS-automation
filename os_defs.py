@@ -4,17 +4,21 @@ import time
 import readline
 import json
 
+# Paths for configuration files
+FILE_PATH_MAIN = 'heat_templates/vEPC.yaml'
+FILE_PATH_CDF = 'heat_templates/VCM_CDF.yaml'
+FILE_PATH_CPE = 'heat_templates/VCM_CPE.yaml'
+FILE_PATH_DPE = 'heat_templates/VCM_DPE.yaml'
+FILE_PATH_RIF = 'heat_templates/VCM_RIF.yaml'
+FILE_PATH_SDB = 'heat_templates/VCM_SDB.yaml'
+FILE_PATH_UDB = 'heat_templates/VCM_UDB.yaml'
+FILE_PATH_VEM = 'heat_templates/VCM_VEM.yaml'
+
+FILE_PATH_ip_files = 'ip_files/'
+IMAGE_DIR_PATH = '/root/IMGS/'
+
 #----------------------------------------------------------------------------------#
 def create_cluster(heat, cluster_name):
-
-	FILE_PATH_MAIN = "/root/test_scripts/heat_migration/vEPC.yaml"
-	FILE_PATH_CDF = '/root/test_scripts/heat_migration/VCM_CDF.yaml'
-	FILE_PATH_CPE = '/root/test_scripts/heat_migration/VCM_CPE.yaml'
-	FILE_PATH_DPE = '/root/test_scripts/heat_migration/VCM_DPE.yaml'
-	FILE_PATH_RIF = '/root/test_scripts/heat_migration/VCM_RIF.yaml'
-	FILE_PATH_SDB = '/root/test_scripts/heat_migration/VCM_SDB.yaml'
-	FILE_PATH_UDB = '/root/test_scripts/heat_migration/VCM_UDB.yaml'
-	FILE_PATH_VEM = '/root/test_scripts/heat_migration/VCM_VEM.yaml'
 
 	try:
 		file_main= open(FILE_PATH_MAIN, 'r')
@@ -90,6 +94,7 @@ def get_configurations(logger, error_logger):
 	return configurations
 
 def input_configurations(error_logger, logger):
+	global FILE_PATH_ip_files
 	try:
 		json_file = open('configurations.json')
 	except:
@@ -149,12 +154,12 @@ def input_configurations(error_logger, logger):
 	configurations['networks']['sgi_pool_start'] = inp[1]
 	configurations['networks']['sgi_pool_end'] = inp[3]
 
-	#vcm_cfg_file_read = open('range_nexthop.txt', 'r').readlines()
+	FILE_PATH_range = FILE_PATH_ip_files + 'range_nexthop.txt'
 	try:
-		param_file_write = open('source/vEPC_deploy/ip_files/range_nexthop.txt', 'w')
+		param_file_write = open(FILE_PATH_range, 'w')
 	except:
-		print "source/vEPC_deploy/ip_files/range_nexthop.txt: file not found"
-		error_logger.exception("source/vEPC_deploy/ip_files/range_nexthop.txt: file not found")
+		print "ip_files/range_nexthop.txt: file not found"
+		error_logger.exception("ip_files/range_nexthop.txt: file not found")
 		sys.exit()
 	inp = file_read.readline()
 	param_file_write.write(inp)
@@ -176,11 +181,234 @@ def get_instance_floatingip(heat, cluster_name, vm_name):
    for i in cluster_details.outputs:
      if i['output_key']== output:
         insatnce_ip= i['output_value']
-   return insatnce_ip
+   return insatnce_ip[0]
+
 def get_instance_private_ip(heat, cluster_name, vm_name):
    cluster_details=heat.stacks.get(cluster_name)
    output = vm_name + '_private_ip'
    for i in cluster_details.outputs:
      if i['output_key']== output:
         insatnce_ip= i['output_value']
-   return insatnce_ip
+   return insatnce_ip[0]
+
+
+#--------create availaible IPs file-------#
+def create_IP_file(netname, configurations, logger):
+	global FILE_PATH_ip_files
+	info_msg = "Creating IP file " + netname
+	logger.info(info_msg)
+	net_cidr = ''
+	if netname == 's1':
+		net_cidr = configurations['networks']['s1-cidr']
+	elif netname == 'sgi':
+		net_cidr = configurations['networks']['sgi-cidr']
+	
+	net_addr = calculate_subnet_address('network_add', net_cidr)
+	subnet_mask = calculate_subnet_address('mask', net_cidr)
+	subnet_mask = subnet_mask.split('.')
+	pool = ''
+	
+	if 's1' in netname:
+		FILE_PATH = FILE_PATH_ip_files + 's1_available_ips.txt'
+		s1_e = configurations['networks']['s1_pool_end'].split('.')
+		pool =  int(s1_e[3])
+	elif 'sgi' in netname:
+		FILE_PATH = FILE_PATH_ip_files + 'sgi_available_ips.txt'
+		sgi_e = configurations['networks']['sgi_pool_end'].split('.')
+		pool =  int(sgi_e[3])# - int(sgi_s[3])
+		
+	ip_list = get_available_IP(net_addr, int(subnet_mask[3]), pool)
+	target = open(FILE_PATH, 'w')
+	#target.truncate()
+	target.write(ip_list)
+	target.close()
+	logger.info("done creating")
+#-----------------------------------#
+def calculate_subnet_address(name, net_cidr):
+	(addrString, cidrString) = net_cidr.split('/')
+	addr = addrString.split('.')
+	cidr = int(cidrString)
+	
+	# Initialize the netmask and calculate based on CIDR mask
+	mask = [0, 0, 0, 0]
+	for i in range(cidr):
+		mask[i/8] = mask[i/8] + (1 << (7 - i % 8))
+	if name == 'mask':
+		return ".".join(map(str, mask))
+
+	# Initialize net and binary and netmask with addr to get network
+	net = []
+	for i in range(4):
+		net.append(int(addr[i]) & mask[i])
+	if name == 'network_add':
+		return ".".join(map(str, net))
+
+#--------------------------------------------#
+def get_available_IP(net_addr, mask, pool):
+	list_ips = ''
+	net_addr = net_addr.split(".")
+	netw_addr = net_addr[0] + '.' + net_addr[1] + '.' + net_addr[2] + '.'
+	rng = 255 - mask
+	max_ip = 255 - mask - pool
+	pool = pool + 1
+	for i in range (pool, rng):
+		ip = netw_addr + str(i)
+		list_ips = list_ips + ip + '\n'
+	
+	return list_ips	
+
+#--------------------------------------------#
+
+#-------------------writing IP of VCM config to separate file---------#
+def write_cfg_file(cfg_file_name, configurations):
+	
+	global FILE_PATH_ip_files
+	sgi_ip = ''
+	
+	s1_ip_filename =  FILE_PATH_ip_files + 's1_assigned_ips.txt'
+	sgi_ip_filename = FILE_PATH_ip_files + 'sgi_assigned_ips.txt'
+	
+	s1_ip_file = open(s1_ip_filename, 'a')
+	sgi_ip_file = open(sgi_ip_filename, 'a')
+		
+	param_file_read = open(FILE_PATH_ip_files + 'range_nexthop.txt', 'r')
+	
+	inp = param_file_read.readline()
+	inp = inp.split("\"")
+	
+	vcm_cfg_file_read = open(cfg_file_name, 'r').readlines()
+	vcm_cfg_file_write = open(cfg_file_name, 'w')
+	
+	for line in vcm_cfg_file_read:
+		if line.startswith("range"):
+			new_line = "range " + inp[1] + '\n'
+			vcm_cfg_file_write.write(new_line)
+		
+		elif line.startswith("nexthop address"):
+			inp = param_file_read.readline()
+			inp = inp.split("\"")
+			new_line = "nexthop address " + inp[1] + '\n'
+			vcm_cfg_file_write.write(new_line)
+		
+		elif line.startswith("bind s1-mme"):
+			s1_cidr = str(configurations['networks']['s1-cidr'])
+			s1_cidr = s1_cidr.split("/")
+			assigned_ip = get_IP_from_file('s1')
+			assigned_ip = assigned_ip.replace('\n', '')
+			new_line = "bind s1-mme ipv4-address " + assigned_ip + " mask " + s1_cidr[1] + " interface eth1\n"
+			vcm_cfg_file_write.write(new_line)
+			s1_ip_file.write(new_line)
+		
+		elif line.startswith("gtpu bind s1u-sgw"):
+			assigned_ip = get_IP_from_file('s1')
+			assigned_ip = assigned_ip.replace('\n', '')
+			new_line = "gtpu bind s1u-sgw " + assigned_ip + " mask " + s1_cidr[1] + " interface eth1\n"
+			vcm_cfg_file_write.write(new_line)
+			s1_ip_file.write(new_line)
+		
+		elif line.startswith("sgi-endpoint bind"):
+			sgi_cidr = str(configurations['networks']['sgi-cidr'])
+			sgi_cidr = sgi_cidr.split("/")
+			sgi_ip = get_IP_from_file('sgi')
+			sgi_ip = sgi_ip.replace('\n', '')
+			new_line = "sgi-endpoint bind " + sgi_ip + " mask " + sgi_cidr[1] + " interface eth2\n"
+			vcm_cfg_file_write.write(new_line)
+			sgi_ip_file.write(new_line)
+		
+		elif line.startswith("ethernet port 2"):
+			new_line = "ethernet port 2 address " + sgi_ip +  " mask " + sgi_cidr[1] + '\n'
+			vcm_cfg_file_write.write(new_line)
+			sgi_ip_file.write(new_line)
+		else:
+			vcm_cfg_file_write.write(line)
+	
+	vcm_cfg_file_write.close()
+	
+	s1_ip_file.close()
+	sgi_ip_file.close()
+	
+	param_file_read.close()
+
+#--------------------------------#
+def get_IP_from_file(f_name):
+	
+	filename = ''
+	
+	if (f_name == 's1'):
+		filename = FILE_PATH_ip_files + 's1_available_ips.txt'
+	elif (f_name == 'sgi'):
+		filename = FILE_PATH_ip_files + 'sgi_available_ips.txt'
+
+	file_read = open(filename, 'r')
+	assigned_ip = file_read.readline()
+	
+	str1 = file_read.read()
+	file_read.close()
+	list_str = str1.split("\n")
+	
+	file_write = open(filename, 'w')
+
+	for i in range (0 , len(list_str)):
+		#new_line = file_read.readline()
+		new_line = list_str[i] + '\n'
+		file_write.write(new_line)
+	
+	file_read.close()
+	file_write.close()
+	
+	return assigned_ip
+#--------------------------------#
+#----------------------------------------------------------------#
+
+
+def image_exists(glance, img_name, error_logger, logger_glance):
+	img_exists = False
+	info_msg = "checking if image " + img_name + " exists"
+	logger_glance.info(info_msg)
+	images = glance.images.list()
+	while True:
+		try:
+			image = images.next()
+			if (img_name == image.name):
+				img_exists = True
+				info_msg = "Image " + img_name + "exists"
+				logger_glance.info(info_msg)
+				return img_exists
+			#print image.name + ' - ' + image.id
+		except StopIteration:
+			error_logger.exception("Image not exists")
+			break
+	return img_exists
+#------------------------------------------#
+
+def check_image_directory(img_name, logger_glance, error_logger):
+	global IMAGE_DIR_PATH
+	info_msg = "Checking if image " + img_name + " exists in the directory " + IMAGE_DIR_PATH
+	logger_glance.info(info_msg)
+	PATH = IMAGE_DIR_PATH + img_name + ".qcow2"
+	if not os.path.isfile(PATH):
+		error_msg = "Image file " + img_name + " does not exist in the directory vEPC/IMGS/, please download image files and copy to the directory vEPC/IMGS/ "
+		print ("[" + time.strftime("%H:%M:%S")+ "] " + error_msg)
+		logger_glance.error(error_msg)
+		error_logger.error(error_msg)
+		sys.exit()
+
+#-----------create VCM and EMS image--------#
+def create_image(glance, img_name, logger_glance, error_logger):
+	global IMAGE_DIR_PATH
+	info_msg = "Creating image " + img_name
+	logger_glance.info(info_msg)
+	IMAGE_PATH =  IMAGE_DIR_PATH + img_name + ".qcow2"
+	try:
+		image = glance.images.create(name=img_name,disk_format = 'qcow2', container_format = 'bare')
+		image = glance.images.upload(image.id, open(IMAGE_PATH, 'rb'))
+		info_msg = "Successfully Created image " + img_name
+		logger_glance.info(info_msg)
+	except:
+		print ("[" + time.strftime("%H:%M:%S")+ "] Unable to create glance image, please check logs")
+		error_msg = "Creating image " + img_name
+		error_logger.exception(error_msg)
+		sys.exit()
+	#print ('Successfully added image')
+
+#--------------------------------------------------------#

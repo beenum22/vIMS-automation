@@ -9,12 +9,30 @@ from heatclient.client import Client as Heat_Client
 from collections import namedtuple
 from os_defs import *
 import yaml
+import logging
+import datetime
+import glanceclient
 
+
+# global variables
 STACK_NAME = "vEPC_test"
 name_list = ['VEM', 'SDB', 'CPE', 'CDF', 'UDB', 'DPE', 'RIF']
 
-import logging
-import datetime
+LOCAL_PATH_MME_CFG = "source/vEPC_deploy/vcm-mme-start"
+REMOTE_PATH_MME_CFG = "/opt/VCM/etc/scripts/vcm-mme-start"
+
+LOCAL_PATH_DAT_CFG = "source/vEPC_deploy/data.txt"
+REMOTE_PATH_DAT_CFG = "/opt/VCM/etc/data.txt"
+
+LOCAL_PATH_CSV_CFG = "source/vEPC_deploy/SubscriptionData.csv"
+REMOTE_PATH_CSV_CFG = "/opt/VCM/etc/SubscriptionData.csv"
+
+LOCAL_PATH_DELL_CFG = "Dell-VCM.cfg"
+REMOTE_PATH_DELL_CFG = "/opt/VCM/config/Dell-VCM.cfg"
+
+REMOTE_PATH_HOSTNAME = "/etc/sysconfig/network"
+
+#------------------ logging configurations ------------------#
 now = datetime.datetime.now()
 date_time = now.strftime("%Y-%m-%d_%H-%M")
 filename_activity = 'logs/deploy_' + date_time + '.log'
@@ -42,35 +60,89 @@ InstanceObj2 = namedtuple("InstanceObj", "name ip")
 instance_list = []
 instance_list2 = []
 
-#input_configurations(error_logger, logger)
+input_configurations(error_logger, logger)
 configurations = get_configurations(logger, error_logger)
+
+
+
+
+create_IP_file('s1', configurations, logger)
+create_IP_file('sgi', configurations, logger)
+
+
+'''
+try:
+	create_IP_file('s1', configurations, logger)
+except:
+	error_logger.exception("Unable to create s1 IP file")
+try:
+	create_IP_file('sgi', configurations, logger)
+except:
+	error_logger.exception("Unable to create sgi IP file")
+'''
+
+write_cfg_file('Dell-VCM.cfg', configurations)
+#-----VCM and EMS image------#
 
 cred = get_keystone_creds(configurations)
 
-ks_client = ksClient.Client(**cred)
-heat_endpoint = ks_client.service_catalog.url_for(service_type='orchestration', endpoint_type='publicURL')
-heatclient = Heat_Client('1', heat_endpoint, token=ks_client.auth_token)
+logger.info("Getting authorized instance of keystone client")
+try:
+	keystone = ksClient.Client(**cred)
+except:
+	error_logger.exception("Unable to create keystone client instance")
+	print ("[" + time.strftime("%H:%M:%S")+ "] Error creating keystone client")
+	sys.exit()
+logger_glance.info("Getting authorized instance of glance client")
+try:
+	glance_endpoint = keystone.service_catalog.url_for(service_type='image', endpoint_type='publicURL')
+	glance = glanceclient.Client('2', glance_endpoint, token=keystone.auth_token)
+except:
+	error_logger.exception("Unable to create glance client instance")
+	print ("[" + time.strftime("%H:%M:%S")+ "] Error creating glance client")
+	sys.exit()
+	
+img_name = 'EMS_IMG'
+if not image_exists(glance, img_name, error_logger, logger_glance):
+	print ("[" + time.strftime("%H:%M:%S")+ "] Creating EMS image...")
+	check_image_directory(img_name, logger_glance, error_logger)
+	create_image(glance, img_name, logger_glance, error_logger)
+	print("[" + time.strftime("%H:%M:%S")+ "] Successfully created EMS image")
+
+img_name = 'VCM_IMG'
+if not image_exists(glance, img_name, error_logger, logger_glance):
+	print("[" + time.strftime("%H:%M:%S")+ "] Creating VCM image...")
+	check_image_directory(img_name, logger_glance, error_logger)
+	create_image(glance, img_name, logger_glance, error_logger)
+	print("[" + time.strftime("%H:%M:%S")+ "] Successfully created VCM image")
+
+#----------------------------------#
+
+heat_endpoint = keystone.service_catalog.url_for(service_type='orchestration', endpoint_type='publicURL')
+heatclient = Heat_Client('1', heat_endpoint, token=keystone.auth_token)
 
 create_cluster(heatclient,STACK_NAME)
 
 cluster_details=heatclient.stacks.get(STACK_NAME)
 while(cluster_details.status!= 'COMPLETE'):
-   time.sleep(30)
-   if cluster_details.status == 'IN_PROGRESS':
-     print('Stack Creation in progress..')
-   cluster_details=heatclient.stacks.get(STACK_NAME)
+	time.sleep(30)
+	if cluster_details.status == 'IN_PROGRESS':
+		print('Stack Creation in progress..')
+	cluster_details=heatclient.stacks.get(STACK_NAME)
+	if cluster_details.status == 'FAILED':
+		print('Stack Creation failed')
+		sys.exit()
 
-print cluster_details
-print "cluster output details \n "
-print cluster_details.outputs
-instance_tuple = get_instance_floatingip(heatclient, STACK_NAME, 'VEM')
-print instance_tuple[0]
-
-instance_tuple = get_instance_private_ip(heatclient, STACK_NAME, 'VEM')
-print instance_tuple[0]
 
 for vm_name in name_list:
 	vm_ip = get_instance_floatingip(heatclient, STACK_NAME, vm_name)
 	instance_obj = InstanceObj(vm_name, vm_ip)
 	instance_list.append(instance_obj)
+	print vm_ip
+	
+for vm_name in name_list:
+	vm_name2 = vm_name + "_2"
+	vm_ip = get_instance_floatingip(heatclient, STACK_NAME, vm_name)
+	instance_obj = InstanceObj(vm_name, vm_ip)
+	instance_list2.append(instance_obj)
 	print vm_ip

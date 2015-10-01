@@ -1,0 +1,64 @@
+2015-10-01 08:02:48,425 INFO     __main__                [-]  Getting credentials from file
+2015-10-01 08:02:48,425 INFO     __main__                [-]  writing to configuration file
+2015-10-01 08:02:48,425 INFO     __main__                [-]  Getting configurations from file
+2015-10-01 08:02:48,426 INFO     __main__                [-]  Creating IP file s1
+2015-10-01 08:02:48,426 INFO     __main__                [-]  done creating
+2015-10-01 08:02:48,427 INFO     __main__                [-]  Creating IP file sgi
+2015-10-01 08:02:48,427 INFO     __main__                [-]  done creating
+2015-10-01 08:02:48,427 INFO     __main__                [-]  Getting authorized instance of keystone client
+2015-10-01 08:02:48,433 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.42
+2015-10-01 08:02:48,510 INFO     glance                  [-]  Getting authorized instance of glance client
+2015-10-01 08:02:48,538 INFO     glance                  [-]  checking if image EMS_IMG exists
+2015-10-01 08:02:48,539 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:02:48,666 ERROR    error_log               [-]  Image not exists
+Traceback (most recent call last):
+  File "/root/test_scripts/heat_migration/os_defs.py", line 371, in image_exists
+    image = images.next()
+StopIteration
+2015-10-01 08:02:48,666 INFO     glance                  [-]  Checking if image EMS_IMG exists in the directory vEPC/IMGS/
+2015-10-01 08:02:48,670 INFO     glance                  [-]  Creating image EMS_IMG
+2015-10-01 08:03:55,261 INFO     glance                  [-]  Successfully Created image EMS_IMG
+2015-10-01 08:03:55,261 INFO     glance                  [-]  checking if image VCM_IMG exists
+2015-10-01 08:03:55,293 ERROR    error_log               [-]  Image not exists
+Traceback (most recent call last):
+  File "/root/test_scripts/heat_migration/os_defs.py", line 371, in image_exists
+    image = images.next()
+StopIteration
+2015-10-01 08:03:55,293 INFO     glance                  [-]  Checking if image VCM_IMG exists in the directory vEPC/IMGS/
+2015-10-01 08:03:55,293 INFO     glance                  [-]  Creating image VCM_IMG
+2015-10-01 08:04:20,497 INFO     glance                  [-]  Successfully Created image VCM_IMG
+2015-10-01 08:04:20,499 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:04:20,763 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:04:20,835 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:04:50,905 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:04:50,941 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:05:21,007 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:05:21,043 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:05:51,110 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:05:51,147 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:06:21,214 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:06:21,253 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:06:51,322 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:06:51,358 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:07:21,433 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:07:21,474 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:07:51,547 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:07:51,583 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:08:21,645 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:08:21,681 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:08:51,749 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:08:51,792 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:09:21,864 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:09:21,938 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:09:52,038 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:09:52,074 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:10:22,141 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:10:22,176 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:10:52,255 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:10:52,291 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:11:22,361 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:11:22,398 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:11:52,461 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:11:52,500 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:12:22,570 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-10-01 08:12:23,048 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
