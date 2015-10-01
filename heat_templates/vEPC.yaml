@@ -102,6 +102,14 @@ resources:
         - protocol: tcp
           port_range_min: 22
           port_range_max: 22
+        # EMS-comm-port
+        - protocol: tcp
+          port_range_min: 8980
+          port_range_max: 8980
+        # All tcp comm
+        - protocol: tcp
+          port_range_min: 1
+          port_range_max: 65535
         # SNMP
         - protocol: udp
           port_range_min: 161
