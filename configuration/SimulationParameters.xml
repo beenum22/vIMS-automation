@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<TesterToolConfig>
+
+	<SimulationParams>
+		<UECount>1</UECount>
+		<eNBCount>1</eNBCount>
+	</SimulationParams>
+	
+	<UEParams>
+		<IMSI>1234</IMSI>
+		<IMEI>4567</IMEI>
+	</UEParams>
+	
+	<eNBParams>
+		<eNBID>1234</eNBID>
+		<TAC>4567</TAC>
+		<MNC>1346</MNC>
+		<MCC>7954</MCC>
+		<MMEI>1973</MMEI>	
+	</eNBParams>
+</TesterToolConfig>

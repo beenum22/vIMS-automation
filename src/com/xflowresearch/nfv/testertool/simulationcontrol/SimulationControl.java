@@ -1,0 +1,58 @@
+package com.xflowresearch.nfv.testertool.simulationcontrol;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.xflowresearch.nfv.testertool.common.XMLParser;
+import com.xflowresearch.nfv.testertool.enodeb.eNodeB;
+import com.xflowresearch.nfv.testertool.ue.UE;
+
+public class SimulationControl 
+{
+	private static SimulationControl instance = new SimulationControl();
+
+	private static eNodeB enodeb;
+	private static UE ue;
+	
+	private XMLParser xmlparser;
+
+	/** Logger to log the messages and Errors **/
+	private static final Logger logger = LoggerFactory.getLogger("SimulationControlLogger");
+
+	
+	private SimulationControl(){
+		enodeb = eNodeB.getInstance();
+		ue = UE.getInstance();
+
+		xmlparser = new XMLParser();
+	}
+
+	
+	public static SimulationControl getInstance( ) {
+		return instance;
+	}
+	
+	
+	public Logger getLogger(){
+		return SimulationControl.logger;
+	}
+
+
+	public void startSimulation(){
+		logger.info("Simulation started");
+
+		/*TODO: Parse/Read the input parameters from 'XML' files here!! */
+		xmlparser.readSimulationParameters();
+
+		/** Initialize UE and eNodeB instances' data and start their threads**/
+		Thread eNBThread = new Thread(enodeb);
+		eNBThread.setName("eNBThread1");
+		eNBThread.start();
+
+		Thread UEThread = new Thread(ue);
+		UEThread.setName("UEThread1");
+		UEThread.start();
+
+	}
+
+}
