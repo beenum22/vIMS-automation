@@ -12,6 +12,30 @@ import paramiko
 import select
 #import Scale
 #import Scale_down
+############################## logging ########################################
+import logging
+import datetime
+now = datetime.datetime.now()
+date_time = now.strftime("%Y-%m-%d_%H-%M")
+filename_activity = 'logs/deploy_' + date_time + '.log'
+filename_error = 'logs/deploy_error_' + date_time + '.log'
+
+logging.basicConfig(filename=filename_activity, level=logging.INFO, filemode='w', format='%(asctime)s %(levelname)-8s %(name)-23s [-]  %(message)s')
+
+logger=logging.getLogger(__name__)
+logger_nova=logging.getLogger('nova')
+logger_neutron=logging.getLogger('neutron')
+logger_glance = logging.getLogger('glance')
+logger_ssh=logging.getLogger('paramiko')
+error_logger = logging.getLogger('error_log')
+
+# create logger with 'Error Loging'
+error_logger.setLevel(logging.ERROR)
+fh = logging.FileHandler(filename_error, mode = 'w')
+fh.setLevel(logging.ERROR)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+error_logger.addHandler(fh)
 ############################## Time Stamp Function ########################################
 import sys
 from datetime import datetime as dt
@@ -33,16 +57,16 @@ class F:
 
 sys.stdout = F()
 ############################## Global Variables ##########################################
-IMAGE_PATH = '/root/vIMS/vIMS.qcow2'
+IMAGE_PATH = '/root/AB/vIMS.qcow2'
 COMPRESSED_FILE_PATH = '/root/IMG/vIMS-image.tar.gz'
 IMAGE_DIRECTORY = '/root/IMG/'
 SNMP_CONFIG_PATH = '/etc/snmp/snmpd.conf'
-SNMP_FILE_PATH = '/root/vIMS/snmpd.conf'
+SNMP_FILE_PATH = '/root/AB/snmpd.conf'
 MIB_PATH = "/usr/share/mibs/PROJECT-CLEARWATER-MIB.txt"
-MIB_FILE_PATH = "/root/vIMS/PROJECT-CLEARWATER-MIB.txt"
+MIB_FILE_PATH = "/root/AB/PROJECT-CLEARWATER-MIB.txt"
 os.environ['IMAGE_PATH'] = '/root/vIMS/IMG'
-CONFIG_PATH = '/root/vIMS/configurations.json'
-USER_CONFIG_PATH = '/root/vIMS/user_config.json'
+CONFIG_PATH = '/root/AB/configurations.json'
+USER_CONFIG_PATH = '/root/AB/user_config.json'
 STACK_NAME = 'IMS'
 REPO_URL = 'http://repo.cw-ngv.com/stable'
 ETCD_IP = ''
@@ -65,6 +89,7 @@ def get_user_configurations():
 	return configurations
 
 print('Getting user confiurations...')
+logger.info("Getting initial user confiurations.")
 user_config = get_user_configurations()
 ext_net = user_config['networks']['external']
 ext_net = str(ext_net)
@@ -72,6 +97,7 @@ domain = user_config['domain']['zone']
 domain = str(domain)
 
 print('Successfull')
+logger.info("Getting initial user confiurations Successfull.")
 ############################## Keystone Credentials Functions ############################
 
 def get_keystone_creds(configurations):
@@ -90,25 +116,31 @@ def get_nova_creds(configurations):
 	d['project_id'] = configurations['os-creds']['os-project-id']
 	return d
 print('Getting credentials')  
+logger.info("Getting client credentials")
 def get_configurations():
 	file = open(CONFIG_PATH)
 	configurations = json.load(file)
 	file.close()
 	return configurations
-print('Credentials Loaded')  
+print('Credentials Loaded')
+logger.info("Credentials Loaded")  
 config = get_configurations()
 
 credsks = get_keystone_creds(config)
+logger.info("Getting Keystone credentials")
 creds = get_nova_creds(config)
-
+logger_nova.info("Getting of nova credentials")
 # Get authorized instance of nova client
-nova = nvclient.Client(**creds)   
+nova = nvclient.Client(**creds) 
+logger_nova.info("Getting authorized instance of nova client")  
 # Get authorized instance of neutron client
 neutron = ntrnclient.Client(**credsks)
+logger_neutron.info("Getting authorized instance of nova client")
 ############################### Create Keypair #########################################
 
 # Creating a keypair
 print('Creating Keypair')
+logger.info("Creating Keypair")
 keypair = nova.keypairs.create(name = 'secure')
 # Open a file for storing the private key
 f_private = open('/root/.ssh/secure.pem', "w")
@@ -121,6 +153,7 @@ f_public = open('/root/.ssh/secure.pub', "w")
 f_public.write(keypair.public_key)
 f_public.close()
 print('Finished Creating Keypairs')
+logger.info("Finished Creating Keypairs")
 
 ############################# Create Availability Zones #################################
 
@@ -140,27 +173,36 @@ def create_agg(nova):
  print hostnA
  try:
    agg_idA = nova.aggregates.create(get_aggnameA(), get_avlzoneA())
+   logger_nova.info("creating nova aggregate group A and availability zone A")
  except:
+   
    print('Err')
+   error_logger.exception("Unable to create nova aggregate group A and availability zone A")
    pass
  try:
    agg_idB = nova.aggregates.create(get_aggnameB(), get_avlzoneB())
+   logger_nova.info("creating nova aggregate group B and availability zone B")
  except:
    print('Err')
+    error_logger.exception("Unable to create nova aggregate group B and availability zone B")
    pass
  try:
    nova.aggregates.add_host(aggregate=agg_idA, host=hostnA)
+   logger_nova.info("Adding host to nova aggregate group A")
  except:
    print('Err')
+   error_logger.exception("Error in adding host to nova aggregate group A")
    pass
  try:
    nova.aggregates.add_host(aggregate=agg_idB, host=hostnB)
+   logger_nova.info("Adding host to nova aggregate group B")
  except:
    print('Err')
+   error_logger.exception("Error in adding host to nova aggregate group B")
    pass
 
 print('Successfully added availaibility zones')
-
+logger.info("Successfully added availaibility zones")
 ############################## Create Ubuntu 14.04 Image ###################################
 
 #os.system("sudo -s")
@@ -172,13 +214,19 @@ print('Successfully added availaibility zones')
 
 # Get authorized instance of glance client
 creden = get_keystone_creds(config)
+logger.info("getting keystone client credentials")
 keystone = ksClient.Client(**creden)
+logger_glance.info("Creating Glance endpoint")
 glance_endpoint = keystone.service_catalog.url_for(service_type='image', endpoint_type='publicURL')
+logger_glance.info("Creating Glance client")
 glance = glanceclient.Client('2',glance_endpoint, token=keystone.auth_token)
 
+logger_glance.info("Creating Glance image")
 image = glance.images.create(name="IMS",disk_format = 'ami',container_format = 'ami')
+logger_glance.info("Uploading Glance Image")
 image = glance.images.upload(image.id, open(IMAGE_PATH, 'rb'))
 print ('Successfully added image')
+logger_glance.info("Successfully added image")
  
 
 ########################### Fetch network ID of network netname ###########################
@@ -199,21 +247,21 @@ print ('Network ID of external network =' + net_id)
 #dnssec_key = os.system("head -c 64 /dev/random | base64")
 #dnssec_key = str(dnssec_key)
 print ('Successfully created a DNS security key')
-
+logger.info("Successfully created a DNS security key")
 ############################## Heat Stack Create ##########################################
 def create_cluster(heat,cluster_name):
   cluster_full_name=STACK_NAME
 
-  file_main= open('/root/vIMS/clearwater.yaml', 'r')                
-  file_bono= open('/root/vIMS/bono.yaml', 'r')
-  file_sprout= open('/root/vIMS/sprout.yaml', 'r')
-  file_ralf= open('/root/vIMS/ralf.yaml', 'r')
-  file_dns= open('/root/vIMS/dns.yaml', 'r')
-  file_ellis= open('/root/vIMS/ellis.yaml', 'r')
-  file_network= open('/root/vIMS/network.yaml', 'r')
-  file_groups= open('/root/vIMS/security-groups.yaml', 'r')
-  file_homestead= open('/root/vIMS/homestead.yaml', 'r')
-  file_homer= open('/root/vIMS/homer.yaml', 'r')
+  file_main= open('/root/AB/clearwater.yaml', 'r')                
+  file_bono= open('/root/AB/bono.yaml', 'r')
+  file_sprout= open('/root/AB/sprout.yaml', 'r')
+  file_ralf= open('/root/AB/ralf.yaml', 'r')
+  file_dns= open('/root/AB/dns.yaml', 'r')
+  file_ellis= open('/root/AB/ellis.yaml', 'r')
+  file_network= open('/root/AB/network.yaml', 'r')
+  file_groups= open('/root/AB/security-groups.yaml', 'r')
+  file_homestead= open('/root/AB/homestead.yaml', 'r')
+  file_homer= open('/root/AB/homer.yaml', 'r')
 
   cluster_body={
    "stack_name":cluster_full_name,
@@ -245,18 +293,23 @@ def create_cluster(heat,cluster_name):
   #print ("There is an Err creating cluster, exiting...")
   #sys.exit()
   print ("Creating stack "+ cluster_full_name )
- 
+ logger.info("Creating Heat Stack")
   
 
 ########################### Create Heat Stack from credentials of keystone #####################
-
+logger.info("Getting keystone credentials to create heat client")
 cred = get_keystone_creds(config)
+logger.info("creating keystone client")
 ks_client = Keystone_Client(**cred)
+logger.info("creating heat endpoint")
 heat_endpoint = ks_client.service_catalog.url_for(service_type='orchestration', endpoint_type='publicURL')
+logger.info("creating heat client")
 heatclient = Heat_Client('1', heat_endpoint, token=ks_client.auth_token, username='admin', passwork='admin')
+logger.info("creating heatstack Cluster")
 create_cluster(heatclient,STACK_NAME)
 #stack = heatclient.stacks.list()
 #print stack.next()
+logger.info("Deployong Heat Stack")
 print('Please wait while stack is deployed.......')
 #time.sleep(180)
 cluster_details=heatclient.stacks.get(STACK_NAME)
@@ -279,6 +332,7 @@ def get_dns_ip(heat, cluster_name):
 
 #################################### Configure DNS Server #######################################
 #Get DNS IP
+logger.info("Getting DNS ip to configure DNS Server")
 dns_ip = get_dns_ip(heatclient , STACK_NAME)
 time.sleep(240) #Wait for the DNS server to spawn and install BIND
 #Connect to DNS
@@ -288,15 +342,19 @@ while True:
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     print ("Connecting To DNS Node with IP " + dns_ip)
-    ssh.connect( hostname = dns_ip , username = "root", password = "root123" )
+    logger_ssh.info("Connecting To DNS Node")
+	ssh.connect( hostname = dns_ip , username = "root", password = "root123" )
     print ("Connected")
     break
   except:
-    print("Could not connect. Retrying in 5 seconds...")
+    error_logger.exception("Unable to connect with DNS server")
+	print("Could not connect. Retrying in 5 seconds...")
     time.sleep(5)
 	
 
+
 print('Updating Ubuntu..')
+logger_ssh.info("Updating Ubuntu by apt-get update")
 stdin, stdout, stderr = ssh.exec_command("apt-get update")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -307,6 +365,7 @@ while not stdout.channel.exit_status_ready():
 			print stdout.channel.recv(1024),
 
 print('Installing Bind DNS Server')
+logger_ssh.info("Installing Bind DNS Server")
 stdin, stdout, stderr = ssh.exec_command("sudo DEBIAN_FRONTEND=noninteractive apt-get install bind9 --yes")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -316,6 +375,7 @@ while not stdout.channel.exit_status_ready():
 			# Print data from stdout
 			print stdout.channel.recv(1024),
 print('Updating BIND configuration with the specified zone and key')
+logger_ssh.info("Updating BIND configuration with the specified zone and key")
 stdin, stdout, stderr = ssh.exec_command("sudo cat >> /etc/bind/named.conf.local")
 stdin.write('key ' + domain +'. {\n')
 stdin.flush()
@@ -354,6 +414,7 @@ date = stdout.read()
 date = str(date)
 
 print('Creating basic zone configuration')
+logger.info("Creating basic zone configuration")
 stdin, stdout, stderr = ssh.exec_command("sudo cat > /var/lib/bind/db."+domain )
 stdin.write('$ORIGIN '+domain+'.\n')
 stdin.flush()
@@ -372,7 +433,9 @@ stdin, stdout, stderr = ssh.exec_command('sudo chown root:bind /var/lib/bind/db.
 
 #Now that BIND configuration is correct, kick it to reload.
 print('Finished creating configurations')
+logger.info("Finished creating configurations")
 print('Reloading Bind service')
+logger.info("Reloading Bind service")
 
 stdin, stdout, stderr = ssh.exec_command('sudo service bind9 reload')
 #Display Output on screen
@@ -398,6 +461,8 @@ def get_bono_ip(heat, cluster_name):
    return bono_ip[0]
 ################################# Configure Bono Node #########################################
 #Get Bono IP
+logger.info("Configure Bono Node")
+logger.info("Get Bono IP")
 bono_ip = get_bono_ip(heatclient , STACK_NAME)
 
 #Connect to Bono
@@ -407,11 +472,14 @@ while True:
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     print ("Connecting To Bono Node with IP " + bono_ip)
+	logger_ssh.info("Connecting To Bono Node")
     ssh.connect( hostname = bono_ip , username = "root", password = "root123" )
     print ("Connected")
+	logger.info("Connected To Bono Node")
     break
   except:
     print("Could not connect. Retrying in 5 seconds...")
+	error_logger.exception("Unable to Connect To Bono Node")
     time.sleep(5) 
 
 
@@ -420,12 +488,14 @@ stdin, stdout, stderr = ssh.exec_command("exec > >(tee -a /var/log/clearwater-he
 
 # Configure the APT software source.
 print("Configuring APT software source")
+logger.info("Configuring APT software source")
 stdin, stdout, stderr = ssh.exec_command("echo 'deb "+REPO_URL+" binary/' > /etc/apt/sources.list.d/clearwater.list")
 stdin, stdout, stderr = ssh.exec_command("curl -L http://repo.cw-ngv.com/repo_key | apt-key add -")
 stdin, stdout, stderr = ssh.exec_command("apt-get update")
 
 # Configure /etc/clearwater/local_config.
 print ("Configuring clearwater local settings")
+logger.info("Configuring clearwater local settings")
 stdin, stdout, stderr = ssh.exec_command("mkdir -p /etc/clearwater")
 stdin, stdout, stderr = ssh.exec_command("(hostname -I)")
 stdout.flush()
@@ -447,6 +517,7 @@ stdin.channel.shutdown_write()
 
 # Configure and upload /etc/clearwater/shared_config.
 print ("Configuring clearwater shared settings")
+logger.info("Configuring clearwater shared settings")
 stdin, stdout, stderr = ssh.exec_command("cat > /etc/clearwater/shared_config")
 stdin.write('home_domain='+domain+'\n')
 stdin.flush()
@@ -486,6 +557,7 @@ stdin.channel.shutdown_write()
 
 # Installing the software
 print('Installing Bono packages....')
+logger.info("Installing Bono packages.")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install bono --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -522,6 +594,7 @@ while True:
 
 # Installing the software
 print('Installing Bono packages....')
+logger.info("Installing Bono packages.")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install bono --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -540,6 +613,7 @@ while True:
     break	
 
 print('Installing SNMP...')
+logger.info("Installing SNMP.")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -558,6 +632,7 @@ while True:
     break    
 
 print('Installing SNMPD...')
+logger.info("Installing SNMPD.")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -575,8 +650,10 @@ while True:
   else:
     break    
 print('Finished Installation..')
+logger.info("Finished Installation in BONO")
 		
 print('Uploading shared configuration')
+logger.info("Uploading shared configuration")
 stdin, stdout, stderr = ssh.exec_command("sudo /usr/share/clearwater/clearwater-config-manager/scripts/upload_shared_config")
 #Display Output on screen
 while not stdout.channel.exit_status_ready():
@@ -587,6 +664,7 @@ while not stdout.channel.exit_status_ready():
 			# Print data from stdout
 			print stdout.channel.recv(1024),
 print('Applying shared configuration')
+logger.info("Applying shared configuration")
 stdin, stdout, stderr = ssh.exec_command("sudo /usr/share/clearwater/clearwater-config-manager/scripts/apply_shared_config")	
 #Display Output on screen
 while not stdout.channel.exit_status_ready():
@@ -598,6 +676,7 @@ while not stdout.channel.exit_status_ready():
 			print stdout.channel.recv(1024),
 
 #Update DNS Server
+logger.info("Updating DNS server")
 print('Updating DNS server')
 stdin, stdout, stderr = ssh.exec_command("cat > update.sh")
 stdin.write('#!/bin/bash\n')
@@ -652,6 +731,7 @@ while not stdout.channel.exit_status_ready():
 
 #Configure MIB's
 print('Configuring SNMP')
+logger.info("Configuring SNMP")
 sftp = ssh.open_sftp()
 sftp.put( MIB_FILE_PATH, MIB_PATH )
 sftp.put( MIB_FILE_PATH, '/usr/share/snmp/mibs/PROJECT-CLEARWATER-MIB.txt')
@@ -682,7 +762,6 @@ while not stdout.channel.exit_status_ready():
 ssh.close()
 			
 #################################### Get Sprout IP ############################################
-
 def get_sprout_ip(heat, cluster_name):
    temp_list=[]
    cluster_full_name=cluster_name
@@ -695,14 +774,18 @@ def get_sprout_ip(heat, cluster_name):
 
 ################################# Configure Sprout Node #######################################
 #Get Sprout IP
+logger.info("configuring sprout")
+logger.info("Get Sprout IP")
 sprout_ip = get_sprout_ip(heatclient , STACK_NAME)
 
 #Connect to Sprout
 #k = paramiko.RSAKey.from_private_key_file("/root/.ssh/secure.pem")
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+logger_ssh.info("Connecting To Sprout Node")
 print ("Connecting To Sprout Node with IP " + sprout_ip)
 ssh.connect( hostname = sprout_ip , username = "root", password = "root123" )
+logger.info("Connected to Sprout")
 print ("Connected")
 stdin, stdout, stderr = ssh.exec_command("sudo -s")  
 
@@ -714,12 +797,14 @@ sprout_host = str(sprout_host)
 
 # Configure the APT software source.
 print("Configuring APT software source")
+logger.info("Configuring APT software source")
 stdin, stdout, stderr = ssh.exec_command("echo 'deb "+REPO_URL+" binary/' > /etc/apt/sources.list.d/clearwater.list")
 stdin, stdout, stderr = ssh.exec_command("curl -L http://repo.cw-ngv.com/repo_key | apt-key add -")
 stdin, stdout, stderr = ssh.exec_command("apt-get update")
 
 # Configure /etc/clearwater/local_config.
 print ("Configuring clearwater local settings")
+logger.info("Configuring clearwater local settings")
 stdin, stdout, stderr = ssh.exec_command("mkdir -p /etc/clearwater")
 stdin, stdout, stderr = ssh.exec_command("etcd_ip="+ETCD_IP)
 stdin, stdout, stderr = ssh.exec_command('[ -n "$etcd_ip" ] || etcd_ip=$(hostname -I)')
@@ -735,6 +820,7 @@ stdin.channel.shutdown_write()
 
 # Configure and upload /etc/clearwater/shared_config.
 print ("Configuring clearwater shared settings")
+logger.info("Configuring clearwater shared settings")
 stdin, stdout, stderr = ssh.exec_command("cat > /etc/clearwater/shared_config")
 stdin.write('home_domain='+domain+'\n')
 stdin.flush()
@@ -773,6 +859,7 @@ stdin.write('ellis_cookie_key=secret\n')
 stdin.channel.shutdown_write()
 
 # Create /etc/chronos/chronos.conf.
+logger.info("Create /etc/chronos/chronos.conf.")
 stdin, stdout, stderr = ssh.exec_command("mkdir -p /etc/chronos")
 stdin, stdout, stderr = ssh.exec_command("cat > /etc/chronos/chronos.conf")
 stdin.write('[http]\n')
@@ -807,6 +894,7 @@ stdin.channel.shutdown_write()
 
 # Now install the software.
 print('Installing Sprout packages....')
+logger.info("Installing Sprout packages.")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install sprout --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -838,11 +926,13 @@ while True:
   if(not stdout.read()):
     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install clearwater-config-manager --yes --force-yes")
     print('Retrying Installation...')
+	logger.info("Retrying Installation.")
     time.sleep(5)	
   else:
     break			
 
 print('Installing Sprout packages....')
+logger.info("Installing Sprout packages.")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install sprout --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -897,6 +987,7 @@ while True:
   else:
     break     
 print('Installing SNMP...')
+logger.info("Installing SNMP in Sprout")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -915,6 +1006,7 @@ while True:
     break    
 
 print('Installing SNMPD...')
+logger.info("Installing SNMPD in Sprout")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -932,11 +1024,14 @@ while True:
   else:
     break    
 print('Finished Installation..')
+logger.info("Finished Installation")
 		 
        
 print('Installed Sprout packages')
+logger.info("Installed Sprout packages")
 	
 print('Uploading shared configuration')
+logger.info("Uploading shared configuration")
 stdin, stdout, stderr = ssh.exec_command("sudo /usr/share/clearwater/clearwater-config-manager/scripts/upload_shared_config")
 #Display Output on screen
 while not stdout.channel.exit_status_ready():
@@ -947,6 +1042,7 @@ while not stdout.channel.exit_status_ready():
 			# Print data from stdout
 			print stdout.channel.recv(1024),
 print('Applying shared configuration')
+logger.info("Applying shared configuration")
 stdin, stdout, stderr = ssh.exec_command("sudo /usr/share/clearwater/clearwater-config-manager/scripts/apply_shared_config")	
 #Display Output on screen
 while not stdout.channel.exit_status_ready():
@@ -959,6 +1055,7 @@ while not stdout.channel.exit_status_ready():
 
 #Update DNS Server
 print('Updating DNS server')
+logger_ssh.info("Updating DNS server")
 stdin, stdout, stderr = ssh.exec_command("cat > update.sh")
 stdin.write('#!/bin/bash\n')
 stdin.flush()
@@ -1012,6 +1109,7 @@ while not stdout.channel.exit_status_ready():
 
 #Configure MIB's
 print('Configuring SNMP')
+logger.info("Configuring SNMP in Sprout")
 sftp = ssh.open_sftp()
 sftp.put( MIB_FILE_PATH, MIB_PATH )
 sftp.put( MIB_FILE_PATH, '/usr/share/snmp/mibs/PROJECT-CLEARWATER-MIB.txt')
@@ -1054,6 +1152,8 @@ def get_homer_ip(heat, cluster_name):
 
 ################################# Configure Homer Node #########################################
 #Get Homer IP
+logger.info("Configure Homer Node")
+logger.info("Get Homer IP")
 homer_ip = get_homer_ip(heatclient , STACK_NAME)
 
 #Connect to Homer
@@ -1061,8 +1161,10 @@ homer_ip = get_homer_ip(heatclient , STACK_NAME)
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 print ("Connecting To Homer Node with IP " + homer_ip)
+logger_ssh.info("Connecting To Homer Node")
 ssh.connect( hostname = homer_ip , username = "root", password = "root123")
 print ("Connected")
+logger.info("Connected To Homer Node")
 stdin, stdout, stderr = ssh.exec_command("sudo -s")  
 
 # Log all output to file.
@@ -1073,12 +1175,14 @@ homer_host = str(homer_host)
 
 # Configure the APT software source.
 print("Configuring APT software source")
+logger.info("Configuring APT software source")
 stdin, stdout, stderr = ssh.exec_command("echo 'deb "+REPO_URL+" binary/' > /etc/apt/sources.list.d/clearwater.list")
 stdin, stdout, stderr = ssh.exec_command("curl -L http://repo.cw-ngv.com/repo_key | apt-key add -")
 stdin, stdout, stderr = ssh.exec_command("apt-get update")
 
 # Configure /etc/clearwater/local_config.
 print ("Configuring clearwater local settings")
+logger.info("Configuring clearwater local settings")
 stdin, stdout, stderr = ssh.exec_command("mkdir -p /etc/clearwater")
 stdin, stdout, stderr = ssh.exec_command("etcd_ip="+ETCD_IP)
 stdin, stdout, stderr = ssh.exec_command('[ -n "$etcd_ip" ] || etcd_ip=$(hostname -I)')
@@ -1094,6 +1198,7 @@ stdin.channel.shutdown_write()
 
 # Configure and upload /etc/clearwater/shared_config.
 print ("Configuring clearwater shared settings")
+logger.info("Configuring clearwater shared settings")
 stdin, stdout, stderr = ssh.exec_command("cat > /etc/clearwater/shared_config")
 stdin.write('home_domain='+domain+'\n')
 stdin.flush()
@@ -1134,6 +1239,7 @@ stdin.channel.shutdown_write()
 # Now install the software.
 
 print('Installing Homer packages...')
+logger.info("Installing Homer packages.")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install clearwater-cassandra --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -1146,6 +1252,7 @@ while True:
   if(not stdout.read()):
     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install clearwater-cassandra --yes --force-yes -o DPkg::options::=--force-confnew")
     print('Retrying Installation...')
+	logger.info("Retrying Installation.")
     time.sleep(5)	
   else:
     break
@@ -1163,6 +1270,7 @@ while True:
   if(not stdout.read()):
     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install homer --yes --force-yes -o DPkg::options::=--force-confnew")
     print('Retrying Installation...')
+	logger.info("Retrying Installation.")
     time.sleep(5)	
   else:
     break
@@ -1180,11 +1288,13 @@ while True:
   if(not stdout.read()):
     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install clearwater-management --yes --force-yes")
     print('Retrying Installation...')
+	logger.info("Retrying Installation.")
     time.sleep(5)	
   else:
     break
 
 print('Installing Homer packages...')
+logger.info("Installing Homer packages.")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install clearwater-cassandra --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -1218,6 +1328,7 @@ while True:
   else:
     break
 print('Installing SNMP...')
+logger.info("Installing SNMP in Homer")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -1236,6 +1347,7 @@ while True:
     break    
 
 print('Installing SNMPD...')
+logger.info("Installing SNMPD in Homer")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -1253,10 +1365,12 @@ while True:
   else:
     break    
 print('Finished Installation..')
+logger.info("Finished Installation in Homer")
 		    
 print('Installed Homer packages')
 	
 print('Uploading shared configuration')
+logger.info("Uploading shared configuration")
 stdin, stdout, stderr = ssh.exec_command("sudo /usr/share/clearwater/clearwater-config-manager/scripts/upload_shared_config")
 #Display Output on screen
 while not stdout.channel.exit_status_ready():
@@ -1267,6 +1381,7 @@ while not stdout.channel.exit_status_ready():
 			# Print data from stdout
 			print stdout.channel.recv(1024),
 print('Applying shared configuration')
+logger.info("Applying shared configuration")
 stdin, stdout, stderr = ssh.exec_command("sudo /usr/share/clearwater/clearwater-config-manager/scripts/apply_shared_config")	
 #Display Output on screen
 while not stdout.channel.exit_status_ready():
@@ -1279,6 +1394,7 @@ while not stdout.channel.exit_status_ready():
 	
 #Update DNS Server
 print('Updating DNS server')
+logger.info("Updating DNS server for homer")
 stdin, stdout, stderr = ssh.exec_command("cat > update.sh")
 stdin.write('#!/bin/bash\n')
 stdin.flush()
@@ -1348,6 +1464,8 @@ def get_homestead_ip(heat, cluster_name):
 
 ################################# Configure Homestead Node ######################################
 #Get Homestead IP
+logger.info("Configure Homestead Node")
+logger.info("Get Homestead IP")
 homestead_ip = get_homestead_ip(heatclient , STACK_NAME)
 
 #Connect to Homestead
@@ -1355,8 +1473,10 @@ homestead_ip = get_homestead_ip(heatclient , STACK_NAME)
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 print ("Connecting To Homestead Node with IP " + homestead_ip)
+logger_ssh.info("Connecting To Homestead Node")
 ssh.connect( hostname = homestead_ip , username = "root", password = "root123" )
 print ("Connected")
+logger.info("Connected To Homestead Node")
 stdin, stdout, stderr = ssh.exec_command("sudo -s")  
 
 # Log all output to file.
@@ -1367,12 +1487,14 @@ homestead_host = str(homestead_host)
 
 # Configure the APT software source.
 print("Configuring APT software source")
+logger.info("Configuring APT software source")
 stdin, stdout, stderr = ssh.exec_command("echo 'deb "+REPO_URL+" binary/' > /etc/apt/sources.list.d/clearwater.list")
 stdin, stdout, stderr = ssh.exec_command("curl -L http://repo.cw-ngv.com/repo_key | apt-key add -")
 stdin, stdout, stderr = ssh.exec_command("apt-get update")
 
 # Configure /etc/clearwater/local_config.
 print ("Configuring clearwater local settings")
+logger.info("Configuring clearwater local settings")
 stdin, stdout, stderr = ssh.exec_command("mkdir -p /etc/clearwater")
 stdin, stdout, stderr = ssh.exec_command("etcd_ip="+ETCD_IP)
 stdin, stdout, stderr = ssh.exec_command('[ -n "$etcd_ip" ] || etcd_ip=$(hostname -I)')
@@ -1388,6 +1510,7 @@ stdin.channel.shutdown_write()
 
 # Configure and upload /etc/clearwater/shared_config.
 print ("Configuring clearwater shared settings")
+logger.info("Configuring clearwater shared settings")
 stdin, stdout, stderr = ssh.exec_command("cat > /etc/clearwater/shared_config")
 stdin.write('home_domain='+domain+'\n')
 stdin.flush()
@@ -1427,6 +1550,7 @@ stdin.channel.shutdown_write()
 
 # Now install the software.
 print('Installing Homestead packages...')
+logger.info("Installing Homestead packages.")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install clearwater-cassandra --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -1439,6 +1563,7 @@ while True:
   if(not stdout.read()):
     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install clearwater-cassandra --yes --force-yes -o DPkg::options::=--force-confnew")
     print('Retrying Installation...')
+	logger.info("Retrying Installation.")
     time.sleep(5)	
   else:
     break
@@ -1454,6 +1579,7 @@ while True:
   if(not stdout.read()):
     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install homestead homestead-prov --yes --force-yes -o DPkg::options::=--force-confnew")
     print('Retrying Installation...')
+	logger.info("Retrying Installation.")
     time.sleep(5)	
   else:
     break			
@@ -1471,6 +1597,7 @@ while True:
   if(not stdout.read()):
     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install clearwater-management --yes --force-yes")
     print('Retrying Installation...')
+	logger.info("Retrying Installation.")
     time.sleep(5)	
   else:
     break		
@@ -1524,6 +1651,7 @@ while True:
     break		    		
 
 print('Installing SNMP...')
+logger.info("Installing SNMP in Homestead")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -1542,6 +1670,7 @@ while True:
     break    
 
 print('Installing SNMPD...')
+logger.info("Installing SNMPD in Homestead")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -1559,11 +1688,13 @@ while True:
   else:
     break    
 print('Finished Installation..')
+logger.info("Finished Installation in Homestead")
 		    
 print('Installed Homestead packages')	
 
 #Configure MIB's
 print('Configuring SNMP')
+logger.info("Configure MIB's in Homer")
 sftp = ssh.open_sftp()
 sftp.put( MIB_FILE_PATH, MIB_PATH )
 sftp.put( MIB_FILE_PATH, '/usr/share/snmp/mibs/PROJECT-CLEARWATER-MIB.txt')
@@ -1581,6 +1712,7 @@ stdin, stdout, stderr = ssh.exec_command("snmpwalk -v 2c -c clearwater localhost
 
 	
 print('Uploading shared configuration')
+logger.info("Uploading shared configuration")
 stdin, stdout, stderr = ssh.exec_command("sudo /usr/share/clearwater/clearwater-config-manager/scripts/upload_shared_config")
 #Display Output on screen
 while not stdout.channel.exit_status_ready():
@@ -1591,6 +1723,7 @@ while not stdout.channel.exit_status_ready():
 			# Print data from stdout
 			print stdout.channel.recv(1024),
 print('Applying shared configuration')
+logger.info("Applying shared configuration")
 stdin, stdout, stderr = ssh.exec_command("sudo /usr/share/clearwater/clearwater-config-manager/scripts/apply_shared_config")	
 #Display Output on screen
 while not stdout.channel.exit_status_ready():
@@ -1603,6 +1736,7 @@ while not stdout.channel.exit_status_ready():
 
 #Update DNS Server
 print('Updating DNS server')
+logger.info("Updating DNS server for homestead")
 stdin, stdout, stderr = ssh.exec_command("cat > update.sh")
 stdin.write('#!/bin/bash\n')
 stdin.flush()
@@ -1677,6 +1811,8 @@ def get_ellis_ip(heat, cluster_name):
 
 ################################# Configure Ellis Node #######################################
 #Get Ellis IP
+logger.info("Configure Ellis Node")
+logger.info("Get Ellis IP")
 ellis_ip = get_ellis_ip(heatclient , STACK_NAME)
 
 #Connect to Ellis
@@ -1686,11 +1822,14 @@ while True:
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     print ("Connecting To Ellis Node with IP " + ellis_ip)
+	logger_ssh.info("Connecting To Ellis Node")
     ssh.connect( hostname = ellis_ip , username = "root", password = "root123" )
     print ("Connected")
+	logger.info("Connected To Ellis Node")
     break
   except:
     print("Could not connect. Retrying in 5 seconds...")
+	error_logger.exception("Could not connect to Ellis.")
     time.sleep(5) 
 	
 stdin, stdout, stderr = ssh.exec_command("sudo -s")  
@@ -1700,6 +1839,7 @@ stdin, stdout, stderr = ssh.exec_command("exec > >(tee -a /var/log/clearwater-he
 
 # Configure the APT software source.
 print("Configuring APT software source")
+logger.info("Configuring APT software source")
 stdin, stdout, stderr = ssh.exec_command("echo 'deb "+REPO_URL+" binary/' > /etc/apt/sources.list.d/clearwater.list")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -1733,6 +1873,7 @@ ellis_host = str(ellis_host)
 
 # Configure /etc/clearwater/local_config.
 print ("Configuring clearwater local settings")
+logger.info("Configuring clearwater local settings")
 stdin, stdout, stderr = ssh.exec_command("mkdir -p /etc/clearwater")
 stdin, stdout, stderr = ssh.exec_command("etcd_ip="+ETCD_IP)
 stdin, stdout, stderr = ssh.exec_command('[ -n "$etcd_ip" ] || etcd_ip=$(hostname -I)')
@@ -1748,6 +1889,7 @@ stdin.channel.shutdown_write()
 
 # Installing the software
 print ("Installing Ellis software packages....")
+logger.info("Installing Ellis software packages.")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install ellis --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -1766,6 +1908,7 @@ while True:
     break				
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install clearwater-config-manager --yes --force-yes") 
 print ("Installed Ellis packages")
+logger.info("Installed Ellis software packages.")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
 	if stdout.channel.recv_ready():
@@ -1782,6 +1925,7 @@ while True:
   else:
     break		
 print('Installing SNMP...')
+logger.info("Installing SNMP in Ellis")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -1800,6 +1944,7 @@ while True:
     break    
 
 print('Installing SNMPD...')
+logger.info("Installing SNMPD in Ellis")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -1820,6 +1965,7 @@ print('Finished Installation..')
 		    
 # Configure and upload /etc/clearwater/shared_config.
 print ("Configuring clearwater shared settings")
+logger.info("Configuring clearwater shared settings")
 stdin, stdout, stderr = ssh.exec_command("cat > /etc/clearwater/shared_config")
 stdin.write('home_domain='+domain+'\n')
 stdin.flush()
@@ -1858,6 +2004,7 @@ stdin.write('ellis_cookie_key=secret\n')
 stdin.channel.shutdown_write()
 		
 print('Uploading shared configuration')
+logger.info("Uploading shared configuration")
 stdin, stdout, stderr = ssh.exec_command("sudo /usr/share/clearwater/clearwater-config-manager/scripts/upload_shared_config")
 #Display Output on screen
 while not stdout.channel.exit_status_ready():
@@ -1868,6 +2015,7 @@ while not stdout.channel.exit_status_ready():
 			# Print data from stdout
 			print stdout.channel.recv(1024),
 print('Applying shared configuration')
+logger.info("Applying shared configuration")
 stdin, stdout, stderr = ssh.exec_command("sudo /usr/share/clearwater/clearwater-config-manager/scripts/apply_shared_config")	
 #Display Output on screen
 while not stdout.channel.exit_status_ready():
@@ -1880,11 +2028,12 @@ while not stdout.channel.exit_status_ready():
 
 # Allocate a allocate a pool of numbers to assign to users.
 print('Allocating a pool of numbers to assign users')
+logger.info("Allocating a pool of numbers to assign users")
 stdin, stdout, stderr = ssh.exec_command("/usr/share/clearwater/ellis/env/bin/python /usr/share/clearwater/ellis/src/metaswitch/ellis/tools/create_numbers.py --start "+DN_RANGE_START+" --count "+DN_RANGE_LENGTH)			
 
 #Update DNS Server
 print('Updating DNS server')
-
+logger.info("Updating DNS server for ellis")
 stdin, stdout, stderr = ssh.exec_command("cat > update.sh")
 stdin.write('#!/bin/bash\n')
 stdin.flush()
@@ -1958,6 +2107,8 @@ def get_ralf_ip(heat, cluster_name):
 
 ################################# Configure Ralf Node #######################################
 #Get Ralf IP
+logger.info("Configure Ralf Node")
+logger.info("Get Ralf IP")
 while True:
   try:
     ralf_ip = get_ralf_ip(heatclient , STACK_NAME)
@@ -1972,12 +2123,15 @@ while True:
 #    k = paramiko.RSAKey.from_private_key_file("/root/.ssh/secure.pem")
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    print ("Connecting To Ralf Node with IP " + ralf_ip)
+    logger_ssh.info("Connecting To Ralf Node")
+	print ("Connecting To Ralf Node with IP " + ralf_ip)
     ssh.connect( hostname = ralf_ip , username = "root", password = "root123" )
     print ("Connected")
+	logger_ssh.info("Connected To Ralf Node")
     break
   except:
-    print("Could not connect. Retrying in 5 seconds...")
+    error_logger.exception("Could not connect to Ralf.")
+	print("Could not connect. Retrying in 5 seconds...")
     time.sleep(5) 
 
 # Log all output to file.
@@ -1985,6 +2139,7 @@ stdin, stdout, stderr = ssh.exec_command("exec > >(tee -a /var/log/clearwater-he
 
 # Configure the APT software source.
 print("Configuring APT software source")
+logger.info("Configuring APT software source")
 stdin, stdout, stderr = ssh.exec_command("echo 'deb "+REPO_URL+" binary/' > /etc/apt/sources.list.d/clearwater.list")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -2018,6 +2173,7 @@ ralf_host = str(ralf_host)
 
 # Configure /etc/clearwater/local_config.
 print ("Configuring clearwater local settings")
+logger.info("Configuring clearwater local settings")
 stdin, stdout, stderr = ssh.exec_command("mkdir -p /etc/clearwater")
 stdin, stdout, stderr = ssh.exec_command("etcd_ip="+ETCD_IP)
 stdin, stdout, stderr = ssh.exec_command('[ -n "$etcd_ip" ] || etcd_ip=$(hostname -I)')
@@ -2034,6 +2190,7 @@ stdin.channel.shutdown_write()
 # Installing the software
 # Installing the software
 print ("Installing Ralf software packages....")
+logger.info("Installing Ralf software packages.")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install ralf --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -2052,6 +2209,7 @@ while True:
     break				
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install clearwater-config-manager --yes --force-yes") 
 print ("Installed Ralf packages")
+logger.info("Installed Ralf software packages.")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
 	if stdout.channel.recv_ready():
@@ -2103,6 +2261,7 @@ while True:
   else:
     break     
 print('Installing SNMP...')
+logger.info("Installing SNMP in Ralf")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -2121,6 +2280,7 @@ while True:
     break    
 
 print('Installing SNMPD...')
+logger.info("Installing SNMPD in Ralf")
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -2138,10 +2298,13 @@ while True:
   else:
     break    
 print('Finished Installation..')
+logger.info("Finished Installation in Ralf")
 		 
 print('Installed Ralf packages') 
+logger.info("Finished Installation in Ralf")
 #Update DNS Server
 print('Updating DNS server')
+logger.info("Updating DNS server for Ralf")
 stdin, stdout, stderr = ssh.exec_command("cat > update.sh")
 stdin.write('#!/bin/bash\n')
 stdin.flush()
@@ -2221,10 +2384,6 @@ print("*************************")
 SCALE_UP = False
 ################################## Get Homestead information ###################################
 while True:
-  cred = get_keystone_creds(config)
-  ks_client = Keystone_Client(**cred)
-  heat_endpoint = ks_client.service_catalog.url_for(service_type='orchestration', endpoint_type='publicURL')
-  heatclient = Heat_Client('1', heat_endpoint, token=ks_client.auth_token, username='admin', passwork='admin')
 
   #Connect to Homestead
   #k = paramiko.RSAKey.from_private_key_file("/root/.ssh/secure.pem")
@@ -2276,9 +2435,10 @@ while True:
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     print ("Connecting To local Node with IP " + LOCAL_IP)
-    ssh.connect( hostname = LOCAL_IP , username = "root", password = "r00tme" )
-    print ("Connected")
-    stdin, stdout, stderr = ssh.exec_command("python /root/vIMS/Scale.py")  
+    ssh.connect( hostname = LOCAL_IP , username = "root", password = "root123" )
+    print ("Connected")S
+	logger.info("scaling Up")
+    stdin, stdout, stderr = ssh.exec_command("python /root/AB/Scale.py")  
     while not stdout.channel.exit_status_ready():
   	# Only print data if there is data to read in the channel 
   	  if stdout.channel.recv_ready():
@@ -2297,9 +2457,9 @@ while True:
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     print ("Connecting To local Node with IP " + LOCAL_IP)
-    ssh.connect( hostname = LOCAL_IP , username = "root", password = "r00tme" )
+    ssh.connect( hostname = LOCAL_IP , username = "root", password = "root123" )
     print ("Connected")
-    stdin, stdout, stderr = ssh.exec_command("python /root/vIMS/Scale_down.py")  
+    stdin, stdout, stderr = ssh.exec_command("python /root/AB/Scale_down.py")  
     while not stdout.channel.exit_status_ready():
   	# Only print data if there is data to read in the channel 
   	  if stdout.channel.recv_ready():
