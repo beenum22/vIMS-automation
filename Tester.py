@@ -10,6 +10,31 @@ import json
 import time
 import paramiko
 import select
+############################## logging ########################################
+import logging
+import datetime											
+now = datetime.datetime.now()
+date_time = now.strftime("%Y-%m-%d_%H-%M")
+filename_activity = '/root/vIMS/logs/Stress_test_' + date_time + '.log'
+filename_error = '/root/vIMS/logs/Stress_test_error_' + date_time + '.log'
+
+logging.basicConfig(filename=filename_activity, level=logging.INFO, filemode='w', format='%(asctime)s %(levelname)-8s %(name)-23s [-]  %(message)s')
+
+logger=logging.getLogger(__name__)
+logger_nova=logging.getLogger('nova')
+logger_neutron=logging.getLogger('neutron')
+logger_glance = logging.getLogger('glance')
+logger_ssh=logging.getLogger('paramiko')
+error_logger = logging.getLogger('error_log')
+
+# create logger with 'Error Loging'
+error_logger.setLevel(logging.ERROR)
+fh = logging.FileHandler(filename_error, mode = 'w')
+fh.setLevel(logging.ERROR)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+error_logger.addHandler(fh)
+
 ############################## Time Stamp Function ########################################
 import sys
 from datetime import datetime as dt
@@ -47,6 +72,7 @@ def get_user_configurations():
 	return configurations
 
 print('Getting user confiurations...')
+logger.info("Getting user confiurations.")
 user_config = get_user_configurations()
 ext_net = user_config['networks']['external']
 ext_net = str(ext_net)
@@ -54,6 +80,7 @@ domain = user_config['domain']['zone']
 domain = str(domain)
 
 print('Successfull')
+logger.info("Getting user confiurations Successfull.")
 ############################## Keystone Credentials Functions ############################
 
 def get_keystone_creds(configurations):
@@ -77,15 +104,19 @@ def get_configurations():
 	configurations = json.load(file)
 	file.close()
 	return configurations
-print('Credentials Loaded')  
+print('Credentials Loaded')
+logger.info("Credentials Loaded")  
 config = get_configurations()
-
+logger.info("Getting keystone credentials")
 credsks = get_keystone_creds(config)
+logger_nova.info("Getting Nova Credentials")
 creds = get_nova_creds(config)
 
 # Get authorized instance of nova client
+logger_nova.info("Getting authorized instance of nova client")
 nova = nvclient.Client(**creds)   
 # Get authorized instance of neutron client
+logger_neutron.info("Get authorized instance of neutron client")
 neutron = ntrnclient.Client(**credsks)
 
 ############################## Create Ubuntu 14.04 Image ###################################
@@ -122,28 +153,36 @@ def create_agg(nova):
  hostnA = hyper_list[0].service['host']
  print hostnA
  try:
+   logger_nova.info("Creating aggregate group and availability zone for A")
    agg_idA = nova.aggregates.create(get_aggnameA(), get_avlzoneA())
  except:
+   error_logger.exception("Unable to create nova aggregate group A and availability zone A")
    print('Error')
    pass
  try:
+   logger_nova.info("creating nova aggregate group B and availability zone B")
    agg_idB = nova.aggregates.create(get_aggnameB(), get_avlzoneB())
  except:
    print('Error')
+   error_logger.exception("Unable to create nova aggregate group B and availability zone B")
    pass
  try:
+   logger_nova.info("Adding host to nova aggregate group A")
    nova.aggregates.add_host(aggregate=agg_idA, host=hostnA)
  except:
    print('Error')
+   error_logger.exception("Error in adding host to nova aggregate group A")
    pass
  try:
+   logger_nova.info("Adding host to nova aggregate group B")
    nova.aggregates.add_host(aggregate=agg_idB, host=hostnB)
  except:
+   error_logger.exception("Error in adding host to nova aggregate group B")
    print('Error')
    pass
 
 print('Successfully added availaibility zones')
-
+logger.info("Successfully added availaibility zones")
 ########################### Fetch network ID of network netname ###########################
 
 def get_network_id(netname, neutron):
@@ -157,7 +196,7 @@ def get_network_id(netname, neutron):
 net_id = get_network_id(netname= ext_net, neutron = neutron)
 net_id = str(net_id)
 print ('Network ID of external network =' + net_id)
-
+logger.info("Fetch network ID of network netname")
 ############################### Create Keypair #########################################
 
 # Creating a keypair
@@ -187,6 +226,7 @@ def get_private_id(netname, neutron):
 private_id = get_network_id('IMS-private', neutron = neutron)
 private_id = str(private_id)
 print ('Network ID of private network = ' + private_id)
+logger.info("Fetch network ID of private network")
 ############################## Heat Stack Create ##########################################
 def create_cluster(heat,cluster_name):
   cluster_full_name=STACK_NAME
@@ -207,6 +247,7 @@ def create_cluster(heat,cluster_name):
      }
     }
   #try:  
+  logger.info("Create Heat stack")
   heat.stacks.create(**cluster_body)
   #except:
   #print ("There is an error creating cluster, exiting...")
@@ -214,14 +255,18 @@ def create_cluster(heat,cluster_name):
   print ("Creating stack "+ cluster_full_name )
 
 ########################### Create Heat Stack from credentials of keystone #####################
-
+logger.info("Getting Keystone credentials")
 cred = get_keystone_creds(config)
+logger.info("creating keystone client")
 ks_client = Keystone_Client(**cred)
+logger.info("creating heat endpoint")
 heat_endpoint = ks_client.service_catalog.url_for(service_type='orchestration', endpoint_type='publicURL')
+logger.info("creating heat client")
 heatclient = Heat_Client('1', heat_endpoint, token=ks_client.auth_token, username='admin', passwork='admin')
 create_cluster(heatclient,STACK_NAME)
 #stack = heatclient.stacks.list()
 #print stack.next()
+logger.info("deploying heat stack")
 print('Please wait while stack is deployed.......')
 #time.sleep(180)
 cluster_details=heatclient.stacks.get(STACK_NAME)
@@ -244,6 +289,7 @@ def get_bono_ip(heat, cluster_name):
    return bono_ip[0]
 
 #Get Bono IP
+logger.info("Getting bono IP")
 bono_ip = get_bono_ip(heatclient , 'IMS')
 ##################################### Get Node IP ################################################
 
@@ -258,6 +304,8 @@ def get_node_ip(heat, cluster_name):
 
 ################################# Configure Test Node #########################################
 #Get Node IP
+logger.info("configure test node")
+logger.info("getting node IP")
 node_ip = get_node_ip(heatclient , STACK_NAME)
 print('Waiting for the test node to spawn...')
 time.sleep(60) # wait for VM to spawn
@@ -267,11 +315,14 @@ while True:
 #    k = paramiko.RSAKey.from_private_key_file("/root/.ssh/test.pem")
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    logger_ssh.info("Connecting To Test Node")
     print ("Connecting To Test Node with IP " + node_ip)
     ssh.connect( hostname = node_ip , username = "root", password = "root123" )
+    logger_ssh.info("Connected To Test Node")
     print ("Connected")
     break
   except:
+    error_logger.exception("Unable to connect to test node")
     print("Could not connect. Retrying in 5 seconds...")
     time.sleep(5)    
 
@@ -281,10 +332,12 @@ node_host = str(node_host)
 
 # Configure the APT software source.
 print("Configuring APT software source")
+logger.info("Configuring APT software source")
 stdin, stdout, stderr = ssh.exec_command("echo 'deb "+REPO_URL+" binary/' > /etc/apt/sources.list.d/clearwater.list")
 stdin, stdout, stderr = ssh.exec_command("curl -L http://repo.cw-ngv.com/repo_key | apt-key add -")
 
 print('Updating Ubuntu..')
+logger.info("Updating Ubuntu.")
 stdin, stdout, stderr = ssh.exec_command("apt-get update")
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
@@ -296,6 +349,7 @@ while not stdout.channel.exit_status_ready():
       
 # Configure /etc/clearwater/local_config.
 print ("Configuring clearwater local settings")
+logger.info("Configuring clearwater local settings")
 stdin, stdout, stderr = ssh.exec_command("mkdir -p /etc/clearwater")
 stdin.flush()
 stdin, stdout, stderr = ssh.exec_command("cat > /etc/clearwater/local_config")
@@ -307,6 +361,7 @@ stdin.channel.shutdown_write()
 
 # Configure and upload /etc/clearwater/shared_config.
 print ("Configuring clearwater shared settings")
+logger.info("Configuring clearwater shared settings")
 stdin, stdout, stderr = ssh.exec_command("cat > /etc/clearwater/shared_config")
 stdin.write('home_domain='+domain+'\n')
 stdin.flush()
@@ -318,6 +373,7 @@ stdin.channel.shutdown_write()
 
 # Configure /etc/clearwater/local_config.
 print ("Configuring clearwater local settings")
+logger.info("Configuring clearwater local settings")
 stdin, stdout, stderr = ssh.exec_command("mkdir -p /etc/clearwater")
 stdin.flush()
 stdin, stdout, stderr = ssh.exec_command("cat > /etc/clearwater/local_config")
@@ -329,6 +385,7 @@ stdin.channel.shutdown_write()
 
 # Configure and upload /etc/clearwater/shared_config.
 print ("Configuring clearwater shared settings")
+logger.info("Configuring clearwater shared settings")
 stdin, stdout, stderr = ssh.exec_command("cat > /etc/clearwater/shared_config")
 stdin.write('home_domain='+domain+'\n')
 stdin.flush()
@@ -374,3 +431,4 @@ while True:
 
 stdin, stdout, stderr = ssh.exec_command("sudo DEBIAN_FRONTEND=noninteractive apt-get install clearwater-sip-stress --yes")    
 print('Finished installing software')
+logger.info("Finished installing software")
