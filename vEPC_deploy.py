@@ -22,8 +22,6 @@ from novaclient import client
 # global variables
 STACK_NAME = "vEPC_test"
 name_list = ['VEM', 'SDB', 'CPE', 'CDF', 'UDB', 'DPE', 'RIF']
-file_list = ['vem1.txt', 'sdb1.txt', 'cpe1.txt', 'cdf1.txt', 'udb1.txt', 'dpe1.txt', 'rif1.txt']
-file_list2 = ['vem2.txt', 'sdb2.txt', 'cpe2.txt', 'cdf2.txt', 'udb2.txt', 'dpe2.txt', 'rif2.txt']
 
 LOCAL_PATH_MME_CFG = "source/vEPC_deploy/vcm-mme-start"
 REMOTE_PATH_MME_CFG = "/opt/VCM/etc/scripts/vcm-mme-start"
@@ -145,7 +143,7 @@ avl_zoneB = get_avlzoneB()
 heat_endpoint = keystone.service_catalog.url_for(service_type='orchestration', endpoint_type='publicURL')
 heatclient = Heat_Client('1', heat_endpoint, token=keystone.auth_token)
 
-#create_cluster(heatclient,STACK_NAME)
+create_cluster(heatclient,STACK_NAME)
 
 cluster_details=heatclient.stacks.get(STACK_NAME)
 while(cluster_details.status!= 'COMPLETE'):
@@ -159,14 +157,14 @@ while(cluster_details.status!= 'COMPLETE'):
 
 #--------------------- getting IPs from heat client --------------------#
 for vm_name in name_list:
-	vm_ip = get_instance_floatingip(heatclient, cluster_details, vm_name)
+	vm_ip = get_instance_floatingip(heatclient, STACK_NAME, vm_name)
 	instance_obj = InstanceObj(vm_name, vm_ip)
 	instance_list.append(instance_obj)
 	print vm_ip
 	
 for vm_name in name_list:
 	vm_name2 = vm_name + "_2"
-	vm_ip = get_instance_floatingip(heatclient, cluster_details, vm_name2)
+	vm_ip = get_instance_floatingip(heatclient, STACK_NAME, vm_name)
 	instance_obj = InstanceObj(vm_name, vm_ip)
 	instance_list2.append(instance_obj)
 	print vm_ip
@@ -185,11 +183,8 @@ time.sleep(30)
 
 #--------------------- Checking ping status --------------------#
 for i in range(0, 7):
+	#print(instance_list[i].ip + "    " + instance_list[i].name)
 	check_ping_status(instance_list[i].ip, instance_list[i].name, logger)
 for i in range(0, 7):
-	check_ping_status(instance_list2[i].ip, instance_list2[i].name, logger)
-
-for i in range(0, 7):
-	hostname_config(ssh, instance_list[i].ip, instance_list[i].name, file_list[i], REMOTE_PATH_HOSTNAME, error_logger, logger_ssh)
-for i in range(0, 7):
-	hostname_config(ssh, instance_list2[i].ip, instance_list2[i].name, file_list2[i], REMOTE_PATH_HOSTNAME, error_logger, logger_ssh)
+	#print(instance_list[i].ip + "    " + instance_list[i].name)
+	check_ping_status(instance_list2[i].ip, instance_list[i].name, logger)
