@@ -14,9 +14,9 @@ FILE_PATH_SDB = 'heat_templates/VCM_SDB.yaml'
 FILE_PATH_UDB = 'heat_templates/VCM_UDB.yaml'
 FILE_PATH_VEM = 'heat_templates/VCM_VEM.yaml'
 
-DIR_hostnames = 'hostnames/'
-DIR_ip_files = 'ip_files/'
-DIR_IMG = '/root/IMGS/'
+FILE_PATH_ip_files = 'ip_files/'
+IMAGE_DIR_PATH = '/root/IMGS/'
+
 #----------------------------------------------------------------------------------#
 def create_cluster(heat, cluster_name):
 
@@ -102,7 +102,7 @@ def get_configurations(logger, error_logger):
 	return configurations
 
 def input_configurations(error_logger, logger):
-	global DIR_ip_files
+	global FILE_PATH_ip_files
 	try:
 		json_file = open('configurations.json')
 	except:
@@ -162,7 +162,7 @@ def input_configurations(error_logger, logger):
 	configurations['networks']['sgi_pool_start'] = inp[1]
 	configurations['networks']['sgi_pool_end'] = inp[3]
 
-	FILE_PATH_range = DIR_ip_files + 'range_nexthop.txt'
+	FILE_PATH_range = FILE_PATH_ip_files + 'range_nexthop.txt'
 	try:
 		param_file_write = open(FILE_PATH_range, 'w')
 	except:
@@ -183,23 +183,26 @@ def input_configurations(error_logger, logger):
 	
 	file_read.close()
 #--------------------------------------------------------#
-def get_instance_floatingip(heat, cluster_details, vm_name):
+def get_instance_floatingip(heat, cluster_name, vm_name):
+   cluster_details=heat.stacks.get(cluster_name)
    output = vm_name + '_ip'
    for i in cluster_details.outputs:
      if i['output_key']== output:
         insatnce_ip= i['output_value']
    return insatnce_ip[0]
 
-def get_instance_private_ip(heat, cluster_details, vm_name):
+def get_instance_private_ip(heat, cluster_name, vm_name):
+   cluster_details=heat.stacks.get(cluster_name)
    output = vm_name + '_private_ip'
    for i in cluster_details.outputs:
      if i['output_key']== output:
         insatnce_ip= i['output_value']
    return insatnce_ip[0]
 
+
 #--------create availaible IPs file-------#
 def create_IP_file(netname, configurations, logger):
-	global DIR_ip_files
+	global FILE_PATH_ip_files
 	info_msg = "Creating IP file " + netname
 	logger.info(info_msg)
 	net_cidr = ''
@@ -214,11 +217,11 @@ def create_IP_file(netname, configurations, logger):
 	pool = ''
 	
 	if 's1' in netname:
-		FILE_PATH = DIR_ip_files + 's1_available_ips.txt'
+		FILE_PATH = FILE_PATH_ip_files + 's1_available_ips.txt'
 		s1_e = configurations['networks']['s1_pool_end'].split('.')
 		pool =  int(s1_e[3])
 	elif 'sgi' in netname:
-		FILE_PATH = DIR_ip_files + 'sgi_available_ips.txt'
+		FILE_PATH = FILE_PATH_ip_files + 'sgi_available_ips.txt'
 		sgi_e = configurations['networks']['sgi_pool_end'].split('.')
 		pool =  int(sgi_e[3])# - int(sgi_s[3])
 		
@@ -267,16 +270,16 @@ def get_available_IP(net_addr, mask, pool):
 #-------------------writing IP of VCM config to separate file---------#
 def write_cfg_file(cfg_file_name, configurations):
 	
-	global DIR_ip_files
+	global FILE_PATH_ip_files
 	sgi_ip = ''
 	
-	s1_ip_filename =  DIR_ip_files + 's1_assigned_ips.txt'
-	sgi_ip_filename = DIR_ip_files + 'sgi_assigned_ips.txt'
+	s1_ip_filename =  FILE_PATH_ip_files + 's1_assigned_ips.txt'
+	sgi_ip_filename = FILE_PATH_ip_files + 'sgi_assigned_ips.txt'
 	
 	s1_ip_file = open(s1_ip_filename, 'a')
 	sgi_ip_file = open(sgi_ip_filename, 'a')
 		
-	param_file_read = open(DIR_ip_files + 'range_nexthop.txt', 'r')
+	param_file_read = open(FILE_PATH_ip_files + 'range_nexthop.txt', 'r')
 	
 	inp = param_file_read.readline()
 	inp = inp.split("\"")
@@ -340,9 +343,9 @@ def get_IP_from_file(f_name):
 	filename = ''
 	
 	if (f_name == 's1'):
-		filename = DIR_ip_files + 's1_available_ips.txt'
+		filename = FILE_PATH_ip_files + 's1_available_ips.txt'
 	elif (f_name == 'sgi'):
-		filename = DIR_ip_files + 'sgi_available_ips.txt'
+		filename = FILE_PATH_ip_files + 'sgi_available_ips.txt'
 
 	file_read = open(filename, 'r')
 	assigned_ip = file_read.readline()
@@ -387,10 +390,10 @@ def image_exists(glance, img_name, error_logger, logger_glance):
 #------------------------------------------#
 
 def check_image_directory(img_name, logger_glance, error_logger):
-	global DIR_IMG
-	info_msg = "Checking if image " + img_name + " exists in the directory " + DIR_IMG
+	global IMAGE_DIR_PATH
+	info_msg = "Checking if image " + img_name + " exists in the directory " + IMAGE_DIR_PATH
 	logger_glance.info(info_msg)
-	PATH = DIR_IMG + img_name + ".qcow2"
+	PATH = IMAGE_DIR_PATH + img_name + ".qcow2"
 	if not os.path.isfile(PATH):
 		error_msg = "Image file " + img_name + " does not exist in the directory vEPC/IMGS/, please download image files and copy to the directory vEPC/IMGS/ "
 		print ("[" + time.strftime("%H:%M:%S")+ "] " + error_msg)
@@ -400,10 +403,10 @@ def check_image_directory(img_name, logger_glance, error_logger):
 
 #-----------create VCM and EMS image--------#
 def create_image(glance, img_name, logger_glance, error_logger):
-	global DIR_IMG
+	global IMAGE_DIR_PATH
 	info_msg = "Creating image " + img_name
 	logger_glance.info(info_msg)
-	IMAGE_PATH =  DIR_IMG + img_name + ".qcow2"
+	IMAGE_PATH =  IMAGE_DIR_PATH + img_name + ".qcow2"
 	try:
 		image = glance.images.create(name=img_name,disk_format = 'qcow2', container_format = 'bare')
 		image = glance.images.upload(image.id, open(IMAGE_PATH, 'rb'))
@@ -537,46 +540,9 @@ def check_ping_status(hostname, vm_name, logger):
 		if time_sleeping > 120:
 			print("[" + time.strftime("%H:%M:%S")+ "] Host unreachable, please check configuration. Exiting..")
 			logger.error("Host unreachable: exiting")
-			sys.exit()
+			#sys.exit()
 		print("[" + time.strftime("%H:%M:%S")+ "] " + vm_name + " booting up, please wait...")
 		logger.info("Waiting for VM to boot up")
 		time.sleep(5)
-		time_sleeping += 10
+		time_sleeping += 5
 	print("[" + time.strftime("%H:%M:%S")+ "] " + vm_name+" booted up!")
-
-def hostname_config(ssh, ip, vm_name, file_name, REMOTE_PATH_HOSTNAME, error_logger, logger_ssh):
-	print( "[" + time.strftime("%H:%M:%S")+ "] Host-name configuration for " + vm_name)
-	info_msg = "Starting Host-name configuration for " + vm_name
-	logger_ssh.info(info_msg)
-	while(True):
-		try:
-			info_msg = "Connecting to " + vm_name
-			logger_ssh.info(info_msg)
-			ssh.connect(ip, username='root', password='root123')
-			break
-		except:
-			print("[" + time.strftime("%H:%M:%S")+ "] "+vm_name + " not ready for SSH waiting...")
-			error_msg = vm_name + " not ready for SSH "
-			logger_ssh.warning(error_msg)
-			error_logger.exception(error_msg)
-			time.sleep(5)
-	info_msg = "Connected to " + vm_name
-	logger_ssh.info(info_msg)
-	print( "[" + time.strftime("%H:%M:%S")+ "] \t Copying host-name file..." )
-	logger_ssh.info("Openning SFTP session")
-	sftp = ssh.open_sftp()
-	logger_ssh.info("Copying files")
-	sftp.put(DIR_hostnames + "host_" + file_name, REMOTE_PATH_HOSTNAME)
-
-	if(vm_name == 'VCM-EMS'):
-		sftp.put(DIR_hostnames + "ems.txt", "/etc/hosts")
-		print("[" + time.strftime("%H:%M:%S")+ "] Rebooting EMS to allow host-name changes to take effect")
-		time.sleep(5)
-		#ssh.exec_command("reboot")
-	logger_ssh.info("Successfully Copied files")
-	sftp.close()
-	info_msg = vm_name + "Successfully configured"
-	logger_ssh.info(info_msg)
-	logger_ssh.info("Rebooting VM")
-	ssh.exec_command("reboot")
-	ssh.close()
