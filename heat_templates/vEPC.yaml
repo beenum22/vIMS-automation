@@ -80,10 +80,38 @@ parameters:
     description: End of private network IP address pool
     default: 172.16.10.30
 
+
+  internal_net_name:
+    type: string
+    description: Name of private network
+    default: vEPC-private
+  internal_net_cidr:
+    type: string
+    description: Private network address (CIDR notation)
+    default: 192.16.100.0/24
+  internal_net_gateway:
+    type: string
+    description: Private network gateway address
+    default: 192.16.100.254
+  internal_net_pool_start:
+    type: string
+    description: Start of private network IP address pool
+    default: 192.16.100.1
+  internal_net_pool_end:
+    type: string
+    description: End of private network IP address pool
+    default: 192.16.100.253
+  internal_dns_ip:
+    type: string
+    description: IP address of DNS server
+    default: 8.8.8.8
+
+
   security_group_name:
     type: string
     description: End of private network IP address pool
     default: vEPC_sec_grp
+
 resources:
   vEPC_security_group:
     type: OS::Neutron::SecurityGroup
@@ -114,6 +142,18 @@ resources:
         - protocol: udp
           port_range_min: 161
           port_range_max: 161
+
+  internal_network:
+    type: network.yaml
+    properties:
+      public_net: { get_param: public_network }
+      private_net_name: { get_param: internal_net_name }
+      private_net_cidr: { get_param: internal_net_cidr }
+      private_net_gateway: { get_param: internal_net_gateway }
+      private_net_pool_start: { get_param: internal_net_pool_start }
+      private_net_pool_end: { get_param: internal_net_pool_end }
+      dns_ip: { get_param: internal_dns_ip }
+
 
   sgi_network:
     type: OS::Neutron::Net
@@ -157,7 +197,7 @@ resources:
           availability_zone : {get_param: availability_zone_1}
           security_group_def: {get_resource: vEPC_security_group }
           public_network: {get_param: public_network}
-          private_network: {get_param: private_network}
+          private_network: {get_attr: [internal_network, private_net]}
           index: {get_param: index}
 
   VCM_CPE:
@@ -171,7 +211,7 @@ resources:
           availability_zone : {get_param: availability_zone_1}
           security_group_def: {get_resource: vEPC_security_group }
           public_network: {get_param: public_network}
-          private_network: {get_param: private_network}
+          private_network: {get_attr: [internal_network, private_net]}
           index: {get_param: index}
 
   VCM_SDB:
@@ -185,7 +225,7 @@ resources:
           availability_zone : {get_param: availability_zone_1}
           security_group_def: {get_resource: vEPC_security_group }
           public_network: {get_param: public_network}
-          private_network: {get_param: private_network}
+          private_network: {get_attr: [internal_network, private_net]}
           index: {get_param: index}
 
   VCM_UDB:
@@ -199,7 +239,7 @@ resources:
           availability_zone : {get_param: availability_zone_1}
           security_group_def: {get_resource: vEPC_security_group }
           public_network: {get_param: public_network}
-          private_network: {get_param: private_network}
+          private_network: {get_attr: [internal_network, private_net]}
           index: {get_param: index}
 
   VCM_VEM:
@@ -213,7 +253,7 @@ resources:
           availability_zone : {get_param: availability_zone_1}
           security_group_def: {get_resource: vEPC_security_group }
           public_network: {get_param: public_network}
-          private_network: {get_param: private_network}
+          private_network: {get_attr: [internal_network, private_net]}
           index: {get_param: index}
 
 
@@ -253,7 +293,7 @@ resources:
           availability_zone : {get_param: availability_zone_1}
           security_group_def: {get_resource: vEPC_security_group }
           public_network: {get_param: public_network}
-          private_network: {get_param: private_network}
+          private_network: {get_attr: [internal_network, private_net]}
           index: {get_param: index}
           port_s1_id: {get_resource: s1_port_rif }
 
@@ -268,15 +308,10 @@ resources:
           availability_zone : {get_param: availability_zone_1}
           security_group_def: {get_resource: vEPC_security_group }
           public_network: {get_param: public_network}
-          private_network: {get_param: private_network}
+          private_network: {get_attr: [internal_network, private_net]}
           index: {get_param: index}
           port_sgi_id: {get_resource: sgi_port }
           port_s1_id: {get_resource: s1_port_dpe }
-
-
-
-
-
 
   VCM_CDF_2:
     type: OS::Heat::ResourceGroup
@@ -289,7 +324,7 @@ resources:
           availability_zone : {get_param: availability_zone_2}
           security_group_def: {get_resource: vEPC_security_group }
           public_network: {get_param: public_network}
-          private_network: {get_param: private_network}
+          private_network: {get_attr: [internal_network, private_net]}
           index: {get_param: index_2}
 
   VCM_CPE_2:
@@ -303,7 +338,7 @@ resources:
           availability_zone : {get_param: availability_zone_2}
           security_group_def: {get_resource: vEPC_security_group }
           public_network: {get_param: public_network}
-          private_network: {get_param: private_network}
+          private_network: {get_attr: [internal_network, private_net]}
           index: {get_param: index_2}
 
   VCM_SDB_2:
@@ -317,7 +352,7 @@ resources:
           availability_zone : {get_param: availability_zone_2}
           security_group_def: {get_resource: vEPC_security_group }
           public_network: {get_param: public_network}
-          private_network: {get_param: private_network}
+          private_network: {get_attr: [internal_network, private_net]}
           index: {get_param: index_2}
 
   VCM_UDB_2:
@@ -331,7 +366,7 @@ resources:
           availability_zone : {get_param: availability_zone_2}
           security_group_def: {get_resource: vEPC_security_group }
           public_network: {get_param: public_network}
-          private_network: {get_param: private_network}
+          private_network: {get_attr: [internal_network, private_net]}
           index: {get_param: index_2}
 
   VCM_VEM_2:
@@ -345,7 +380,7 @@ resources:
           availability_zone : {get_param: availability_zone_2}
           security_group_def: {get_resource: vEPC_security_group }
           public_network: {get_param: public_network}
-          private_network: {get_param: private_network}
+          private_network: {get_attr: [internal_network, private_net]}
           index: {get_param: index_2}
 
 
@@ -385,7 +420,7 @@ resources:
           availability_zone : {get_param: availability_zone_2}
           security_group_def: {get_resource: vEPC_security_group }
           public_network: {get_param: public_network}
-          private_network: {get_param: private_network}
+          private_network: {get_attr: [internal_network, private_net]}
           index: {get_param: index_2}
           port_s1_id: {get_resource: s1_port_rif_2 }
 
@@ -400,7 +435,7 @@ resources:
           availability_zone : {get_param: availability_zone_2}
           security_group_def: {get_resource: vEPC_security_group }
           public_network: {get_param: public_network}
-          private_network: {get_param: private_network}
+          private_network: {get_attr: [internal_network, private_net]}
           index: {get_param: index_2}
           port_sgi_id: {get_resource: sgi_port_2 }
           port_s1_id: {get_resource: s1_port_dpe_2 }
@@ -467,3 +502,7 @@ outputs:
   VEM_private_ip:
     description: private IP address of VCM-VEM
     value: { get_attr: [ VCM_DPE, private_ip ] }
+
+  private_net_id:
+    description: Network ID
+    value: {get_attr: [internal_network, private_net]}

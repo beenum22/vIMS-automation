@@ -14,6 +14,8 @@ FILE_PATH_SDB = 'heat_templates/VCM_SDB.yaml'
 FILE_PATH_UDB = 'heat_templates/VCM_UDB.yaml'
 FILE_PATH_VEM = 'heat_templates/VCM_VEM.yaml'
 
+FILE_PATH_network = 'heat_templates/network.yaml'
+
 FILE_PATH_ip_files = 'ip_files/'
 IMAGE_DIR_PATH = '/root/IMGS/'
 
@@ -29,12 +31,14 @@ def create_cluster(heat, cluster_name):
 		file_UDB = open(FILE_PATH_UDB, 'r')
 		file_RIF = open(FILE_PATH_RIF, 'r')
 		file_DPE = open(FILE_PATH_DPE, 'r')
+		file_net = open(FILE_PATH_network, 'r')
 	except:
 		print "couldnt openfile"
 	cluster_body={
 	"stack_name":cluster_name,
 	"template":file_main.read(),
 	"files":{
+	  "network.yaml":file_net.read(),
 	  "VCM_CDF.yaml":file_CDF.read(),
 	  "VCM_CPE.yaml":file_CPE.read(),
 	  "VCM_DPE.yaml":file_DPE.read(),
