@@ -7,6 +7,16 @@ import com.xflowresearch.nfv.testertool.common.XMLParser;
 import com.xflowresearch.nfv.testertool.enodeb.eNodeB;
 import com.xflowresearch.nfv.testertool.ue.UE;
 
+/**
+ * SimulationControl
+ * 
+ *	Simulation Control class responsible for reading the input
+ *	parameters of the simulation from a file and based on the 
+ *	config parameters, it spawns the UE and eNodeB threads.
+ *
+ * 
+ * @author ahmadarslan
+ */
 public class SimulationControl 
 {
 	private static SimulationControl instance = new SimulationControl();

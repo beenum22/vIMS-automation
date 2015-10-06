@@ -11,6 +11,15 @@ import org.jdom2.input.SAXBuilder;
 
 import com.xflowresearch.nfv.testertool.simulationcontrol.SimulationControl;
 
+
+/**
+ * XMLParser
+ * 
+ *	XMLParser class for parsing the input/config
+ *  parameters from xml files.
+ * 
+ * @author ahmadarslan
+ */
 public class XMLParser {
 
 	public void readSimulationParameters()
