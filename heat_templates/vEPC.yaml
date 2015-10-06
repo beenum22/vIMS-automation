@@ -506,3 +506,7 @@ outputs:
   private_net_id:
     description: Network ID
     value: {get_attr: [internal_network, private_net]}
+
+  port_mme_ip:
+    description: private IP address of port s1_mme
+    value: {get_attr: [s1_port_rif, fixed_ips, 0, ip_address]}
