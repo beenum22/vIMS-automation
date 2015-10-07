@@ -47,6 +47,19 @@ public class NASDefinitions {
 			public String getHexCode(){
 				return hexValue;
 			}
+			
+			public static String hexToType(String hexVal){
+				if (hexVal != null) {
+					for (MobilityManagementMessageType b : MobilityManagementMessageType.values()) {
+						if (hexVal.equalsIgnoreCase(b.getHexCode())) {
+							return b.toString();
+						}
+					}
+				}
+				return null;
+			}
+			
+			
 		}
 		
 		
@@ -88,6 +101,18 @@ public class NASDefinitions {
 				return hexValue;
 			}
 			
+			public static String hexToType(String hexVal){
+				if (hexVal != null) {
+					for (EPSSessionManagementMessageType b : EPSSessionManagementMessageType.values()) {
+						if (hexVal.equalsIgnoreCase(b.getHexCode())) {
+							return b.toString();
+						}
+					}
+				}
+				return null;
+			}
+			
+			
 		}
 	
 		
@@ -116,6 +141,18 @@ public class NASDefinitions {
 			public String getHexCode(){
 				return hexValue;
 			}
+			
+			public static String hexToType(String hexVal){
+				if (hexVal != null) {
+					for (SecurityHeaderType b : SecurityHeaderType.values()) {
+						if (hexVal.equalsIgnoreCase(b.getHexCode())) {
+							return b.toString();
+						}
+					}
+				}
+				return null;
+			}
+			
 		}
 		
 		
@@ -149,6 +186,18 @@ public class NASDefinitions {
 			public String getHexCode(){
 				return hexValue;
 			}
+			
+			
+			public static String hexToType(String hexVal){
+				if (hexVal != null) {
+					for (ProtocolDiscriminatorValue b : ProtocolDiscriminatorValue.values()) {
+						if (hexVal.equalsIgnoreCase(b.getHexCode())) {
+							return b.toString();
+						}
+					}
+				}
+				return null;
+			}
 		}
 		
 		
@@ -168,6 +217,8 @@ public class NASDefinitions {
 			public String getHexCode(){
 				return hexValue;
 			}
+			
+			
 			
 			//TSC does not apply for NAS key set identifier value "7".
 		}
@@ -225,6 +276,18 @@ public class NASDefinitions {
 			
 			public String getHexCode(){
 				return hexValue;
+			}
+			
+			public static String hexToType(String hexVal){
+				if (hexVal != null) {
+					for (EPSAttachType b : EPSAttachType
+							.values()) {
+						if (hexVal.equalsIgnoreCase(b.getHexCode())) {
+							return b.toString();
+						}
+					}
+				}
+				return null;
 			}
 			
 			
@@ -336,8 +399,22 @@ public class NASDefinitions {
 		}
 		
 		
+		public enum EPSBearerIdentity{
+			
+			NoEPSBearerIdentityAssigned("0000");
+			
+            private String hexValue;
+			
+			private EPSBearerIdentity(final String hexValue) {
+				this.hexValue = hexValue;
+			}
+			
+			public String getHexCode(){
+				return hexValue;
+			}
+		}
+		
+	
+		
 }
 	
-	
-	
-

@@ -66,7 +66,7 @@ public void parametersetter(String Filepath) throws IOException{
 
 }
 
- public void NASAttachRequest(String packetval)
+ public String NASAttachRequest(String packetval)
 	{
 		
 	
@@ -89,20 +89,14 @@ public void parametersetter(String Filepath) throws IOException{
 	    
 	    thirdByte= Integer.toHexString(Integer.parseInt(thirdByte,2));
 	   
-	 
-
-	   
-		//crude implementation with majority packet hardcoded
-		//incorporate NASdefinitions [specifically single bit flags etc in next step]
+	
 		String Packet = firstbyte +secondbyte +thirdByte + value1;
-		 
-		//System.out.println( firstbyte );
-		// System.out.println(secondbyte );
-		// System.out.println( thirdByte);
-		// System.out.println( value1 );
-		 System.out.println( "Attach Request Packet:" + " " +Packet );
+		return Packet;
+	
+		 //System.out.println( "Attach Request Packet:" + " " +Packet );
 		}
 
+ 
  public String [] MMEResponseParser(String Response)
  {
 	 String Responsebytefirst=Response.substring(0,2);
@@ -150,6 +144,26 @@ public void parametersetter(String Filepath) throws IOException{
 	 return Output;
  }
  
+
+ public String [] AttachRepParser(String Reply){
+	 
+	 String SecurityHeaderType=NASDefinitions.SecurityHeaderType.hexToType(Reply.substring(0,1 ));//SecurityHeaderType
+	 System.out.println(Reply.substring(0,1 )); //debugging
+	 
+	 String ProtocolDiscriminator=NASDefinitions.ProtocolDiscriminatorValue.hexToType(Reply.substring(1,2 )); //PD
+	 String EPSMobilityManagementMsg=NASDefinitions.MobilityManagementMessageType.hexToType(Reply.substring(2,4));//EPS Mobility Management Message
+	 String AuthParameterRandValue=Reply.substring( 6,38); 
+	 String AUTNvalue=Reply.substring(40);
+	
+	 String Output [] ={SecurityHeaderType,ProtocolDiscriminator,EPSMobilityManagementMsg,AuthParameterRandValue, };//parameters to be set
+	 return Output;
+		
+		
+ }
+ 
+ 
+ 
+ 
  public String NASAuthenticationResponse(String RES,String AuthRespLength)
  {
 	 
@@ -191,32 +205,59 @@ public void parametersetter(String Filepath) throws IOException{
  
  public String NASESMInformationResponse(String packetval)
  {
-	 String value1=packetval;
-	 
-	 String Packet=(NASDefinitions.SecurityHeaderType.IntegrityProtectedCiphered.getHexCode()
-				+ NASDefinitions.ProtocolDiscriminatorValue.EPSSessionManagementMessage.getHexCode()
-				+ NASDefinitions.EPSSessionManagementMessageType.ESMInformationResponse.getHexCode()
-				+value1);
-	 
-	 System.out.println("ESM Information Response Packet:" + " " +Packet);
-	 return Packet;
-	 
+	    String MsgAuthCode = packetval.substring(0,8);
+	    
+	    String firstbyte=(NASDefinitions.SecurityHeaderType.IntegrityProtectedCiphered.getHexCode()
+	    		+ NASDefinitions.ProtocolDiscriminatorValue.MobilityManagementMessage.getHexCode()); //first BYTE
+	   
+	    firstbyte='0'+Integer.toHexString(Integer.parseInt(firstbyte,2));
+	    
+		String Seqno =packetval.substring(8, 10);
+		String Byte2 =NASDefinitions.EPSBearerIdentity.NoEPSBearerIdentityAssigned.getHexCode()
+				+NASDefinitions.ProtocolDiscriminatorValue.EPSSessionManagementMessage.getHexCode();
+		Byte2='0'+Integer.toHexString(Integer.parseInt(Byte2,2));
+		
+		String ProcTransactionID=packetval.substring(10,12);
+		
+		
+		
+		String String1= NASDefinitions.SecurityHeaderType.PlainNASMessage.getHexCode()
+				+ NASDefinitions.ProtocolDiscriminatorValue.EPSMobilityManagementMessage.getHexCode()
+				+NASDefinitions.MobilityManagementMessageType.AttachComplete.getHexCode();
+		
+		
+	     
+	   String Packet= firstbyte + MsgAuthCode + Seqno + Byte2 + ProcTransactionID 
+			   +NASDefinitions.EPSSessionManagementMessageType.ESMInformationResponse.getHexCode() +packetval.substring(16);
+			   
 
- }
+		System.out.println(Packet);
+		return Packet;
+	}
+
+
+
 
  public String NASAttachComplete(String packetval)
 	{
+	
+	   String MsgAuthCode = packetval.substring(2,10);
+	    
+	    String firstbyte=(NASDefinitions.SecurityHeaderType.IntegrityProtectedCiphered.getHexCode()
+	    		+ NASDefinitions.ProtocolDiscriminatorValue.MobilityManagementMessage.getHexCode()); //first BYTE
+	   
+	    firstbyte='0'+Integer.toHexString(Integer.parseInt(firstbyte,2));
+	    
+		String Seqno =packetval.substring(8, 10);
 		
 		
-	 //String value1="710BF600F1100001011234567802C0C000050201D031D15200F1100001"; //representing a particular UE
+		String String1= NASDefinitions.SecurityHeaderType.PlainNASMessage.getHexCode()
+				+ NASDefinitions.ProtocolDiscriminatorValue.EPSMobilityManagementMessage.getHexCode()
+				+NASDefinitions.MobilityManagementMessageType.AttachComplete.getHexCode();
 		
-	    String value1=packetval;
-		//crude implementation with majority packet hardcoded
-		//incorporate NASdefinitions [specifically single bit flags etc in next step]
-		String Packet =  (NASDefinitions.SecurityHeaderType.IntegrityProtectedCiphered.getHexCode()
-		+ NASDefinitions.ProtocolDiscriminatorValue.MobilityManagementMessage.getHexCode()
-		+ NASDefinitions.MobilityManagementMessageType.AttachComplete.getHexCode()
-		+value1);		
+		String ESMMsgContainer= packetval.substring(10);
+	     
+	   String Packet= firstbyte + MsgAuthCode + Seqno + String1 +ESMMsgContainer;
 
 		System.out.println(Packet);
 		return Packet;
@@ -226,7 +267,7 @@ public void parametersetter(String Filepath) throws IOException{
  public void runNASimulation() throws IOException{
  
 	 //UE generated parameters 
-     String Filepath="configuration/SuccessfulAttach.txt"	 ;
+     String Filepath="SuccessfulAttach.txt"	 ;
 	 
 	 String AttachReq=null;
 	 String AuthReq=null;//from MME;
