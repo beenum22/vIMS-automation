@@ -6,7 +6,9 @@ import java.util.ArrayList;
  * S1APPacket
  * 
  *	S1APPacket class that allows creation of
- *	an S1AP packet given the input parameters.
+ *	an S1AP packet given the input parameters
+ *	and parsing of a received S1AP packet 
+ *	given in a string encoded as hexadecimal. 
  * 
  * @author ahmadarslan
  */
