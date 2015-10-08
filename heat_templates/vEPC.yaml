@@ -14,9 +14,6 @@ parameters:
     label: Flavor
     description: Type of instance (flavor) to be used on the compute instance.
     default: m1.medium
-  security_group_def:
-    type: string
-    default: default
   public_network:
     type: string
     label: Public network name or ID
@@ -30,11 +27,6 @@ parameters:
     type: string
     label: availability_zone for VMs
     default: nova
-  private_network:
-    type: string
-    label: Private network name or ID
-    description: Network to attach server to.
-    default: net04
   index:
     type: number
     description: Index of node in the cluster
@@ -45,72 +37,137 @@ parameters:
     default: 10
 
 
-  sgi_net_name:
+  S1_C_net_name:
+    type: string
+    description: Private network address (CIDR notation)
+    default: S1C-0
+  S1_C_net_cidr:
+    type: string
+    description: Private network address (CIDR notation)
+    default: 172.100.10.0/27
+  S1_C_net_pool_start:
+    type: string
+    description: Start of private network IP address pool
+    default: 172.100.10.2
+  S1_C_net_pool_end:
+    type: string
+    description: End of private network IP address pool
+    default: 172.100.10.30
+
+
+  S1_U_net_name:
+    type: string
+    description: Private network address (CIDR notation)
+    default: S1U-0
+  S1_U_net_cidr:
+    type: string
+    description: Private network address (CIDR notation)
+    default: 172.100.11.0/27
+  S1_U_net_pool_start:
+    type: string
+    description: Start of private network IP address pool
+    default: 172.100.11.2
+  S1_U_net_pool_end:
+    type: string
+    description: End of private network IP address pool
+    default: 172.100.11.30
+
+  S6a_net_name:
+    type: string
+    description: Private network address (CIDR notation)
+    default: S6a-0
+  S6a_net_cidr:
+    type: string
+    description: Private network address (CIDR notation)
+    default: 172.100.13.0/27
+  S6a_net_pool_start:
+    type: string
+    description: Start of private network IP address pool
+    default: 172.100.13.2
+  S6a_net_pool_end:
+    type: string
+    description: End of private network IP address pool
+    default: 172.100.13.30
+
+
+  RADIUS_net_name:
+    type: string
+    description: Private network address (CIDR notation)
+    default: RADIUS-0
+  RADIUS_net_cidr:
+    type: string
+    description: Private network address (CIDR notation)
+    default: 172.100.14.0/27
+  RADIUS_net_pool_start:
+    type: string
+    description: Start of private network IP address pool
+    default: 172.100.14.2
+  RADIUS_net_pool_end:
+    type: string
+    description: End of private network IP address pool
+    default: 172.100.14.30
+
+
+  SGs_net_name:
+    type: string
+    description: Private network address (CIDR notation)
+    default: SGs-0
+  SGs_net_cidr:
+    type: string
+    description: Private network address (CIDR notation)
+    default: 172.100.12.0/27
+  SGs_net_pool_start:
+    type: string
+    description: Start of private network IP address pool
+    default: 172.100.12.2
+  SGs_net_pool_end:
+    type: string
+    description: End of private network IP address pool
+    default: 172.100.12.30
+
+
+  SGi_net_name:
     type: string
     description: Private network address (CIDR notation)
     default: SGi-0
-  sgi_net_cidr:
+  SGi_net_cidr:
     type: string
     description: Private network address (CIDR notation)
-    default: 172.16.20.0/24
-  sgi_net_pool_start:
+    default: 172.100.15.0/27
+  SGi_net_pool_start:
     type: string
     description: Start of private network IP address pool
-    default: 172.16.20.10
-  sgi_net_pool_end:
+    default: 172.100.15.2
+  SGi_net_pool_end:
     type: string
     description: End of private network IP address pool
-    default: 172.16.20.30
+    default: 172.100.15.30
 
-
-  s1_net_name:
+  net0_net_name:
     type: string
     description: Private network address (CIDR notation)
-    default: S1-0
-  s1_net_cidr:
+    default: net0-0
+  net0_net_cidr:
     type: string
     description: Private network address (CIDR notation)
-    default: 172.16.10.0/24
-  s1_net_pool_start:
+    default: 10.0.0.0/24
+  net0_net_pool_start:
     type: string
     description: Start of private network IP address pool
-    default: 172.16.10.10
-  s1_net_pool_end:
+    default: 10.0.0.2
+  net0_net_pool_end:
     type: string
     description: End of private network IP address pool
-    default: 172.16.10.30
-
-
-  internal_net_name:
-    type: string
-    description: Name of private network
-    default: vEPC-private
-  internal_net_cidr:
-    type: string
-    description: Private network address (CIDR notation)
-    default: 192.16.100.0/24
-  internal_net_gateway:
-    type: string
-    description: Private network gateway address
-    default: 192.16.100.254
-  internal_net_pool_start:
-    type: string
-    description: Start of private network IP address pool
-    default: 192.16.100.1
-  internal_net_pool_end:
-    type: string
-    description: End of private network IP address pool
-    default: 192.16.100.253
-  internal_dns_ip:
-    type: string
-    description: IP address of DNS server
-    default: 8.8.8.8
-
+    default: 10.0.0.254
 
   security_group_name:
     type: string
     description: End of private network IP address pool
     default: vEPC_sec_grp
+  router_name:
+    type: string
+    description: Private network address (CIDR notation)
+    default: extrouter
 
 resources:
   vEPC_security_group:
@@ -143,370 +200,64 @@ resources:
           port_range_min: 161
           port_range_max: 161
 
-  internal_network:
+
+  S1_C_network:
     type: network.yaml
     properties:
-      public_net: { get_param: public_network }
-      private_net_name: { get_param: internal_net_name }
-      private_net_cidr: { get_param: internal_net_cidr }
-      private_net_gateway: { get_param: internal_net_gateway }
-      private_net_pool_start: { get_param: internal_net_pool_start }
-      private_net_pool_end: { get_param: internal_net_pool_end }
-      dns_ip: { get_param: internal_dns_ip }
+      private_net_name: { get_param: S1_C_net_name }
+      private_net_cidr: { get_param: S1_C_net_cidr }
+      private_net_pool_start: { get_param: S1_C_net_pool_start }
+      private_net_pool_end: { get_param: S1_C_net_pool_end }
 
-
-  sgi_network:
-    type: OS::Neutron::Net
+  S1_U_network:
+    type: network.yaml
     properties:
-      name: { get_param: sgi_net_name }
+      private_net_name: { get_param: S1_U_net_name }
+      private_net_cidr: { get_param: S1_U_net_cidr }
+      private_net_pool_start: { get_param: S1_U_net_pool_start }
+      private_net_pool_end: { get_param: S1_U_net_pool_end }
 
-  sgi_network_subnet:
-    type: OS::Neutron::Subnet
+  S6a_network:
+    type: network.yaml
     properties:
-      name: { get_param: sgi_net_name }
-      network_id: { get_resource: sgi_network }
-      cidr: { get_param: sgi_net_cidr }
-      allocation_pools:
-        - start: { get_param: sgi_net_pool_start }
-          end: { get_param: sgi_net_pool_end }
+      private_net_name: { get_param: S6a_net_name }
+      private_net_cidr: { get_param: S6a_net_cidr }
+      private_net_pool_start: { get_param: S6a_net_pool_start }
+      private_net_pool_end: { get_param: S6a_net_pool_end }
 
-  s1_network:
-    type: OS::Neutron::Net
+  RADIUS_network:
+    type: network.yaml
     properties:
-      name: { get_param: s1_net_name }
+      private_net_name: { get_param: RADIUS_net_name }
+      private_net_cidr: { get_param: RADIUS_net_cidr }
+      private_net_pool_start: { get_param: RADIUS_net_pool_start }
+      private_net_pool_end: { get_param: RADIUS_net_pool_end }
 
-  s1_network_subnet:
-    type: OS::Neutron::Subnet
+  SGs_network:
+    type: network.yaml
     properties:
-      name: { get_param: s1_net_name }
-      network_id: { get_resource: s1_network }
-      cidr: { get_param: s1_net_cidr }
-      allocation_pools:
-        - start: { get_param: s1_net_pool_start }
-          end: { get_param: s1_net_pool_end }
+      private_net_name: { get_param: SGs_net_name }
+      private_net_cidr: { get_param: SGs_net_cidr }
+      private_net_pool_start: { get_param: SGs_net_pool_start }
+      private_net_pool_end: { get_param: SGs_net_pool_end }
 
-
-  VCM_CDF:
-    type: OS::Heat::ResourceGroup
+  SGi_network:
+    type: network.yaml
     properties:
-      resource_def:
-        type: VCM_CDF.yaml
-        properties:
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          availability_zone : {get_param: availability_zone_1}
-          security_group_def: {get_resource: vEPC_security_group }
-          public_network: {get_param: public_network}
-          private_network: {get_attr: [internal_network, private_net]}
-          index: {get_param: index}
+      private_net_name: { get_param: SGi_net_name }
+      private_net_cidr: { get_param: SGi_net_cidr }
+      private_net_pool_start: { get_param: SGi_net_pool_start }
+      private_net_pool_end: { get_param: SGi_net_pool_end }
 
-  VCM_CPE:
-    type: OS::Heat::ResourceGroup
+  net0_network:
+    type: network.yaml
     properties:
-      resource_def:
-        type: VCM_CPE.yaml
-        properties:
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          availability_zone : {get_param: availability_zone_1}
-          security_group_def: {get_resource: vEPC_security_group }
-          public_network: {get_param: public_network}
-          private_network: {get_attr: [internal_network, private_net]}
-          index: {get_param: index}
-
-  VCM_SDB:
-    type: OS::Heat::ResourceGroup
-    properties:
-      resource_def:
-        type: VCM_SDB.yaml
-        properties:
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          availability_zone : {get_param: availability_zone_1}
-          security_group_def: {get_resource: vEPC_security_group }
-          public_network: {get_param: public_network}
-          private_network: {get_attr: [internal_network, private_net]}
-          index: {get_param: index}
-
-  VCM_UDB:
-    type: OS::Heat::ResourceGroup
-    properties:
-      resource_def:
-        type: VCM_UDB.yaml
-        properties:
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          availability_zone : {get_param: availability_zone_1}
-          security_group_def: {get_resource: vEPC_security_group }
-          public_network: {get_param: public_network}
-          private_network: {get_attr: [internal_network, private_net]}
-          index: {get_param: index}
-
-  VCM_VEM:
-    type: OS::Heat::ResourceGroup
-    properties:
-      resource_def:
-        type: VCM_VEM.yaml
-        properties:
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          availability_zone : {get_param: availability_zone_1}
-          security_group_def: {get_resource: vEPC_security_group }
-          public_network: {get_param: public_network}
-          private_network: {get_attr: [internal_network, private_net]}
-          index: {get_param: index}
-
-
-  sgi_port:
-    type: OS::Neutron::Port
-    properties:
-      name: sgi
-      network_id: { get_resource: sgi_network}
-      security_groups:
-        - { get_resource: vEPC_security_group }
-
-  s1_port_dpe:
-    type: OS::Neutron::Port
-    properties:
-      name: s1_u
-      network_id: { get_resource: s1_network}
-      security_groups:
-        - { get_resource: vEPC_security_group }
-
-  s1_port_rif:
-    type: OS::Neutron::Port
-    properties:
-      name: s1_mme
-      network_id: { get_resource: s1_network}
-      security_groups:
-        - { get_resource: vEPC_security_group }
-
-
-  VCM_RIF:
-    type: OS::Heat::ResourceGroup
-    properties:
-      resource_def:
-        type: VCM_RIF.yaml
-        properties:
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          availability_zone : {get_param: availability_zone_1}
-          security_group_def: {get_resource: vEPC_security_group }
-          public_network: {get_param: public_network}
-          private_network: {get_attr: [internal_network, private_net]}
-          index: {get_param: index}
-          port_s1_id: {get_resource: s1_port_rif }
-
-  VCM_DPE:
-    type: OS::Heat::ResourceGroup
-    properties:
-      resource_def:
-        type: VCM_DPE.yaml
-        properties:
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          availability_zone : {get_param: availability_zone_1}
-          security_group_def: {get_resource: vEPC_security_group }
-          public_network: {get_param: public_network}
-          private_network: {get_attr: [internal_network, private_net]}
-          index: {get_param: index}
-          port_sgi_id: {get_resource: sgi_port }
-          port_s1_id: {get_resource: s1_port_dpe }
-
-  VCM_CDF_2:
-    type: OS::Heat::ResourceGroup
-    properties:
-      resource_def:
-        type: VCM_CDF.yaml
-        properties:
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          availability_zone : {get_param: availability_zone_2}
-          security_group_def: {get_resource: vEPC_security_group }
-          public_network: {get_param: public_network}
-          private_network: {get_attr: [internal_network, private_net]}
-          index: {get_param: index_2}
-
-  VCM_CPE_2:
-    type: OS::Heat::ResourceGroup
-    properties:
-      resource_def:
-        type: VCM_CPE.yaml
-        properties:
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          availability_zone : {get_param: availability_zone_2}
-          security_group_def: {get_resource: vEPC_security_group }
-          public_network: {get_param: public_network}
-          private_network: {get_attr: [internal_network, private_net]}
-          index: {get_param: index_2}
-
-  VCM_SDB_2:
-    type: OS::Heat::ResourceGroup
-    properties:
-      resource_def:
-        type: VCM_SDB.yaml
-        properties:
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          availability_zone : {get_param: availability_zone_2}
-          security_group_def: {get_resource: vEPC_security_group }
-          public_network: {get_param: public_network}
-          private_network: {get_attr: [internal_network, private_net]}
-          index: {get_param: index_2}
-
-  VCM_UDB_2:
-    type: OS::Heat::ResourceGroup
-    properties:
-      resource_def:
-        type: VCM_UDB.yaml
-        properties:
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          availability_zone : {get_param: availability_zone_2}
-          security_group_def: {get_resource: vEPC_security_group }
-          public_network: {get_param: public_network}
-          private_network: {get_attr: [internal_network, private_net]}
-          index: {get_param: index_2}
-
-  VCM_VEM_2:
-    type: OS::Heat::ResourceGroup
-    properties:
-      resource_def:
-        type: VCM_VEM.yaml
-        properties:
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          availability_zone : {get_param: availability_zone_2}
-          security_group_def: {get_resource: vEPC_security_group }
-          public_network: {get_param: public_network}
-          private_network: {get_attr: [internal_network, private_net]}
-          index: {get_param: index_2}
-
-
-  sgi_port_2:
-    type: OS::Neutron::Port
-    properties:
-      name: sgi_2
-      network_id: { get_resource: sgi_network}
-      security_groups:
-        - { get_resource: vEPC_security_group }
-
-  s1_port_dpe_2:
-    type: OS::Neutron::Port
-    properties:
-      name: s1_u_2
-      network_id: { get_resource: s1_network}
-      security_groups:
-        - { get_resource: vEPC_security_group }
-
-  s1_port_rif_2:
-    type: OS::Neutron::Port
-    properties:
-      name: s1_mme_2
-      network_id: { get_resource: s1_network}
-      security_groups:
-        - { get_resource: vEPC_security_group }
-
-
-  VCM_RIF_2:
-    type: OS::Heat::ResourceGroup
-    properties:
-      resource_def:
-        type: VCM_RIF.yaml
-        properties:
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          availability_zone : {get_param: availability_zone_2}
-          security_group_def: {get_resource: vEPC_security_group }
-          public_network: {get_param: public_network}
-          private_network: {get_attr: [internal_network, private_net]}
-          index: {get_param: index_2}
-          port_s1_id: {get_resource: s1_port_rif_2 }
-
-  VCM_DPE_2:
-    type: OS::Heat::ResourceGroup
-    properties:
-      resource_def:
-        type: VCM_DPE.yaml
-        properties:
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          availability_zone : {get_param: availability_zone_2}
-          security_group_def: {get_resource: vEPC_security_group }
-          public_network: {get_param: public_network}
-          private_network: {get_attr: [internal_network, private_net]}
-          index: {get_param: index_2}
-          port_sgi_id: {get_resource: sgi_port_2 }
-          port_s1_id: {get_resource: s1_port_dpe_2 }
-
+      private_net_name: { get_param: net0_net_name }
+      private_net_cidr: { get_param: net0_net_cidr }
+      private_net_pool_start: { get_param: net0_net_pool_start }
+      private_net_pool_end: { get_param: net0_net_pool_end }
 
 outputs:
-  CDF_ip:
-    description: IP address VCM-CDF-1
-    value: { get_attr: [ VCM_CDF, floating_ip ] }
-
-  CPE_ip:
-    description: IP address of VCM-CPE-1
-    value: { get_attr: [ VCM_CPE, floating_ip ] }
-
-  SDB_ip:
-    description: IP address of VCM-SDB-1
-    value: { get_attr: [ VCM_SDB, floating_ip ] }
-
-  UDB_ip:
-    description: IP address of VCM-UDB-1
-    value: { get_attr: [ VCM_UDB, floating_ip ] }
-
-  VEM_ip:
-    description: IP address of VCM-VEM-1
-    value: { get_attr: [ VCM_VEM, floating_ip ] }
-
-  RIF_ip:
-    description: IP address of VCM-RIF-1
-    value: { get_attr: [ VCM_RIF, floating_ip ] }
-
-  DPE_ip:
-    description: IP address of VCM-DPE-1
-    value: { get_attr: [ VCM_DPE, floating_ip ] }
-
-
-  CDF_2_ip:
-    description: IP address VCM-CDF-2
-    value: { get_attr: [ VCM_CDF_2, floating_ip ] }
-
-  CPE_2_ip:
-    description: IP address of VCM-CPE-2
-    value: { get_attr: [ VCM_CPE_2, floating_ip ] }
-
-  SDB_2_ip:
-    description: IP address of VCM-SDB-2
-    value: { get_attr: [ VCM_SDB_2, floating_ip ] }
-
-  UDB_2_ip:
-    description: IP address of VCM-UDB-2
-    value: { get_attr: [ VCM_UDB_2, floating_ip ] }
-
-  VEM_2_ip:
-    description: IP address of VCM-VEM-2
-    value: { get_attr: [ VCM_VEM_2, floating_ip ] }
-
-  RIF_2_ip:
-    description: IP address of VCM-RIF-2
-    value: { get_attr: [ VCM_RIF_2, floating_ip ] }
-
-  DPE_2_ip:
-    description: IP address of VCM-DPE-2
-    value: { get_attr: [ VCM_DPE_2, floating_ip ] }
-
-  VEM_private_ip:
-    description: private IP address of VCM-VEM
-    value: { get_attr: [ VCM_DPE, private_ip ] }
-
-  private_net_id:
-    description: Network ID
-    value: {get_attr: [internal_network, private_net]}
-
-  port_mme_ip:
-    description: private IP address of port s1_mme
-    value: {get_attr: [s1_port_rif, fixed_ips, 0, ip_address]}
+  network_id:
+    description: ID internal_network
+    value: { get_attr: [ SGi_network, private_net ] }
