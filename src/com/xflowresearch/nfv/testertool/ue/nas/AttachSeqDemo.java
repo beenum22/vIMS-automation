@@ -6,9 +6,9 @@ public class AttachSeqDemo {
 	public String SendAttachPack( String AttachArguments){
 		
 		NASImplementation NASobject =new NASImplementation();
-		return (NASobject.NASAttachRequest(AttachArguments));
-		
-		
+		String NASPDU = NASobject.NASAttachRequest(AttachArguments);
+		NASPDU = Integer.toHexString(NASPDU.length()/2) + NASPDU;
+		return NASPDU;	
 	}
 	
 	
@@ -25,6 +25,8 @@ public class AttachSeqDemo {
 	}
 	
 	
+	// remove later
+	/*
 	public static void main(String args[]){
 		
 		String AttachArguments ="08091132547698214305e0e000000000050202d011d1";
@@ -37,5 +39,6 @@ public class AttachSeqDemo {
 		
 		
 	}
+	*/
 
 }
