@@ -257,6 +257,19 @@ resources:
       private_net_pool_start: { get_param: net0_net_pool_start }
       private_net_pool_end: { get_param: net0_net_pool_end }
 
+  Router:
+    type: router.yaml
+    properties:
+      router_name: { get_param: router_name }
+      public_net: { get_param: public_network }
+      net0_subnet: { get_attr: [ net0_network, private_net_subnet ] }
+      S1C_subnet: { get_attr: [ S1_C_network, private_net_subnet ] }
+      S1U_subnet: { get_attr: [ S1_U_network, private_net_subnet ] }
+      SGs_subnet: { get_attr: [ SGs_network, private_net_subnet ] }
+      S6a_subnet: { get_attr: [ S6a_network, private_net_subnet ] }
+      radius_subnet: { get_attr: [ RADIUS_network, private_net_subnet ] }
+      SGi_subnet: { get_attr: [ SGi_network, private_net_subnet ] }
+
 outputs:
   network_id:
     description: ID internal_network

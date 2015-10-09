@@ -1,0 +1,109 @@
+heat_template_version: 2014-10-16
+
+description: >
+  router and interfaces
+
+parameters:
+  router_name:
+    type: string
+    description: Name of router
+    default: extrouter
+
+  public_net:
+    type: string
+    description: Name of public network
+    default: net04_ext
+
+  net0_subnet:
+    type: string
+    description: Name of private network
+    default: asdf
+
+  S1C_subnet:
+    type: string
+    description: Name of private network
+    default: asdf
+
+  S1U_subnet:
+    type: string
+    description: Name of private network
+    default: asdf
+
+  SGs_subnet:
+    type: string
+    description: Name of private network
+    default: asdf
+
+  S6a_subnet:
+    type: string
+    description: Name of private network
+    default: asdf
+
+  radius_subnet:
+    type: string
+    description: Name of private network
+    default: asdf
+
+  SGi_subnet:
+    type: string
+    description: Name of private network
+    default: asdf
+
+resources:
+  router:
+    type: OS::Neutron::Router
+    properties:
+      name: { get_param: router_name }
+
+  router_gateway:
+    type: OS::Neutron::RouterGateway
+    properties:
+      router_id: { get_resource: router }
+      network: { get_param: public_net }
+
+  router_interface_net0:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: router }
+      subnet_id: { get_param: net0_subnet }
+
+  router_interface_S1C:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: router }
+      subnet_id: { get_param: S1C_subnet }
+
+  router_interface_S1U:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: router }
+      subnet_id: { get_param: S1U_subnet }
+
+  router_interface_SGs:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: router }
+      subnet_id: { get_param: SGs_subnet }
+
+  router_interface_S6a:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: router }
+      subnet_id: { get_param: S6a_subnet }
+
+  router_interface_radius:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: router }
+      subnet_id: { get_param: radius_subnet }
+
+  router_interface_SGi:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: router }
+      subnet_id: { get_param: SGi_subnet }
+
+outputs:
+  router_id:
+    description: ID of private network
+    value: { get_resource: router }
