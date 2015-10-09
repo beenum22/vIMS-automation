@@ -21,8 +21,8 @@ public class SimulationControl
 {
 	private static SimulationControl instance = new SimulationControl();
 
-	private static eNodeB enodeb;
-	private static UE ue;
+	private eNodeB enodeb;
+	private UE ue;
 	
 	private XMLParser xmlparser;
 
@@ -31,8 +31,8 @@ public class SimulationControl
 
 	
 	private SimulationControl(){
-		enodeb = eNodeB.getInstance();
-		ue = UE.getInstance();
+		enodeb = new eNodeB();
+		ue = new UE();
 
 		xmlparser = new XMLParser();
 	}

@@ -14,18 +14,10 @@ import org.slf4j.LoggerFactory;
  */
 public class eNodeB implements Runnable
 {
-	private static eNodeB instance = new eNodeB();
-
 	private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
 
+	public eNodeB(){
 
-	private eNodeB(){
-
-	}
-
-
-	public static eNodeB getInstance() {
-		return instance;
 	}
 
 
