@@ -144,13 +144,34 @@ public void parametersetter(String Filepath) throws IOException{
 	 return Output;
  }
  
+ public static String hexToBinary(String hex) {
+	    int i = Integer.parseInt(hex, 16);
+	    String bin = Integer.toBinaryString(i);
+	    if (bin.length() ==1)
+	    {
+	    	bin = "000" + bin; 
+	    }
+	    else if (bin.length()==2)
+	    {
+	    	bin="00" + bin ;
+	    	
+	    }
+	    else if (bin.length()==3)
+	    {
+	    	bin="0" + bin;
+	    }
+	    else if (bin.length()==4);
+	
+	    return bin;
+	}
+ 
 
  public String [] AttachRepParser(String Reply){
 	 
-	 String SecurityHeaderType=NASDefinitions.SecurityHeaderType.hexToType(Reply.substring(0,1 ));//SecurityHeaderType
-	 System.out.println(Reply.substring(0,1 )); //debugging
+	 String SecurityHeaderType=NASDefinitions.SecurityHeaderType.hexToType(hexToBinary(Reply.substring(0,1 )));//SecurityHeaderType
+	 //System.out.println(Reply.substring(0,1 )); //debugging
 	 
-	 String ProtocolDiscriminator=NASDefinitions.ProtocolDiscriminatorValue.hexToType(Reply.substring(1,2 )); //PD
+	 String ProtocolDiscriminator=NASDefinitions.ProtocolDiscriminatorValue.hexToType(hexToBinary(Reply.substring(1,2 ))); //PD
 	 String EPSMobilityManagementMsg=NASDefinitions.MobilityManagementMessageType.hexToType(Reply.substring(2,4));//EPS Mobility Management Message
 	 String AuthParameterRandValue=Reply.substring( 6,38); 
 	 String AUTNvalue=Reply.substring(40);
@@ -162,7 +183,7 @@ public void parametersetter(String Filepath) throws IOException{
  }
  
  
- 
+
  
  public String NASAuthenticationResponse(String RES,String AuthRespLength)
  {

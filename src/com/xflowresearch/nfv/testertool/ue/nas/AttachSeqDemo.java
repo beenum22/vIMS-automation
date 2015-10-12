@@ -25,8 +25,8 @@ public class AttachSeqDemo {
 	}
 	
 	
-	// remove later
-	/*
+	//remove later
+	
 	public static void main(String args[]){
 		
 		String AttachArguments ="08091132547698214305e0e000000000050202d011d1";
@@ -39,6 +39,6 @@ public class AttachSeqDemo {
 		
 		
 	}
-	*/
+	
 
 }
