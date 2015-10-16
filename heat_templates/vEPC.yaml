@@ -22,25 +22,25 @@ parameters:
   availability_zone_1:
     type: string
     label: availability_zone for VMs
-    default: nova
+    default: compute1
   availability_zone_2:
     type: string
     label: availability_zone for VMs
-    default: nova
+    default: compute2
   index:
     type: number
     description: Index of node in the cluster
-    default: 0
+    default: 1
   index_2:
     type: number
     description: Index of node in the cluster
-    default: 10
+    default: 2
 
 
   S1_C_net_name:
     type: string
     description: Private network address (CIDR notation)
-    default: S1C-0
+    default: S1C
   S1_C_net_cidr:
     type: string
     description: Private network address (CIDR notation)
@@ -58,7 +58,7 @@ parameters:
   S1_U_net_name:
     type: string
     description: Private network address (CIDR notation)
-    default: S1U-0
+    default: S1U
   S1_U_net_cidr:
     type: string
     description: Private network address (CIDR notation)
@@ -75,7 +75,7 @@ parameters:
   S6a_net_name:
     type: string
     description: Private network address (CIDR notation)
-    default: S6a-0
+    default: S6a
   S6a_net_cidr:
     type: string
     description: Private network address (CIDR notation)
@@ -93,7 +93,7 @@ parameters:
   RADIUS_net_name:
     type: string
     description: Private network address (CIDR notation)
-    default: RADIUS-0
+    default: RADIUS
   RADIUS_net_cidr:
     type: string
     description: Private network address (CIDR notation)
@@ -111,7 +111,7 @@ parameters:
   SGs_net_name:
     type: string
     description: Private network address (CIDR notation)
-    default: SGs-0
+    default: SGs
   SGs_net_cidr:
     type: string
     description: Private network address (CIDR notation)
@@ -129,7 +129,7 @@ parameters:
   SGi_net_name:
     type: string
     description: Private network address (CIDR notation)
-    default: SGi-0
+    default: SGi
   SGi_net_cidr:
     type: string
     description: Private network address (CIDR notation)
@@ -146,7 +146,7 @@ parameters:
   net0_net_name:
     type: string
     description: Private network address (CIDR notation)
-    default: net0-0
+    default: net0
   net0_net_cidr:
     type: string
     description: Private network address (CIDR notation)
@@ -159,6 +159,10 @@ parameters:
     type: string
     description: End of private network IP address pool
     default: 10.0.0.254
+  net0_net_gateway:
+    type: string
+    description: Private network gateway address
+    default: 10.0.0.1
 
   security_group_name:
     type: string
@@ -200,6 +204,15 @@ resources:
           port_range_min: 161
           port_range_max: 161
 
+
+  net0_network:
+    type: internal_network.yaml
+    properties:
+      private_net_name: { get_param: net0_net_name }
+      private_net_cidr: { get_param: net0_net_cidr }
+      private_net_pool_start: { get_param: net0_net_pool_start }
+      private_net_pool_end: { get_param: net0_net_pool_end }
+      private_net_gateway: { get_param: net0_net_gateway }
 
   S1_C_network:
     type: network.yaml
@@ -249,14 +262,6 @@ resources:
       private_net_pool_start: { get_param: SGi_net_pool_start }
       private_net_pool_end: { get_param: SGi_net_pool_end }
 
-  net0_network:
-    type: network.yaml
-    properties:
-      private_net_name: { get_param: net0_net_name }
-      private_net_cidr: { get_param: net0_net_cidr }
-      private_net_pool_start: { get_param: net0_net_pool_start }
-      private_net_pool_end: { get_param: net0_net_pool_end }
-
   Router:
     type: router.yaml
     properties:
@@ -269,6 +274,214 @@ resources:
       S6a_subnet: { get_attr: [ S6a_network, private_net_subnet ] }
       radius_subnet: { get_attr: [ RADIUS_network, private_net_subnet ] }
       SGi_subnet: { get_attr: [ SGi_network, private_net_subnet ] }
+
+  VCM_VEM:
+    type: OS::Heat::ResourceGroup
+    properties:
+      resource_def:
+        type: VCM_VEM.yaml
+        properties:
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          availability_zone : {get_param: availability_zone_1}
+          security_group_def: {get_resource: vEPC_security_group }
+          public_network: {get_param: public_network}
+          private_network: {get_attr: [net0_network, private_net]}
+          index: {get_param: index}
+
+  VCM_VEM_2:
+    type: OS::Heat::ResourceGroup
+    properties:
+      resource_def:
+        type: VCM_VEM.yaml
+        properties:
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          availability_zone : {get_param: availability_zone_2}
+          security_group_def: {get_resource: vEPC_security_group }
+          public_network: {get_param: public_network}
+          private_network: {get_attr: [net0_network, private_net]}
+          index: {get_param: index_2}
+
+  VCM_SDB:
+    type: OS::Heat::ResourceGroup
+    properties:
+      resource_def:
+        type: VCM_SDB.yaml
+        properties:
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          availability_zone : {get_param: availability_zone_1}
+          security_group_def: {get_resource: vEPC_security_group }
+          public_network: {get_param: public_network}
+          private_network: {get_attr: [net0_network, private_net]}
+          index: {get_param: index}
+
+  VCM_SDB_2:
+    type: OS::Heat::ResourceGroup
+    properties:
+      resource_def:
+        type: VCM_SDB.yaml
+        properties:
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          availability_zone : {get_param: availability_zone_2}
+          security_group_def: {get_resource: vEPC_security_group }
+          public_network: {get_param: public_network}
+          private_network: {get_attr: [net0_network, private_net]}
+          index: {get_param: index_2}
+
+  VCM_RIF:
+    type: OS::Heat::ResourceGroup
+    properties:
+      resource_def:
+        type: VCM_RIF.yaml
+        properties:
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          availability_zone : {get_param: availability_zone_1}
+          security_group_def: {get_resource: vEPC_security_group }
+          public_network: {get_param: public_network}
+          private_network: {get_attr: [net0_network, private_net]}
+          S1C_network: {get_attr: [S1_C_network, private_net]}
+          SGs_network: {get_attr: [SGs_network, private_net]}
+          index: {get_param: index}
+
+  VCM_RIF_2:
+    type: OS::Heat::ResourceGroup
+    properties:
+      resource_def:
+        type: VCM_RIF.yaml
+        properties:
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          availability_zone : {get_param: availability_zone_2}
+          security_group_def: {get_resource: vEPC_security_group }
+          public_network: {get_param: public_network}
+          private_network: {get_attr: [net0_network, private_net]}
+          S1C_network: {get_attr: [S1_C_network, private_net]}
+          SGs_network: {get_attr: [SGs_network, private_net]}
+          index: {get_param: index_2}
+
+  VCM_CPE:
+    type: OS::Heat::ResourceGroup
+    properties:
+      resource_def:
+        type: VCM_CPE.yaml
+        properties:
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          availability_zone : {get_param: availability_zone_1}
+          security_group_def: {get_resource: vEPC_security_group }
+          public_network: {get_param: public_network}
+          private_network: {get_attr: [net0_network, private_net]}
+          index: {get_param: index}
+
+  VCM_CPE_2:
+    type: OS::Heat::ResourceGroup
+    properties:
+      resource_def:
+        type: VCM_CPE.yaml
+        properties:
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          availability_zone : {get_param: availability_zone_2}
+          security_group_def: {get_resource: vEPC_security_group }
+          public_network: {get_param: public_network}
+          private_network: {get_attr: [net0_network, private_net]}
+          index: {get_param: index_2}
+
+  VCM_DPE:
+    type: OS::Heat::ResourceGroup
+    properties:
+      resource_def:
+        type: VCM_DPE.yaml
+        properties:
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          availability_zone : {get_param: availability_zone_1}
+          security_group_def: {get_resource: vEPC_security_group }
+          public_network: {get_param: public_network}
+          private_network: {get_attr: [net0_network, private_net]}
+          S1U_network: {get_attr: [S1_U_network, private_net]}
+          SGi_network: {get_attr: [SGi_network, private_net]}
+          index: {get_param: index}
+
+  VCM_DPE_2:
+    type: OS::Heat::ResourceGroup
+    properties:
+      resource_def:
+        type: VCM_DPE.yaml
+        properties:
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          availability_zone : {get_param: availability_zone_2}
+          security_group_def: {get_resource: vEPC_security_group }
+          public_network: {get_param: public_network}
+          private_network: {get_attr: [net0_network, private_net]}
+          S1U_network: {get_attr: [S1_U_network, private_net]}
+          SGi_network: {get_attr: [SGi_network, private_net]}
+          index: {get_param: index_2}
+
+  VCM_UDB:
+    type: OS::Heat::ResourceGroup
+    properties:
+      resource_def:
+        type: VCM_UDB.yaml
+        properties:
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          availability_zone : {get_param: availability_zone_1}
+          security_group_def: {get_resource: vEPC_security_group }
+          public_network: {get_param: public_network}
+          private_network: {get_attr: [net0_network, private_net]}
+          S6a_network: {get_attr: [S6a_network, private_net]}
+          index: {get_param: index}
+
+  VCM_UDB_2:
+    type: OS::Heat::ResourceGroup
+    properties:
+      resource_def:
+        type: VCM_UDB.yaml
+        properties:
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          availability_zone : {get_param: availability_zone_2}
+          security_group_def: {get_resource: vEPC_security_group }
+          public_network: {get_param: public_network}
+          private_network: {get_attr: [net0_network, private_net]}
+          S6a_network: {get_attr: [S6a_network, private_net]}
+          index: {get_param: index_2}
+
+  VCM_CDF:
+    type: OS::Heat::ResourceGroup
+    properties:
+      resource_def:
+        type: VCM_CDF.yaml
+        properties:
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          availability_zone : {get_param: availability_zone_1}
+          security_group_def: {get_resource: vEPC_security_group }
+          public_network: {get_param: public_network}
+          private_network: {get_attr: [net0_network, private_net]}
+          RADIUS_network: {get_attr: [RADIUS_network, private_net]}
+          index: {get_param: index}
+
+  VCM_CDF_2:
+    type: OS::Heat::ResourceGroup
+    properties:
+      resource_def:
+        type: VCM_CDF.yaml
+        properties:
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          availability_zone : {get_param: availability_zone_2}
+          security_group_def: {get_resource: vEPC_security_group }
+          public_network: {get_param: public_network}
+          private_network: {get_attr: [net0_network, private_net]}
+          RADIUS_network: {get_attr: [RADIUS_network, private_net]}
+          index: {get_param: index_2}
 
 outputs:
   network_id:

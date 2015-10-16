@@ -35,13 +35,25 @@ parameters:
     label: Private network name or ID
     description: Network to attach server to.
     default: net04
-    
+
+  S6a_network:
+    type: string
+    description: ID of port in s1 network
+    default: asdf
+
   index:
     type: number
     description: Index of node in the cluster
     default: 0
 
 resources:
+  port_S6a:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: S6a_network }
+      security_groups:
+        - { get_param: security_group_def }
+
   port:
     type: OS::Neutron::Port
     properties:
@@ -52,10 +64,6 @@ resources:
     type: OS::Neutron::FloatingIP
     properties:
       floating_network: { get_param: public_network }
-  floating_ip_assoc:
-    type: OS::Neutron::FloatingIPAssociation
-    properties:
-      floatingip_id: { get_resource: floating_ip }
       port_id: { get_resource: port }
 
   instance:
@@ -66,6 +74,7 @@ resources:
       flavor: { get_param: flavor }
       availability_zone : {get_param: availability_zone}
       networks:
+        - port: { get_resource: port_S6a }
         - port: { get_resource: port }
   
       user_data:

@@ -36,17 +36,37 @@ parameters:
     description: Network to attach server to.
     default: net04
 
+  S1C_network:
+    type: string
+    description: ID of port in s1 network
+    default: asdf
+
+  SGs_network:
+    type: string
+    description: ID of port in s1 network
+    default: asdf
+
   index:
     type: number
     description: Index of node in the cluster
     default: 0
 
-  port_s1_id:
-    type: string
-    description: ID of port in s1 network
-    default: asdf
-
 resources:
+
+  port_S1C:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: S1C_network }
+      security_groups:
+        - { get_param: security_group_def }
+
+  port_SGs:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: SGs_network }
+      security_groups:
+        - { get_param: security_group_def }
+
   port:
     type: OS::Neutron::Port
     properties:
@@ -57,12 +77,7 @@ resources:
     type: OS::Neutron::FloatingIP
     properties:
       floating_network: { get_param: public_network }
-  floating_ip_assoc:
-    type: OS::Neutron::FloatingIPAssociation
-    properties:
-      floatingip_id: { get_resource: floating_ip }
       port_id: { get_resource: port }
-
 
   instance:
     type: OS::Nova::Server
@@ -72,8 +87,10 @@ resources:
       flavor: { get_param: flavor }
       availability_zone : {get_param: availability_zone}
       networks:
-        - port: { get_param: port_s1_id }
+        - port: { get_resource: port_S1C }
+        - port: { get_resource: port_SGs}
         - port: { get_resource: port }
+
 
       user_data:
         str_replace:

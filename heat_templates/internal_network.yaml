@@ -12,6 +12,10 @@ parameters:
     type: string
     description: Private network address (CIDR notation)
     default: 192.16.100.0/24
+  private_net_gateway:
+    type: string
+    description: Private network gateway address
+    default: 192.16.100.254
   private_net_pool_start:
     type: string
     description: Start of private network IP address pool
@@ -20,6 +24,10 @@ parameters:
     type: string
     description: End of private network IP address pool
     default: 192.16.100.253
+  dns_ip:
+    type: string
+    description: IP address of DNS server
+    default: 8.8.8.8
 
 resources:
   private_net:
@@ -33,10 +41,10 @@ resources:
       name: { get_param: private_net_name }
       network_id: { get_resource: private_net }
       cidr: { get_param: private_net_cidr }
+      gateway_ip: { get_param: private_net_gateway }
       allocation_pools:
         - start: { get_param: private_net_pool_start }
           end: { get_param: private_net_pool_end }
-
 
 outputs:
   private_net:

@@ -40,17 +40,31 @@ parameters:
     description: Index of node in the cluster
     default: 0
 
-  port_sgi_id:
+  S1U_network:
     type: string
-    description: ID of port in sg1 network
+    description: ID of port in s1 network
     default: asdf
 
-  port_s1_id:
+  SGi_network:
     type: string
     description: ID of port in s1 network
     default: asdf
 
 resources:
+
+  port_S1U:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: S1U_network }
+      security_groups:
+        - { get_param: security_group_def }
+
+  port_SGi:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: SGi_network }
+      security_groups:
+        - { get_param: security_group_def }
   port:
     type: OS::Neutron::Port
     properties:
@@ -61,12 +75,7 @@ resources:
     type: OS::Neutron::FloatingIP
     properties:
       floating_network: { get_param: public_network }
-  floating_ip_assoc:
-    type: OS::Neutron::FloatingIPAssociation
-    properties:
-      floatingip_id: { get_resource: floating_ip }
       port_id: { get_resource: port }
-
 
   instance:
     type: OS::Nova::Server
@@ -76,8 +85,8 @@ resources:
       flavor: { get_param: flavor }
       availability_zone : {get_param: availability_zone}
       networks:
-        - port: { get_param: port_sgi_id }
-        - port: { get_param: port_s1_id }
+        - port: { get_resource: port_S1U }
+        - port: { get_resource: port_SGi}
         - port: { get_resource: port }
 
 
