@@ -467,6 +467,59 @@ resources:
           extrouter_id: {get_attr: [Router, router_id]}
 
 outputs:
-  network_id:
-    description: ID internal_network
-    value: { get_attr: [ SGi_network, private_net ] }
+  CDF_ip:
+    description: IP address VCM-CDF-1
+    value: { get_attr: [ VCM_CDF, floating_ip ] }
+
+  CPE_ip:
+    description: IP address of VCM-CPE-1
+    value: { get_attr: [ VCM_CPE, floating_ip ] }
+
+  SDB_ip:
+    description: IP address of VCM-SDB-1
+    value: { get_attr: [ VCM_SDB, floating_ip ] }
+
+  UDB_ip:
+    description: IP address of VCM-UDB-1
+    value: { get_attr: [ VCM_UDB, floating_ip ] }
+
+  VEM_ip:
+    description: IP address of VCM-VEM-1
+    value: { get_attr: [ VCM_VEM, floating_ip ] }
+
+  RIF_ip:
+    description: IP address of VCM-RIF-1
+    value: { get_attr: [ VCM_RIF, floating_ip ] }
+
+  DPE_ip:
+    description: IP address of VCM-DPE-1
+    value: { get_attr: [ VCM_DPE, floating_ip ] }
+
+
+  CDF_2_ip:
+    description: IP address VCM-CDF-2
+    value: { get_attr: [ VCM_CDF_2, floating_ip ] }
+
+  CPE_2_ip:
+    description: IP address of VCM-CPE-2
+    value: { get_attr: [ VCM_CPE_2, floating_ip ] }
+
+  SDB_2_ip:
+    description: IP address of VCM-SDB-2
+    value: { get_attr: [ VCM_SDB_2, floating_ip ] }
+
+  UDB_2_ip:
+    description: IP address of VCM-UDB-2
+    value: { get_attr: [ VCM_UDB_2, floating_ip ] }
+
+  VEM_2_ip:
+    description: IP address of VCM-VEM-2
+    value: { get_attr: [ VCM_VEM_2, floating_ip ] }
+
+  RIF_2_ip:
+    description: IP address of VCM-RIF-2
+    value: { get_attr: [ VCM_RIF_2, floating_ip ] }
+
+  DPE_2_ip:
+    description: IP address of VCM-DPE-2
+    value: { get_attr: [ VCM_DPE_2, floating_ip ] }

@@ -129,3 +129,17 @@ while(cluster_details.status!= 'COMPLETE'):
 		print('Stack Creation failed')
 		sys.exit()
 print cluster_details.outputs
+
+#--------------------- getting IPs from heat client --------------------#
+for vm_name in name_list:
+	vm_ip = get_instance_floatingip(heatclient, cluster_details, vm_name)
+	instance_obj = InstanceObj(vm_name, vm_ip)
+	instance_list.append(instance_obj)
+	print vm_ip
+	
+for vm_name in name_list:
+	vm_name2 = vm_name + "_2"
+	vm_ip = get_instance_floatingip(heatclient, cluster_details, vm_name2)
+	instance_obj = InstanceObj(vm_name, vm_ip)
+	instance_list2.append(instance_obj)
+	print vm_ip
