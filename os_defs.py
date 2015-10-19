@@ -13,8 +13,8 @@ FILE_PATH_RIF = 'heat_templates/VCM_RIF.yaml'
 FILE_PATH_SDB = 'heat_templates/VCM_SDB.yaml'
 FILE_PATH_UDB = 'heat_templates/VCM_UDB.yaml'
 FILE_PATH_VEM = 'heat_templates/VCM_VEM.yaml'
-
 FILE_PATH_network = 'heat_templates/network.yaml'
+FILE_PATH_router = 'heat_templates/router.yaml'
 
 DIR_hostnames = 'hostnames/'
 DIR_ip_files = 'ip_files/'
@@ -32,13 +32,15 @@ def create_cluster(heat, cluster_name):
 		file_RIF = open(FILE_PATH_RIF, 'r')
 		file_DPE = open(FILE_PATH_DPE, 'r')
 		file_net = open(FILE_PATH_network, 'r')
+		file_router = open(FILE_PATH_router, 'r')
 	except:
-		print "couldnt openfile"
+		print "could not open file"
 	cluster_body={
 	"stack_name":cluster_name,
 	"template":file_main.read(),
 	"files":{
 	  "network.yaml":file_net.read(),
+	  "router.yaml":file_router.read(),
 	  "VCM_CDF.yaml":file_CDF.read(),
 	  "VCM_CPE.yaml":file_CPE.read(),
 	  "VCM_DPE.yaml":file_DPE.read(),
@@ -50,28 +52,47 @@ def create_cluster(heat, cluster_name):
 	 "parameters": {
 	 "image": "VCM_IMG",
 	 "flavor": "m1.medium",
-	 "security_group_def": "default",
 	 "public_network": "net04_ext",
 	 "availability_zone_1": "compute1",
 	 "availability_zone_2": "compute2",
-	 "private_network": "net04",
-	 "index": "0",
-	 "index_2": "10",
-	 "sgi_net_name": "SGi-0",
-	 "sgi_net_cidr": "172.16.20.0/24",
-	 "sgi_net_pool_start": "172.16.20.10",
-	 "sgi_net_pool_end": "172.16.20.30",
-	 "s1_net_name": "S1-0",
-	 "s1_net_cidr": "172.16.10.0/24",
-	 "s1_net_pool_start": "172.16.10.10",
-	 "s1_net_pool_end": "172.16.10.30",
-	 "security_group_name": "vEPC_sec_grp"
+	 "index": "1",
+	 "index_2": "2",
+	 "security_group_name": "vEPC_sec_grp",
+	 "router_name": "extrouter",
+	 "S1_C_net_name": "S1C",
+	 "S1_C_net_cidr": "172.100.10.0/27",
+	 "S1_C_net_pool_start": "172.100.10.2",
+	 "S1_C_net_pool_end": "172.100.10.30",
+	 "S1_U_net_name": "S1U",
+	 "S1_U_net_cidr": "172.100.11.0/27",
+	 "S1_U_net_pool_start": "172.100.11.2",
+	 "S1_U_net_pool_end": "172.100.11.30",
+	 "S6a_net_name": "S6a",
+	 "S6a_net_cidr": "172.100.13.0/27",
+	 "S6a_net_pool_start": "172.100.13.2",
+	 "S6a_net_pool_end": "172.100.13.30",
+	 "RADIUS_net_name": "RADIUS",
+	 "RADIUS_net_cidr": "172.100.14.0/27",
+	 "RADIUS_net_pool_start": "172.100.14.2",
+	 "RADIUS_net_pool_end": "172.100.14.30",
+	 "SGs_net_name": "SGs",
+	 "SGs_net_cidr": "172.100.12.0/27",
+	 "SGs_net_pool_start": "172.100.12.2",
+	 "SGs_net_pool_end": "172.100.12.30",
+	 "SGi_net_name": "SGi",
+	 "SGi_net_cidr": "172.100.15.0/27",
+	 "SGi_net_pool_start": "172.100.15.2",
+	 "SGi_net_pool_end": "172.100.15.30",
+	 "net0_net_name": "net0",
+	 "net0_net_cidr": "10.0.0.0/24",
+	 "net0_net_pool_start": "10.0.0.2",
+	 "net0_net_pool_end": "10.0.0.254"
 	 }
 	}
 	try:  
 		heat.stacks.create(**cluster_body)
 	except:
-		print ("There is an error creating cluster, exiting...")
+		print ("Unable to create stack, exiting...")
 		raise
 		sys.exit()
 
@@ -165,26 +186,10 @@ def input_configurations(error_logger, logger):
 	inp = inp.split("\"")
 	configurations['networks']['sgi_pool_start'] = inp[1]
 	configurations['networks']['sgi_pool_end'] = inp[3]
-
-	FILE_PATH_range = DIR_ip_files + 'range_nexthop.txt'
-	try:
-		param_file_write = open(FILE_PATH_range, 'w')
-	except:
-		print "ip_files/range_nexthop.txt: file not found"
-		error_logger.exception("ip_files/range_nexthop.txt: file not found")
-		sys.exit()
-	inp = file_read.readline()
-	param_file_write.write(inp)
-	
-	inp = file_read.readline()
-	param_file_write.write(inp)
-	
 	logger.info("writing to configuration file")
 	json_file.close()
 	with open('configurations.json', 'w') as outfile:
 		json.dump(configurations, outfile)
-	param_file_write.close()
-	
 	file_read.close()
 #--------------------------------------------------------#
 def get_instance_floatingip(heat, cluster_details, vm_name):
@@ -200,182 +205,6 @@ def get_instance_private_ip(heat, cluster_details, vm_name):
      if i['output_key']== output:
         insatnce_ip= i['output_value']
    return insatnce_ip[0]
-
-def get_mme_port_ip(heat, cluster_details):
-   for i in cluster_details.outputs:
-     if i['output_key']== 'port_mme_ip':
-        insatnce_ip= i['output_value']
-   return insatnce_ip
-
-
-#--------create availaible IPs file-------#
-def create_IP_file(netname, configurations, logger):
-	global DIR_ip_files
-	info_msg = "Creating IP file " + netname
-	logger.info(info_msg)
-	net_cidr = ''
-	if netname == 's1':
-		net_cidr = configurations['networks']['s1-cidr']
-	elif netname == 'sgi':
-		net_cidr = configurations['networks']['sgi-cidr']
-	
-	net_addr = calculate_subnet_address('network_add', net_cidr)
-	subnet_mask = calculate_subnet_address('mask', net_cidr)
-	subnet_mask = subnet_mask.split('.')
-	pool = ''
-	
-	if 's1' in netname:
-		FILE_PATH = DIR_ip_files + 's1_available_ips.txt'
-		s1_e = configurations['networks']['s1_pool_end'].split('.')
-		pool =  int(s1_e[3])
-	elif 'sgi' in netname:
-		FILE_PATH = DIR_ip_files + 'sgi_available_ips.txt'
-		sgi_e = configurations['networks']['sgi_pool_end'].split('.')
-		pool =  int(sgi_e[3])# - int(sgi_s[3])
-		
-	ip_list = get_available_IP(net_addr, int(subnet_mask[3]), pool)
-	target = open(FILE_PATH, 'w')
-	#target.truncate()
-	target.write(ip_list)
-	target.close()
-	logger.info("done creating")
-#-----------------------------------#
-def calculate_subnet_address(name, net_cidr):
-	(addrString, cidrString) = net_cidr.split('/')
-	addr = addrString.split('.')
-	cidr = int(cidrString)
-	
-	# Initialize the netmask and calculate based on CIDR mask
-	mask = [0, 0, 0, 0]
-	for i in range(cidr):
-		mask[i/8] = mask[i/8] + (1 << (7 - i % 8))
-	if name == 'mask':
-		return ".".join(map(str, mask))
-
-	# Initialize net and binary and netmask with addr to get network
-	net = []
-	for i in range(4):
-		net.append(int(addr[i]) & mask[i])
-	if name == 'network_add':
-		return ".".join(map(str, net))
-
-#--------------------------------------------#
-def get_available_IP(net_addr, mask, pool):
-	list_ips = ''
-	net_addr = net_addr.split(".")
-	netw_addr = net_addr[0] + '.' + net_addr[1] + '.' + net_addr[2] + '.'
-	rng = 255 - mask
-	max_ip = 255 - mask - pool
-	pool = pool + 1
-	for i in range (pool, rng):
-		ip = netw_addr + str(i)
-		list_ips = list_ips + ip + '\n'
-	
-	return list_ips	
-
-#--------------------------------------------#
-
-#-------------------writing IP of VCM config to separate file---------#
-def write_cfg_file(cfg_file_name, configurations):
-	
-	global DIR_ip_files
-	sgi_ip = ''
-	
-	s1_ip_filename =  DIR_ip_files + 's1_assigned_ips.txt'
-	sgi_ip_filename = DIR_ip_files + 'sgi_assigned_ips.txt'
-	
-	s1_ip_file = open(s1_ip_filename, 'a')
-	sgi_ip_file = open(sgi_ip_filename, 'a')
-		
-	param_file_read = open(DIR_ip_files + 'range_nexthop.txt', 'r')
-	
-	inp = param_file_read.readline()
-	inp = inp.split("\"")
-	
-	vcm_cfg_file_read = open(cfg_file_name, 'r').readlines()
-	vcm_cfg_file_write = open(cfg_file_name, 'w')
-	
-	for line in vcm_cfg_file_read:
-		if line.startswith("range"):
-			new_line = "range " + inp[1] + '\n'
-			vcm_cfg_file_write.write(new_line)
-		
-		elif line.startswith("nexthop address"):
-			inp = param_file_read.readline()
-			inp = inp.split("\"")
-			new_line = "nexthop address " + inp[1] + '\n'
-			vcm_cfg_file_write.write(new_line)
-		
-		elif line.startswith("bind s1-mme"):
-			s1_cidr = str(configurations['networks']['s1-cidr'])
-			s1_cidr = s1_cidr.split("/")
-			assigned_ip = get_IP_from_file('s1')
-			assigned_ip = assigned_ip.replace('\n', '')
-			new_line = "bind s1-mme ipv4-address " + assigned_ip + " mask " + s1_cidr[1] + " interface eth1\n"
-			vcm_cfg_file_write.write(new_line)
-			s1_ip_file.write(new_line)
-		
-		elif line.startswith("gtpu bind s1u-sgw"):
-			assigned_ip = get_IP_from_file('s1')
-			assigned_ip = assigned_ip.replace('\n', '')
-			new_line = "gtpu bind s1u-sgw " + assigned_ip + " mask " + s1_cidr[1] + " interface eth1\n"
-			vcm_cfg_file_write.write(new_line)
-			s1_ip_file.write(new_line)
-		
-		elif line.startswith("sgi-endpoint bind"):
-			sgi_cidr = str(configurations['networks']['sgi-cidr'])
-			sgi_cidr = sgi_cidr.split("/")
-			sgi_ip = get_IP_from_file('sgi')
-			sgi_ip = sgi_ip.replace('\n', '')
-			new_line = "sgi-endpoint bind " + sgi_ip + " mask " + sgi_cidr[1] + " interface eth2\n"
-			vcm_cfg_file_write.write(new_line)
-			sgi_ip_file.write(new_line)
-		
-		elif line.startswith("ethernet port 2"):
-			new_line = "ethernet port 2 address " + sgi_ip +  " mask " + sgi_cidr[1] + '\n'
-			vcm_cfg_file_write.write(new_line)
-			sgi_ip_file.write(new_line)
-		else:
-			vcm_cfg_file_write.write(line)
-	
-	vcm_cfg_file_write.close()
-	
-	s1_ip_file.close()
-	sgi_ip_file.close()
-	
-	param_file_read.close()
-
-#--------------------------------#
-def get_IP_from_file(f_name):
-	
-	filename = ''
-	
-	if (f_name == 's1'):
-		filename = DIR_ip_files + 's1_available_ips.txt'
-	elif (f_name == 'sgi'):
-		filename = DIR_ip_files + 'sgi_available_ips.txt'
-
-	file_read = open(filename, 'r')
-	assigned_ip = file_read.readline()
-	
-	str1 = file_read.read()
-	file_read.close()
-	list_str = str1.split("\n")
-	
-	file_write = open(filename, 'w')
-
-	for i in range (0 , len(list_str)):
-		#new_line = file_read.readline()
-		new_line = list_str[i] + '\n'
-		file_write.write(new_line)
-	
-	file_read.close()
-	file_write.close()
-	
-	return assigned_ip
-#--------------------------------#
-#----------------------------------------------------------------#
-
 
 def image_exists(glance, img_name, error_logger, logger_glance):
 	img_exists = False
@@ -395,7 +224,6 @@ def image_exists(glance, img_name, error_logger, logger_glance):
 			error_logger.exception("Image not exists")
 			break
 	return img_exists
-#------------------------------------------#
 
 def check_image_directory(img_name, logger_glance, error_logger):
 	global DIR_IMG
@@ -529,47 +357,3 @@ def create_aggregate_groups(nova, error_logger, logger_nova):
 		sys.exit()
 
 #-----------------------------------------------------------------------#
-# Check if server hostname can be pinged
-def check_ping(hostname, logger):
-    response = os.system("ping -c 1 " + hostname+" > /dev/null 2>&1")
-    # and then check the response...
-    if response == 0:
-        pingstatus = "Network Active"
-        logger.info("VM is up and running")
-    else:
-        pingstatus = "Network Error"
-        logger.warning("Host is unreachable")
-    return pingstatus
-def check_ping_status(hostname, vm_name, logger):
-	time_sleeping = 0
-	info_msg = "Checking ping status of " + vm_name
-	logger.info(info_msg)
-	while check_ping(hostname, logger) != 'Network Active':
-		if time_sleeping > 120:
-			print("[" + time.strftime("%H:%M:%S")+ "] Host unreachable, please check configuration. Exiting..")
-			logger.error("Host unreachable: exiting")
-			sys.exit()
-		print("[" + time.strftime("%H:%M:%S")+ "] " + vm_name + " booting up, please wait...")
-		logger.info("Waiting for VM to boot up")
-		time.sleep(5)
-		time_sleeping += 10
-	print("[" + time.strftime("%H:%M:%S")+ "] " + vm_name+" booted up!")
-
-
-def mme_file_edit(mme_ip, configurations, logger):
-	logger.info("editing mme file")
-	file_name = 'vcm-mme-start'
-	file_str = open(file_name, 'r').readlines()
-	file_write = open(file_name, 'w')
-	
-	s1_cidr = configurations['networks']['s1-cidr']
-	s1_cidr = s1_cidr.split("/")
-	
-	for line in file_str:
-		if line.startswith("ifconfig eth1:1"):
-			new_line = "ifconfig eth1:1 " + mme_ip + "/" + s1_cidr[1] + " -arp\n"
-			file_write.write(new_line)
-		else:
-			file_write.write(line)
-	logger.info("Successfully edited mme file")
-	file_write.close()

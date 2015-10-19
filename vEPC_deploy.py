@@ -25,19 +25,6 @@ name_list = ['VEM', 'SDB', 'CPE', 'CDF', 'UDB', 'DPE', 'RIF']
 file_list = ['vem1.txt', 'sdb1.txt', 'cpe1.txt', 'cdf1.txt', 'udb1.txt', 'dpe1.txt', 'rif1.txt']
 file_list2 = ['vem2.txt', 'sdb2.txt', 'cpe2.txt', 'cdf2.txt', 'udb2.txt', 'dpe2.txt', 'rif2.txt']
 
-LOCAL_PATH_MME_CFG = "vcm-mme-start"
-REMOTE_PATH_MME_CFG = "/opt/VCM/etc/scripts/vcm-mme-start"
-
-LOCAL_PATH_DAT_CFG = "data.txt"
-REMOTE_PATH_DAT_CFG = "/opt/VCM/etc/data.txt"
-
-LOCAL_PATH_CSV_CFG = "SubscriptionData.csv"
-REMOTE_PATH_CSV_CFG = "/opt/VCM/etc/SubscriptionData.csv"
-
-LOCAL_PATH_DELL_CFG = "Dell-VCM.cfg"
-REMOTE_PATH_DELL_CFG = "/opt/VCM/config/Dell-VCM.cfg"
-
-REMOTE_PATH_HOSTNAME = "/etc/sysconfig/network"
 
 #------------------ logging configurations ------------------#
 now = datetime.datetime.now()
@@ -61,32 +48,20 @@ fh.setLevel(logging.ERROR)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 fh.setFormatter(formatter)
 error_logger.addHandler(fh)
-#---------------------------------------------------------#
 
+#---------------------------------------------------------#
 InstanceObj = namedtuple("InstanceObj", "name ip")
 InstanceObj2 = namedtuple("InstanceObj", "name ip")
 instance_list = []
 instance_list2 = []
+
 #------------------ input configurations ------------------#
 input_configurations(error_logger, logger)
 configurations = get_configurations(logger, error_logger)
-
-try:
-	create_IP_file('s1', configurations, logger)
-except:
-	error_logger.exception("Unable to create s1 IP file")
-try:
-	create_IP_file('sgi', configurations, logger)
-except:
-	error_logger.exception("Unable to create sgi IP file")
-
-write_cfg_file('Dell-VCM.cfg', configurations)
-
 cred = get_keystone_creds(configurations)
 
-logger.info("Getting authorized instance of keystone client")
-
 #------------------ Glance Image creation ------------------#
+logger.info("Getting authorized instance of keystone client")
 try:
 	keystone = ksClient.Client(**cred)
 except:
@@ -117,7 +92,6 @@ if not image_exists(glance, img_name, error_logger, logger_glance):
 	print("[" + time.strftime("%H:%M:%S")+ "] Successfully created VCM image")
 
 #--------------------- nova client --------------------#
-
 logger_nova.info("Getting nova credentials")
 nova_creds = get_nova_creds(configurations)
 
@@ -135,11 +109,9 @@ except:
 	sys.exit()
 
 #--------------------- aggregate group creation --------------------#
-
 create_aggregate_groups(nova, error_logger, logger_nova)
 avl_zoneA = get_avlzoneA()
 avl_zoneB = get_avlzoneB()
-
 
 #--------------------- Heat stack creation --------------------#
 heat_endpoint = keystone.service_catalog.url_for(service_type='orchestration', endpoint_type='publicURL')
@@ -156,42 +128,4 @@ while(cluster_details.status!= 'COMPLETE'):
 	if cluster_details.status == 'FAILED':
 		print('Stack Creation failed')
 		sys.exit()
-
-#--------------------- getting IPs from heat client --------------------#
-for vm_name in name_list:
-	vm_ip = get_instance_floatingip(heatclient, cluster_details, vm_name)
-	instance_obj = InstanceObj(vm_name, vm_ip)
-	instance_list.append(instance_obj)
-	print vm_ip
-	
-for vm_name in name_list:
-	vm_name2 = vm_name + "_2"
-	vm_ip = get_instance_floatingip(heatclient, cluster_details, vm_name2)
-	instance_obj = InstanceObj(vm_name, vm_ip)
-	instance_list2.append(instance_obj)
-	print vm_ip
-
-#--------------------- paramiko client creation --------------------#
-logger_ssh.info("Getting authorized client of paramiko")
-try:
-	ssh = paramiko.SSHClient()
-	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-except:
-	error_logger.exception("Creating paramiko client instance")
-	print("[" + time.strftime("%H:%M:%S")+ "] Error creating paramiko client")
-	sys.exit()
-
-print "waiting for VMs to boot up"
-time.sleep(40)
-
-#--------------------- Getting mme-port IP --------------------#
-
-mme_port_ip = get_mme_port_ip(heatclient, cluster_details)
-print mme_port_ip
-mme_file_edit(mme_port_ip,configurations, logger)
-
-#--------------------- Checking ping status --------------------#
-for i in range(0, 7):
-	check_ping_status(instance_list[i].ip, instance_list[i].name, logger)
-for i in range(0, 7):
-	check_ping_status(instance_list2[i].ip, instance_list2[i].name, logger)
+print cluster_details.outputs
