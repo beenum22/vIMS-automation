@@ -46,6 +46,12 @@ parameters:
     description: Index of node in the cluster
     default: 0
 
+  extrouter_id:
+    type: string
+    label: Private network name or ID
+    description: Network to attach server to.
+    default: asdf
+
 resources:
   port_radius:
     type: OS::Neutron::Port

@@ -40,6 +40,11 @@ parameters:
     type: number
     description: Index of node in the cluster
     default: 0
+    
+  extrouter_id:
+    type: string
+    description: Index of node in the cluster
+    default: 0
 
 resources:
   port:

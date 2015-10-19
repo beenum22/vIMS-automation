@@ -50,6 +50,12 @@ parameters:
     description: ID of port in s1 network
     default: asdf
 
+  extrouter_id:
+    type: string
+    label: Private network name or ID
+    description: Network to attach server to.
+    default: asdf
+
 resources:
 
   port_S1U:

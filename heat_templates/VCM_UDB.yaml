@@ -46,6 +46,11 @@ parameters:
     description: Index of node in the cluster
     default: 0
 
+  extrouter_id:
+    type: string
+    description: ID of port in s1 network
+    default: asdf
+
 resources:
   port_S6a:
     type: OS::Neutron::Port
