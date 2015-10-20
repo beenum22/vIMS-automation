@@ -143,3 +143,9 @@ for vm_name in name_list:
 	instance_obj = InstanceObj(vm_name, vm_ip)
 	instance_list2.append(instance_obj)
 	print vm_ip
+
+#--------------------- Checking ping status --------------------#
+for i in range(0, 7):
+	check_ping_status(instance_list[i].ip, instance_list[i].name, logger)
+for i in range(0, 7):
+	check_ping_status(instance_list2[i].ip, instance_list2[i].name, logger)
