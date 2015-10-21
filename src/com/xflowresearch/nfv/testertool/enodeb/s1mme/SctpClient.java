@@ -61,7 +61,8 @@ public class SctpClient {
 
 		try {
 			sctpChannel = SctpChannel.open();
-			sctpChannel.bind(new InetSocketAddress(0));// '0' instead of user defined port to get an available port assigned by the OS!!
+			sctpChannel.bind(new InetSocketAddress(36412));
+			//sctpChannel.bind(new InetSocketAddress(0));// '0' instead of user defined port to get an available port assigned by the OS!!
 			sctpChannel.connect(socketAddress, 1 ,1);
 		} catch (IOException e) {
 			logger.error("SCTP connection to server was refused!");
