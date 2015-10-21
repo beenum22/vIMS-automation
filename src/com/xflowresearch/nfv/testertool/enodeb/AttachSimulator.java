@@ -68,7 +68,7 @@ public class AttachSimulator {
 	}
 	
 	public void s1SetupMessage(XMLParser xmlparser){
-		String pac = "00110030000004003b00080010f13200013880003c400d050049784c6f61642d654e4231004000070004044010f1320089400100";
+		String pac = xmlparser.getPLMN();
 		
 		sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort()));
 		byte [] message = hexStringToByteArray(pac);

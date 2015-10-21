@@ -28,7 +28,11 @@ public class XMLParser {
 	private String RRCEstablishmentCause;
 	private String MMEIP;
 	private String MMEPort;
-
+	private String PLMN;
+	
+	public String getPLMN(){
+		return PLMN;
+	}
 	public String geteNBUES1APID() {
 		return eNBUES1APID;
 	}
@@ -92,6 +96,7 @@ public class XMLParser {
 					//System.out.println("MNC: " + item.getChild("MNC").getText());
 					//System.out.println("MCC: "+ item.getChild("MCC").getText());
 					//System.out.println("MMEI: "+ item.getChild("MMEI").getText());
+					PLMN = item.getChild("PLMN").getText();
 				}
 			//	System.out.println();        		
 			}
