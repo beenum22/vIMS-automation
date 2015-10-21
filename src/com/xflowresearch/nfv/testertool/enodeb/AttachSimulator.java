@@ -66,4 +66,32 @@ public class AttachSimulator {
 		sctpClient.disconnectFromHost();
 		/** Test S1AP Packet Creation Here!! **/
 	}
+	
+	public void s1SetupMessage(XMLParser xmlparser){
+		String pac = "00110030000004003b00080010f13200013880003c400d050049784c6f61642d654e4231004000070004044010f1320089400100";
+		
+		sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort()));
+		byte [] message = hexStringToByteArray(pac);
+
+		sctpClient.sendProtocolPayload(message, 18);
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		sctpClient.disconnectFromHost();
+		/** Test S1AP Packet Creation Here!! **/
+	}
+	public static byte[] hexStringToByteArray(String s)
+	{
+		byte[] b = new byte[s.length() / 2];
+		for (int i = 0; i < b.length; i++)
+		{
+			int index = i * 2;
+			int v = Integer.parseInt(s.substring(index, index + 2), 16);
+			b[i] = (byte) v;
+		}
+		return b;
+	}
 }

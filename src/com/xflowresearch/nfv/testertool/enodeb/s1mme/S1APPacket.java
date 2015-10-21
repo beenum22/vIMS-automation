@@ -227,7 +227,7 @@ public class S1APPacket
 
 			System.out.println("protocolIE:"+temp.protocolIE+"\ncriticality:"+temp.criticality+"\nlengthOfValue:"+temp.lengthOfValue+"\nvalue:"+temp.value);
 
-			values.add(temp);	
+			values.add(temp);
 		}
 	}
 	/** Functions to parse a packet **/
