@@ -55,6 +55,7 @@ public class SimulationControl
 		xmlparser.readSimulationParameters();
 
 		/** Initialize UE and eNodeB instances' data and start their threads**/
+		enodeb.setXMLParser(xmlparser);
 		Thread eNBThread = new Thread(enodeb);
 		eNBThread.setName("eNBThread1");
 		eNBThread.start();

@@ -6,11 +6,19 @@
 	<SimulationParams>
 		<UECount>1</UECount>
 		<eNBCount>1</eNBCount>
+		
+		<MMEIP>127.0.0.1</MMEIP>
+		<MMEPort>36412</MMEPort>
 	</SimulationParams>
 	
 	<UEParams>
 		<IMSI>1234</IMSI>
 		<IMEI>4567</IMEI>
+		
+		<eNBUES1APID>0001</eNBUES1APID>
+		<TAI>0010f1321011</TAI>
+		<EUTRANCGI>4010f13201388010000000010004ac110128</EUTRANCGI>
+		<RRCEstablishmentCause>30</RRCEstablishmentCause>
 	</UEParams>
 	
 	<eNBParams>

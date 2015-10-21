@@ -3,6 +3,8 @@ package com.xflowresearch.nfv.testertool.enodeb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.xflowresearch.nfv.testertool.common.XMLParser;
+
 /**
  * eNodeB
  * 
@@ -15,6 +17,12 @@ import org.slf4j.LoggerFactory;
 public class eNodeB implements Runnable
 {
 	private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
+	
+	private XMLParser xmlparser;
+	
+	public void setXMLParser(XMLParser xmlparser){
+		this.xmlparser = xmlparser;
+	}
 
 	public eNodeB(){
 
@@ -33,7 +41,7 @@ public class eNodeB implements Runnable
 
 		/** Test Attach Sequence initiation **/
 		AttachSimulator as = new AttachSimulator();
-		as.s1apTestPacket();
+		as.s1apTestPacket(xmlparser);
 		
 	}
 

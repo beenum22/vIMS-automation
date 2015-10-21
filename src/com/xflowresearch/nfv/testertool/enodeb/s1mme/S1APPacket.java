@@ -166,12 +166,11 @@ public class S1APPacket
 	/** Functions to create a packet **/
 
 
-
-
-
+	
 	/** Functions to parse a packet **/
 	public void parsePacket(String packet)
 	{	
+		System.out.println("New S1AP Packet:");
 		header = packet.substring(0, 10);
 		
 		//parse fields from header..
@@ -191,22 +190,21 @@ public class S1APPacket
 			lengthOfValues = Integer.parseInt(header.substring(8, 10), 16);
 			value = packet.substring(10, packet.length());
 		}
-		/*System.out.println("type:"+type);
+		System.out.println("type:"+type);
 		System.out.println("procCode:"+procCode);
 		System.out.println("criticality:"+criticality);
-		System.out.println("lengthOfValues:"+lengthOfValues);*/
+		System.out.println("lengthOfValues:"+lengthOfValues);
 
 		//parse fields from value..
 		numOfValues = Integer.parseInt(value.substring(0, 6), 16);
 
 		int a = 6, b = 10;
 
-		//System.out.println("header:"+header);
-		//System.out.println("value:"+value);
+		System.out.println("numOfValues:"+numOfValues);
 
 		for(int i=0;i<numOfValues;i++)
 		{
-			//System.out.println("\nItem_"+(i+1));
+			System.out.println("\nItem_"+(i+1));
 			Value temp = new Value();
 			
 			temp.protocolIE = S1APDefinitions.IEDict.hexToIEDict(value.substring(a, b).substring(2, 4));
@@ -227,7 +225,7 @@ public class S1APPacket
 			temp.value = value.substring(a, b);
 			a = b; b += 4;
 
-			//System.out.println("protocolIE:"+temp.protocolIE+"\ncriticality:"+temp.criticality+"\nlengthOfValue:"+temp.lengthOfValue+"\nvalue:"+temp.value);
+			System.out.println("protocolIE:"+temp.protocolIE+"\ncriticality:"+temp.criticality+"\nlengthOfValue:"+temp.lengthOfValue+"\nvalue:"+temp.value);
 
 			values.add(temp);	
 		}
