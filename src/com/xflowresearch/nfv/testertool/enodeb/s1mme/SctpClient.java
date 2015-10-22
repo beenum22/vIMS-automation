@@ -61,8 +61,8 @@ public class SctpClient {
 
 		try {
 			sctpChannel = SctpChannel.open();
-			sctpChannel.bind(new InetSocketAddress(36412));
-			//sctpChannel.bind(new InetSocketAddress(0));// '0' instead of user defined port to get an available port assigned by the OS!!
+			//sctpChannel.bind(new InetSocketAddress(36412));
+			sctpChannel.bind(new InetSocketAddress(0));// '0' instead of user defined port to get an available port assigned by the OS!!
 			sctpChannel.connect(socketAddress, 1 ,1);
 		} catch (IOException e) {
 			logger.error("SCTP connection to server was refused!");
@@ -72,11 +72,11 @@ public class SctpClient {
 		isConnected = true;
 
 		/** start the asynchronous receiving thread **/
-		new Thread(){
+		/*new Thread(){
 			public void run(){
 				recievingThread();
 			}
-		}.start();
+		}.start();*/
 	}
 
 
@@ -207,6 +207,30 @@ public class SctpClient {
 			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
 		}
 		return new String(hexChars);
+	}
+	
+	
+	////////////////////new method to recieve synchronous messages/////////////
+	public void recieveSCTPMessage(){
+		final ByteBuffer byteBuffer = ByteBuffer.allocate(64000);
+		MessageInfo messageInfo = null;
+
+		try {
+			messageInfo = sctpChannel.receive(byteBuffer , null, null);
+		} catch (IOException e) {
+			logger.error("SCTP Message read error!");
+			e.printStackTrace();
+		}
+
+		byteBuffer.flip();
+
+		byte[]data = new byte[byteBuffer.remaining()];
+		byteBuffer.get(data);
+
+		String hexPayload = bytesToHex(data);
+
+		handleMessageFromHost(messageInfo, hexPayload);
+		
 	}
 
 }

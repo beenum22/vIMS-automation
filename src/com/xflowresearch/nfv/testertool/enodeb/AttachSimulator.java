@@ -22,6 +22,16 @@ public class AttachSimulator {
 		
 	}
 
+	public void sendS1SetupMessage(XMLParser xmlparser){
+		String pac = xmlparser.getPLMN();
+		
+		sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort()));
+		byte [] message = hexStringToByteArray(pac);
+
+		sctpClient.sendProtocolPayload(message, 18);
+		sctpClient.recieveSCTPMessage();
+		/** Test S1AP Packet Creation Here!! **/
+	}
 	
 	public void s1apTestPacket(XMLParser xmlparser)
 	{
@@ -29,58 +39,38 @@ public class AttachSimulator {
 		
 		//////NAS packet Generation////////////////////////////
 		String AttachArguments ="08091132547698214305e0e000000000050202d011d1";
-		String Reply = "07520067c6697351ff4aec29cdbaabf2fbe3461008199eed4aa3b9b93ba100c2e82de53c";
 		
-		AttachSeqDemo obj =new AttachSeqDemo();
+		AttachSeqDemo obj = new AttachSeqDemo();
 		String NASPDU = obj.SendAttachPack(AttachArguments);
-		System.out.println("Attach Request:" + " " +obj.SendAttachPack(AttachArguments));
 		//////////////////////////////////
 
 		
 		S1APPacket pac = new S1APPacket("InitiatingMessage", "initialUEMessage", "ignore", 5);
 		
 		pac.addValue("eNBUES1APID", "reject", 2, xmlparser.geteNBUES1APID());
-		
-		//pac.addValue("NASPDU", "reject", 25, "1907417108091132547698214305e0e000000000050202d011d1");
 		pac.addValue("NASPDU", "reject", (NASPDU.length()/2), NASPDU);
-		
-		//pac.addValue("TAI", "reject", 6, "0010f1321011");
 		pac.addValue("TAI", "reject", 6, xmlparser.getTAI());
-		
 		pac.addValue("EUTRANCGI", "ignore", 18, xmlparser.getEUTRANCGI());
-		
 		pac.addValue("RRCEstablishmentCause", "ignore", 1, xmlparser.getRRCEstablishmentCause());
 		
 		pac.createPacket();
-		
 		byte [] message = pac.getBytePacket();
 
 		sctpClient.sendProtocolPayload(message, 18);
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		sctpClient.disconnectFromHost();
+		sctpClient.recieveSCTPMessage();
+		//sctpClient.disconnectFromHost();
 		/** Test S1AP Packet Creation Here!! **/
+		
+		
+		
+		//second packet
+		String secondPacket = "000d403800000500000005c021f600d8000800020001001a000c0b075308634f82417968ca98006440080010f13201388010004340060010f1321011";
+		byte [] message1 = hexStringToByteArray(secondPacket);
+		sctpClient.sendProtocolPayload(message, 18);
+		sctpClient.recieveSCTPMessage();
 	}
 	
-	public void s1SetupMessage(XMLParser xmlparser){
-		String pac = xmlparser.getPLMN();
-		
-		sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort()));
-		byte [] message = hexStringToByteArray(pac);
 
-		sctpClient.sendProtocolPayload(message, 18);
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		/** Test S1AP Packet Creation Here!! **/
-	}
 	public static byte[] hexStringToByteArray(String s)
 	{
 		byte[] b = new byte[s.length() / 2];

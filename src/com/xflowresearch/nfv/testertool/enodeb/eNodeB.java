@@ -42,7 +42,7 @@ public class eNodeB implements Runnable
 		/** Test Attach Sequence initiation **/
 		AttachSimulator as = new AttachSimulator();
 		
-		as.s1SetupMessage(xmlparser);
+		as.sendS1SetupMessage(xmlparser);
 		
 		as.s1apTestPacket(xmlparser);
 	}
