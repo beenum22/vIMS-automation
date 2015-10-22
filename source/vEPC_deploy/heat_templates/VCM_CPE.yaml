@@ -1,13 +1,13 @@
 heat_template_version: 2014-10-16
 
-description: VCM-VEM
+description: VCM-CPE
 
 parameters:
   name:
     type: string
     label: name
     description: name to be used for server
-    default: VCM-VEM
+    default: CPE
   image:
     type: string
     label: Image name or ID
@@ -35,16 +35,16 @@ parameters:
     label: Private network name or ID
     description: Network to attach server to.
     default: net04
-    
   index:
     type: number
     description: Index of node in the cluster
     default: 0
-    
+
   extrouter_id:
     type: string
-    description: Index of node in the cluster
-    default: 0
+    label: Private network name or ID
+    description: Network to attach server to.
+    default: asdf
 
 resources:
   port:
@@ -68,7 +68,6 @@ resources:
       availability_zone : {get_param: availability_zone}
       networks:
         - port: { get_resource: port }
-
       user_data:
         str_replace:
           params:
@@ -78,8 +77,8 @@ resources:
 
             #cloud-config
             manage_etc_hosts: True
-            hostname: VEM-__index__
-            fqdn: VEM-__index__.private.xyz
+            hostname: CPE-__index__
+            fqdn: CPE-__index__.private.xyz
 
 
 outputs:

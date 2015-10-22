@@ -1,13 +1,13 @@
 heat_template_version: 2014-10-16
 
-description: VCM-CDF
+description: VCM-UDB
 
 parameters:
   name:
     type: string
     label: name
     description: name to be used for server
-    default: VCM-CDF
+    default: UDB
   image:
     type: string
     label: Image name or ID
@@ -28,15 +28,15 @@ parameters:
     default: net04_ext
   availability_zone:
     type: string
-    label: availability_zone for server
+    label: availability_zone for VMs
     default: nova
   private_network:
     type: string
     label: Private network name or ID
-    description: Private Network to attach server to.
+    description: Network to attach server to.
     default: net04
 
-  RADIUS_network:
+  S6a_network:
     type: string
     description: ID of port in s1 network
     default: asdf
@@ -48,15 +48,22 @@ parameters:
 
   extrouter_id:
     type: string
-    label: Private network name or ID
-    description: Network to attach server to.
+    description: ID of port in s1 network
     default: asdf
 
+  allowed_ip_S6a:
+    type: string
+    label: Private network name or ID
+    description: Network to attach server to.
+    default: 172.100.13.5
+
 resources:
-  port_radius:
+  port_S6a:
     type: OS::Neutron::Port
     properties:
-      network_id: { get_param: RADIUS_network }
+      network_id: { get_param: S6a_network }
+      allowed_address_pairs:
+        - ip_address: { get_param: allowed_ip_S6a }
       security_groups:
         - { get_param: security_group_def }
 
@@ -80,8 +87,9 @@ resources:
       flavor: { get_param: flavor }
       availability_zone : {get_param: availability_zone}
       networks:
-        - port: { get_resource: port_radius }
+        - port: { get_resource: port_S6a }
         - port: { get_resource: port }
+  
       user_data:
         str_replace:
           params:
@@ -91,7 +99,7 @@ resources:
 
             #cloud-config
             manage_etc_hosts: True
-            hostname: CDF-__index__
+            hostname: UDB-__index__
             fqdn: CDF-__index__.private.xyz
 
 

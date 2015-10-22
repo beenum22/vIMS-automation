@@ -1,17 +1,17 @@
 heat_template_version: 2014-10-16
 
-description: VCM-UDB
+description: VCM-DPE
 
 parameters:
   name:
     type: string
     label: name
     description: name to be used for server
-    default: VCM-UDB
+    default: DPE
   image:
     type: string
     label: Image name or ID
-    description: Image to be used for server.
+    description: Image to be used for server. Please use an Ubuntu based image.
     default: VCM_IMG
   flavor:
     type: string
@@ -35,30 +35,58 @@ parameters:
     label: Private network name or ID
     description: Network to attach server to.
     default: net04
-
-  S6a_network:
-    type: string
-    description: ID of port in s1 network
-    default: asdf
-
   index:
     type: number
     description: Index of node in the cluster
     default: 0
 
-  extrouter_id:
+  S1U_network:
     type: string
     description: ID of port in s1 network
     default: asdf
 
+  SGi_network:
+    type: string
+    description: ID of port in s1 network
+    default: asdf
+
+  extrouter_id:
+    type: string
+    label: Private network name or ID
+    description: Network to attach server to.
+    default: asdf
+
+  allowed_ip_S1U:
+    type: string
+    label: Private network name or ID
+    description: Network to attach server to.
+    default: 172.100.11.25
+
+  allowed_ip_SGi:
+    type: string
+    label: Private network name or ID
+    description: Network to attach server to.
+    default: 172.100.15.25
+
 resources:
-  port_S6a:
+
+  port_S1U:
     type: OS::Neutron::Port
     properties:
-      network_id: { get_param: S6a_network }
+      network_id: { get_param: S1U_network }
+      allowed_address_pairs:
+        - ip_address: { get_param: allowed_ip_S1U }
       security_groups:
         - { get_param: security_group_def }
 
+  port_SGi:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: SGi_network }
+      allowed_address_pairs:
+        - ip_address: { get_param: allowed_ip_SGi }
+      security_groups:
+        - { get_param: security_group_def }
   port:
     type: OS::Neutron::Port
     properties:
@@ -79,9 +107,11 @@ resources:
       flavor: { get_param: flavor }
       availability_zone : {get_param: availability_zone}
       networks:
-        - port: { get_resource: port_S6a }
+        - port: { get_resource: port_S1U }
+        - port: { get_resource: port_SGi}
         - port: { get_resource: port }
-  
+
+
       user_data:
         str_replace:
           params:
@@ -91,8 +121,8 @@ resources:
 
             #cloud-config
             manage_etc_hosts: True
-            hostname: UDB-__index__
-            fqdn: CDF-__index__.private.xyz
+            hostname: DPE-__index__
+            fqdn: DPE-__index__.private.xyz
 
 
 outputs:

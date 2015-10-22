@@ -1,13 +1,13 @@
 heat_template_version: 2014-10-16
 
-description: VCM-RIF
+description: VCM-SDB
 
 parameters:
   name:
     type: string
     label: name
     description: name to be used for server
-    default: VCM-RIF
+    default: SDB
   image:
     type: string
     label: Image name or ID
@@ -35,17 +35,7 @@ parameters:
     label: Private network name or ID
     description: Network to attach server to.
     default: net04
-
-  S1C_network:
-    type: string
-    description: ID of port in s1 network
-    default: asdf
-
-  SGs_network:
-    type: string
-    description: ID of port in s1 network
-    default: asdf
-
+    
   index:
     type: number
     description: Index of node in the cluster
@@ -58,21 +48,6 @@ parameters:
     default: asdf
 
 resources:
-
-  port_S1C:
-    type: OS::Neutron::Port
-    properties:
-      network_id: { get_param: S1C_network }
-      security_groups:
-        - { get_param: security_group_def }
-
-  port_SGs:
-    type: OS::Neutron::Port
-    properties:
-      network_id: { get_param: SGs_network }
-      security_groups:
-        - { get_param: security_group_def }
-
   port:
     type: OS::Neutron::Port
     properties:
@@ -93,11 +68,8 @@ resources:
       flavor: { get_param: flavor }
       availability_zone : {get_param: availability_zone}
       networks:
-        - port: { get_resource: port_S1C }
-        - port: { get_resource: port_SGs}
         - port: { get_resource: port }
-
-
+  
       user_data:
         str_replace:
           params:
@@ -107,8 +79,8 @@ resources:
 
             #cloud-config
             manage_etc_hosts: True
-            hostname: RIF-__index__
-            fqdn: RIF-__index__.private.xyz
+            hostname: SDB-__index__
+            fqdn: SDB-__index__.private.xyz
 
 
 outputs:

@@ -1,1 +1,57 @@
-{"auto-del": "yes", "zone-val": "1", "allowed-ip-sgi": "172.17.2.20", "vcm-cfg": {"name-prefix": "VCM-", "ems-vm-name": "EMS", "vcm-img-name": "VCM_IMG", "ems-img-name": "EMS_IMG"}, "scale-up-val": "3", "allowed-ip-s1mme": "172.17.1.20", "allowed-ip-s1u": "172.17.1.21", "deploy-ems": "yes", "os-creds": {"os-authurl": "http://10.204.111.42:5000/v2.0/", "os-tenant-name": "admin", "os-project-id": "admin", "os-api-key": "admin", "os-pass": "admin", "os-user": "admin", "os-user-name": "admin"}, "networks": {"net-ext-name": "net04_ext", "sgi_pool_start": "172.16.2.10", "s1_pool_start": "172.16.1.10", "sgi_pool_end": "172.16.2.30", "s1-cidr": "172.16.1.0/24", "net-int-name": "net04", "sgi-cidr": "172.16.2.0/24", "s1-name": "S1", "sgi-name": "SGi", "s1_pool_end": "172.16.1.30"}}
+{
+    "deploy-ems": "yes", 
+    "os-creds": {
+        "os-authurl": "http://10.204.111.42:5000/v2.0/", 
+        "os-tenant-name": "admin", 
+        "os-project-id": "admin", 
+        "os-api-key": "admin", 
+        "os-pass": "admin", 
+        "os-user": "admin ", 
+        "os-user-name": "admin"
+    }, 
+    "vcm-cfg": {
+        "name-prefix": "VCM-", 
+        "ems-vm-name": "EMS", 
+        "vcm-img-name": "VCM_IMG", 
+        "ems-img-name": "EMS_IMG"
+    }, 
+    "auto-del": "yes", 
+    "networks": {
+        "s1u-cidr": "172.100.11.0/27", 
+        "s1c-pool-end": "172.100.10.21", 
+        "s1c-pool-start": "172.100.10.4", 
+        "s6a-pool-end": "172.100.12.21", 
+        "net-int-cidr": "10.0.0.0/24", 
+        "sgs-pool-start": "172.100.14.4", 
+        "sgi-name": "SGi", 
+        "s1u-name": "S1U", 
+        "sgi-pool-end": "172.100.15.21", 
+        "s6a-cidr": "172.100.12.0/27", 
+        "sgs-pool-end": "172.100.14.21", 
+        "radius-pool-start": "172.100.13.4", 
+        "allowed-ip-radius": "172.16.6.22", 
+        "s1u-pool-start": "172.100.11.4", 
+        "s6a-pool-start": "172.100.12.4", 
+        "net-int-name": "vcm_network", 
+        "sgi-pool-start": "172.100.15.4", 
+        "sgs-cidr": "172.100.14.0/27", 
+        "radius-pool-end": "172.100.13.21", 
+        "allowed-ip-s1c": "172.16.6.22", 
+        "net-ext-name": "net04_ext", 
+        "radius-name": "RADIUS", 
+        "s6a-name": "S6a", 
+        "sgs-name": "SGs", 
+        "net-int-pool-end": "10.0.0.21", 
+        "s1c-name": "S1C", 
+        "sgi-cidr": "172.100.15.0/27", 
+        "allowed-ip-s1u": "172.16.6.22", 
+        "s1c-cidr": "172.100.10.0/27", 
+        "allowed-ip-sgi": "172.16.6.22", 
+        "net-int-pool-start": "10.0.0.4", 
+        "allowed-ip-s6a-2": "172.16.6.22", 
+        "radius-cidr": "172.100.13.0/27", 
+        "allowed-ip-s6a-1": "172.16.6.22", 
+        "s1u-pool-end": "172.100.11.21", 
+        "allowed-ip-sgs": "172.16.6.22"
+    }
+}

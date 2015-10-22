@@ -163,6 +163,43 @@ parameters:
     description: End of private network IP address pool
     default: 10.0.0.254
 
+  allowed_ip_radius:
+    type: string
+    label: Private network name or ID
+    description: Network to attach server to.
+    default: 172.100.14.5
+  allowed_ip_S1U:
+    type: string
+    label: Private network name or ID
+    description: Network to attach server to.
+    default: 172.100.11.25
+  allowed_ip_SGi:
+    type: string
+    label: Private network name or ID
+    description: Network to attach server to.
+    default: 172.100.15.25
+  allowed_ip_S1C:
+    type: string
+    label: Private network name or ID
+    description: Network to attach server to.
+    default: 172.100.10.20
+  allowed_ip_SGs:
+    type: string
+    label: Private network name or ID
+    description: Network to attach server to.
+    default: 172.100.12.7
+  allowed_ip_S6a_1:
+    type: string
+    label: Private network name or ID
+    description: Network to attach server to.
+    default: 172.100.13.5
+  allowed_ip_S6a_2:
+    type: string
+    label: Private network name or ID
+    description: Network to attach server to.
+    default: 172.100.13.6
+
+
 resources:
   vEPC_security_group:
     type: OS::Neutron::SecurityGroup
@@ -327,6 +364,8 @@ resources:
           private_network: {get_attr: [net0_network, private_net]}
           S1C_network: {get_attr: [S1_C_network, private_net]}
           SGs_network: {get_attr: [SGs_network, private_net]}
+          allowed_ip_S1C: {get_param: allowed_ip_S1C }
+          allowed_ip_SGs: {get_param: allowed_ip_SGs }
           index: {get_param: index}
           extrouter_id: {get_attr: [Router, router_id]}
   VCM_RIF_2:
@@ -343,6 +382,8 @@ resources:
           private_network: {get_attr: [net0_network, private_net]}
           S1C_network: {get_attr: [S1_C_network, private_net]}
           SGs_network: {get_attr: [SGs_network, private_net]}
+          allowed_ip_S1C: {get_param: allowed_ip_S1C }
+          allowed_ip_SGs: {get_param: allowed_ip_SGs }
           index: {get_param: index_2}
           extrouter_id: {get_attr: [Router, router_id]}
   VCM_CPE:
@@ -387,6 +428,8 @@ resources:
           private_network: {get_attr: [net0_network, private_net]}
           S1U_network: {get_attr: [S1_U_network, private_net]}
           SGi_network: {get_attr: [SGi_network, private_net]}
+          allowed_ip_S1U: {get_param: allowed_ip_S1U }
+          allowed_ip_SGi: {get_param: allowed_ip_SGi }
           index: {get_param: index}
           extrouter_id: {get_attr: [Router, router_id]}
   VCM_DPE_2:
@@ -403,6 +446,8 @@ resources:
           private_network: {get_attr: [net0_network, private_net]}
           S1U_network: {get_attr: [S1_U_network, private_net]}
           SGi_network: {get_attr: [SGi_network, private_net]}
+          allowed_ip_S1U: {get_param: allowed_ip_S1U }
+          allowed_ip_SGi: {get_param: allowed_ip_SGi }
           index: {get_param: index_2}
           extrouter_id: {get_attr: [Router, router_id]}
   VCM_UDB:
@@ -418,6 +463,7 @@ resources:
           public_network: {get_param: public_network}
           private_network: {get_attr: [net0_network, private_net]}
           S6a_network: {get_attr: [S6a_network, private_net]}
+          allowed_ip_S6a: {get_param: allowed_ip_S6a_1 }
           index: {get_param: index}
           extrouter_id: {get_attr: [Router, router_id]}
   VCM_UDB_2:
@@ -433,6 +479,7 @@ resources:
           public_network: {get_param: public_network}
           private_network: {get_attr: [net0_network, private_net]}
           S6a_network: {get_attr: [S6a_network, private_net]}
+          allowed_ip_S6a: {get_param: allowed_ip_S6a_2 }
           index: {get_param: index_2}
           extrouter_id: {get_attr: [Router, router_id]}
   VCM_CDF:
@@ -448,6 +495,7 @@ resources:
           public_network: {get_param: public_network}
           private_network: {get_attr: [net0_network, private_net]}
           RADIUS_network: {get_attr: [RADIUS_network, private_net]}
+          allowed_ip_radius: {get_param: allowed_ip_radius }
           index: {get_param: index}
           extrouter_id: {get_attr: [Router, router_id]}
   VCM_CDF_2:
@@ -463,6 +511,7 @@ resources:
           public_network: {get_param: public_network}
           private_network: {get_attr: [net0_network, private_net]}
           RADIUS_network: {get_attr: [RADIUS_network, private_net]}
+          allowed_ip_radius: {get_param: allowed_ip_radius }
           index: {get_param: index_2}
           extrouter_id: {get_attr: [Router, router_id]}
 

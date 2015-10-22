@@ -5,22 +5,21 @@ import readline
 import json
 
 # Paths for configuration files
-FILE_PATH_MAIN = 'heat_templates/vEPC.yaml'
-FILE_PATH_CDF = 'heat_templates/VCM_CDF.yaml'
-FILE_PATH_CPE = 'heat_templates/VCM_CPE.yaml'
-FILE_PATH_DPE = 'heat_templates/VCM_DPE.yaml'
-FILE_PATH_RIF = 'heat_templates/VCM_RIF.yaml'
-FILE_PATH_SDB = 'heat_templates/VCM_SDB.yaml'
-FILE_PATH_UDB = 'heat_templates/VCM_UDB.yaml'
-FILE_PATH_VEM = 'heat_templates/VCM_VEM.yaml'
-FILE_PATH_network = 'heat_templates/network.yaml'
-FILE_PATH_router = 'heat_templates/router.yaml'
+FILE_PATH_MAIN = 'source/vEPC_deploy/heat_templates/vEPC.yaml'
+FILE_PATH_CDF = 'source/vEPC_deploy/heat_templates/VCM_CDF.yaml'
+FILE_PATH_CPE = 'source/vEPC_deploy/heat_templates/VCM_CPE.yaml'
+FILE_PATH_DPE = 'source/vEPC_deploy/heat_templates/VCM_DPE.yaml'
+FILE_PATH_RIF = 'source/vEPC_deploy/heat_templates/VCM_RIF.yaml'
+FILE_PATH_SDB = 'source/vEPC_deploy/heat_templates/VCM_SDB.yaml'
+FILE_PATH_UDB = 'source/vEPC_deploy/heat_templates/VCM_UDB.yaml'
+FILE_PATH_VEM = 'source/vEPC_deploy/heat_templates/VCM_VEM.yaml'
+FILE_PATH_network = 'source/vEPC_deploy/heat_templates/network.yaml'
+FILE_PATH_router = 'source/vEPC_deploy/heat_templates/router.yaml'
 
-DIR_hostnames = 'hostnames/'
 DIR_ip_files = 'ip_files/'
 DIR_IMG = '/root/IMGS/'
 #----------------------------------------------------------------------------------#
-def create_cluster(heat, cluster_name):
+def create_cluster(heat, cluster_name, configurations, logger_heat, error_logger):
 
 	try:
 		file_main= open(FILE_PATH_MAIN, 'r')
@@ -34,7 +33,8 @@ def create_cluster(heat, cluster_name):
 		file_net = open(FILE_PATH_network, 'r')
 		file_router = open(FILE_PATH_router, 'r')
 	except:
-		print "could not open file"
+		error_logger.exception("Unable to open file")
+		print ("[" + time.strftime("%H:%M:%S")+ "] Unable to open file")
 	cluster_body={
 	"stack_name":cluster_name,
 	"template":file_main.read(),
@@ -50,50 +50,57 @@ def create_cluster(heat, cluster_name):
 	  "VCM_VEM.yaml":file_VEM.read()
 	 },
 	 "parameters": {
-	 "image": "VCM_IMG",
+	 "image": configurations['vcm-cfg']['vcm-img-name'],
 	 "flavor": "m1.medium",
-	 "public_network": "net04_ext",
-	 "availability_zone_1": "compute1",
-	 "availability_zone_2": "compute2",
+	 "public_network": configurations['networks']['net-ext-name'],
+	 "availability_zone_1": get_avlzoneA(),
+	 "availability_zone_2": get_avlzoneB(),
 	 "index": "1",
 	 "index_2": "2",
 	 "security_group_name": "vEPC_sec_grp",
 	 "router_name": "extrouter",
-	 "S1_C_net_name": "S1C",
-	 "S1_C_net_cidr": "172.100.10.0/27",
-	 "S1_C_net_pool_start": "172.100.10.2",
-	 "S1_C_net_pool_end": "172.100.10.30",
-	 "S1_U_net_name": "S1U",
-	 "S1_U_net_cidr": "172.100.11.0/27",
-	 "S1_U_net_pool_start": "172.100.11.2",
-	 "S1_U_net_pool_end": "172.100.11.30",
-	 "S6a_net_name": "S6a",
-	 "S6a_net_cidr": "172.100.13.0/27",
-	 "S6a_net_pool_start": "172.100.13.2",
-	 "S6a_net_pool_end": "172.100.13.30",
-	 "RADIUS_net_name": "RADIUS",
-	 "RADIUS_net_cidr": "172.100.14.0/27",
-	 "RADIUS_net_pool_start": "172.100.14.2",
-	 "RADIUS_net_pool_end": "172.100.14.30",
-	 "SGs_net_name": "SGs",
-	 "SGs_net_cidr": "172.100.12.0/27",
-	 "SGs_net_pool_start": "172.100.12.2",
-	 "SGs_net_pool_end": "172.100.12.30",
-	 "SGi_net_name": "SGi",
-	 "SGi_net_cidr": "172.100.15.0/27",
-	 "SGi_net_pool_start": "172.100.15.2",
-	 "SGi_net_pool_end": "172.100.15.30",
-	 "net0_net_name": "net0",
-	 "net0_net_cidr": "10.0.0.0/24",
-	 "net0_net_pool_start": "10.0.0.2",
-	 "net0_net_pool_end": "10.0.0.254"
+	 "S1_C_net_name": configurations['networks']['s1c-name'],
+	 "S1_C_net_cidr": configurations['networks']['s1c-cidr'],
+	 "S1_C_net_pool_start": configurations['networks']['s1c-pool-start'],
+	 "S1_C_net_pool_end": configurations['networks']['s1c-pool-end'],
+	 "S1_U_net_name": configurations['networks']['s1u-name'],
+	 "S1_U_net_cidr": configurations['networks']['s1u-cidr'],
+	 "S1_U_net_pool_start": configurations['networks']['s1u-pool-start'],
+	 "S1_U_net_pool_end": configurations['networks']['s1u-pool-end'],
+	 "S6a_net_name": configurations['networks']['s6a-name'],
+	 "S6a_net_cidr": configurations['networks']['s6a-cidr'],
+	 "S6a_net_pool_start": configurations['networks']['s6a-pool-start'],
+	 "S6a_net_pool_end": configurations['networks']['s6a-pool-end'],
+	 "RADIUS_net_name": configurations['networks']['radius-name'],
+	 "RADIUS_net_cidr": configurations['networks']['radius-cidr'],
+	 "RADIUS_net_pool_start": configurations['networks']['radius-pool-start'],
+	 "RADIUS_net_pool_end": configurations['networks']['radius-pool-end'],
+	 "SGs_net_name": configurations['networks']['sgs-name'],
+	 "SGs_net_cidr": configurations['networks']['sgs-cidr'],
+	 "SGs_net_pool_start": configurations['networks']['sgs-pool-start'],
+	 "SGs_net_pool_end": configurations['networks']['sgs-pool-end'],
+	 "SGi_net_name": configurations['networks']['sgi-name'],
+	 "SGi_net_cidr": configurations['networks']['sgi-cidr'],
+	 "SGi_net_pool_start": configurations['networks']['sgi-pool-start'],
+	 "SGi_net_pool_end": configurations['networks']['sgi-pool-end'],
+	 "net0_net_name": configurations['networks']['net-int-name'],
+	 "net0_net_cidr": configurations['networks']['net-int-cidr'],
+	 "net0_net_pool_start": configurations['networks']['net-int-pool-start'],
+	 "net0_net_pool_end": configurations['networks']['net-int-pool-end'],
+	 "allowed_ip_radius": configurations['networks']['allowed-ip-radius'],
+	 "allowed_ip_S1U": configurations['networks']['allowed-ip-s1u'],
+	 "allowed_ip_SGi": configurations['networks']['allowed-ip-sgi'],
+	 "allowed_ip_S1C": configurations['networks']['allowed-ip-s1c'],
+	 "allowed_ip_SGs": configurations['networks']['allowed-ip-sgs'],
+	 "allowed_ip_S6a_1": configurations['networks']['allowed-ip-s6a-1'],
+	 "allowed_ip_S6a_2": configurations['networks']['allowed-ip-s6a-2']
 	 }
 	}
 	try:  
 		heat.stacks.create(**cluster_body)
 	except:
-		print ("Unable to create stack, exiting...")
-		raise
+		error_logger.exception("Unable to create heat stack")
+		print ("[" + time.strftime("%H:%M:%S")+ "] Unable to create heat stack")
 		sys.exit()
 
 def get_keystone_creds(configurations):
@@ -126,71 +133,6 @@ def get_configurations(logger, error_logger):
 	file.close()
 	return configurations
 
-def input_configurations(error_logger, logger):
-	global DIR_ip_files
-	try:
-		json_file = open('configurations.json')
-	except:
-         print "configuration.json: file not found"
-         error_logger.exception("configuration.json: file not found")
-         sys.exit()
-	
-	configurations = json.load(json_file)
-	
-	try:
-		logger.info("Getting credentials from file")
-		file_read = open('creds.txt')
-	except:
-		print "creds.txt: file not found"
-		error_logger.exception("creds.txt: file not found")
-		sys.exit()
-	
-	inp = file_read.readline()
-	inp = inp.split("\"")
-	configurations['os-creds']['os-authurl'] = inp[1]
-	
-	inp = file_read.readline()
-	inp = inp.split("\"")
-	configurations['os-creds']['os-user-name'] = inp[1]
-	
-	inp = file_read.readline()
-	inp = inp.split("\"")
-	configurations['os-creds']['os-tenant-name'] = inp[1]
-	
-	inp = file_read.readline()
-	inp = inp.split("\"")
-	configurations['os-creds']['os-pass'] = inp[1]
-
-	inp = file_read.readline()
-	inp = inp.split("\"")
-	configurations['networks']['net-int-name'] = inp[1]
-
-	inp = file_read.readline()
-	inp = inp.split("\"")
-	configurations['networks']['net-ext-name'] = inp[1]
-
-	inp = file_read.readline()
-	inp = inp.split("\"")
-	configurations['networks']['s1-cidr'] = inp[1]
-
-	inp = file_read.readline()
-	inp = inp.split("\"")
-	configurations['networks']['sgi-cidr'] = inp[1]
-	
-	inp = file_read.readline()
-	inp = inp.split("\"")
-	configurations['networks']['s1_pool_start'] = inp[1]
-	configurations['networks']['s1_pool_end'] = inp[3]
-	
-	inp = file_read.readline()
-	inp = inp.split("\"")
-	configurations['networks']['sgi_pool_start'] = inp[1]
-	configurations['networks']['sgi_pool_end'] = inp[3]
-	logger.info("writing to configuration file")
-	json_file.close()
-	with open('configurations.json', 'w') as outfile:
-		json.dump(configurations, outfile)
-	file_read.close()
 #--------------------------------------------------------#
 def get_instance_floatingip(heat, cluster_details, vm_name):
    output = vm_name + '_ip'
@@ -357,7 +299,6 @@ def create_aggregate_groups(nova, error_logger, logger_nova):
 		sys.exit()
 
 #-----------------------------------------------------------------------#
-#-----------------------------------------------------------------------#
 # Check if server hostname can be pinged
 def check_ping(hostname, logger):
     response = os.system("ping -c 1 " + hostname+" > /dev/null 2>&1")
@@ -382,5 +323,99 @@ def check_ping_status(hostname, vm_name, logger):
 		print("[" + time.strftime("%H:%M:%S")+ "] " + vm_name + " booting up, please wait...")
 		logger.info("Waiting for VM to boot up")
 		time.sleep(5)
-		time_sleeping += 10
+		time_sleeping += 5
 	print("[" + time.strftime("%H:%M:%S")+ "] " + vm_name+" booted up!")
+
+def run_deploy_script(ssh,instance_obj,logger_ssh, instance_id):
+	print("[" + time.strftime("%H:%M:%S")+ "] Configuring " + instance_obj.name + "-" + str(instance_id))
+	while(True):
+		try:
+			info_msg = "Connecting to " + instance_obj.name
+			logger_ssh.info(info_msg)
+			ssh.connect(instance_obj.ip, username='root', password='root123')
+			break
+		except:
+			print("[" + time.strftime("%H:%M:%S")+ "] " +instance_obj.name + " not ready for SSH waiting...")
+			error_msg = instance_obj.name + " not ready for SSH "
+			logger_ssh.warning(error_msg)
+			error_logger.exception(error_msg)
+			time.sleep(10)
+	
+	info_msg = "Connected to " + instance_obj.name
+	logger_ssh.info(info_msg)
+	print("[" + time.strftime("%H:%M:%S")+ "] \t Running deploy_script..." )
+	
+	if instance_obj.name == 'UDB' or instance_obj.name == 'CDF':
+		internal_interface = 'eth1'
+	elif instance_obj.name == 'DPE' or instance_obj.name == 'RIF':
+		internal_interface = 'eth2'
+	else:
+		internal_interface = 'eth0'
+	info_msg = "executing command: ./deploy_script --vnfc "+instance_obj.name+" --instance_id "+ str(instance_id) +" --internal_if " + internal_interface
+	logger_ssh.info(info_msg)
+	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("./deploy_script --vnfc " + instance_obj.name + " --instance_id " + str(instance_id) + " --internal_if " + internal_interface)
+	ssh_stdout.readlines()
+	info_msg = "executing command: ./validate_deploy.sh"
+	logger_ssh.info(info_msg)
+	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('./validate_deploy.sh')
+	print("[" + time.strftime("%H:%M:%S")+ "] \t"+str(ssh_stdout.readlines()))
+	
+	ssh.close()
+
+def start_vcm_service(ssh,instance_obj,logger_ssh):
+	print("[" + time.strftime("%H:%M:%S")+ "] Configuring " + instance_obj.name)
+	while(True):
+		try:
+			info_msg = "Connecting to " + instance_obj.name
+			logger_ssh.info(info_msg)
+			ssh.connect(instance_obj.ip, username='root', password='root123')
+			break
+		except:
+			print("[" + time.strftime("%H:%M:%S")+ "] " +instance_obj.name + " not ready for SSH waiting...")
+			error_msg = instance_obj.name + " not ready for SSH "
+			logger_ssh.warning(error_msg)
+			error_logger.exception(error_msg)
+			time.sleep(10)
+	
+	info_msg = "Connected to " + instance_obj.name
+	logger_ssh.info(info_msg)
+
+	info_msg = "executing command: vcm-start"
+	logger_ssh.info(info_msg)
+	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("vcm-start")
+	print("[" + time.strftime("%H:%M:%S")+ "] \t"+str(ssh_stdout.readlines()))
+	
+	info_msg = "executing command: ./validate_deploy.sh"
+	logger_ssh.info(info_msg)
+	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('./validate_deploy.sh')
+	print("[" + time.strftime("%H:%M:%S")+ "] \t"+str(ssh_stdout.readlines()))
+
+	ssh.close()
+
+def send_command(chan, cmd, end_phrase, logger_ssh):
+	info_msg = "Sending command " + cmd
+	logger_ssh.info(info_msg)
+	chan.send(cmd)
+	buff = ''
+	while not buff.endswith(end_phrase):
+		resp = chan.recv(9999)
+		buff += resp
+		# print buff
+	print 'buff', buff
+	info_msg = "Reponse buffer:" + buff 
+	logger_ssh.info(info_msg)
+	time.sleep(2)
+# MAIN FUNCTION TO SOURCE CONFIG FILE
+def source_config(ssh, logger_ssh):
+	chan = ssh.invoke_shell()
+	# Ssh and wait for the password prompt.
+	send_command(chan, 'ssh -o StrictHostKeyChecking=no admin@localhost\n', '\'s password: ', logger_ssh)
+	# Send the password and wait for a prompt.
+	send_command(chan, 'abc123\n', 'VEM-1(exec)> ', logger_ssh)
+	# Execute enable and wait for a prompt again.
+	send_command(chan, 'enable\n', '(exec)# ', logger_ssh)
+	# Execute configure command and wait for a prompt again.
+	send_command(chan, 'configure\n', '(configure)# ', logger_ssh)
+	# Source config file and wait for a prompt again.
+	send_command(chan, 'source Dell-VCM.cfg\n', '(configure)# ', logger_ssh)
+	ssh.close()
