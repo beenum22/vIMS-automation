@@ -103,6 +103,7 @@ resources:
           template: |
             #!/bin/bash  
             sudo cp /home/ec2-user/.ssh/authorized_keys /root/.ssh/
+            sudo apt-get update
 outputs:
   public_ip:
     description: IP address in public network

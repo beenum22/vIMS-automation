@@ -9,6 +9,12 @@ import keystoneclient.v2_0.client as ksClient
 import json
 import time
 
+################################### File path function ###################################
+import subprocess
+p = subprocess.Popen(["pwd"], stdout=subprocess.PIPE , shell=True)
+PATH = p.stdout.read()
+PATH = PATH.rstrip('\n')
+
 ############################## Time Stamp Function #######################################
 import sys
 from datetime import datetime as dt
@@ -31,11 +37,9 @@ class F:
 sys.stdout = F()
 
 ############################## Global Variables ##########################################
-IMAGE_PATH = '/root/IMG/trusty-server-cloudimg-amd64-disk1.img'
-IMAGE_DIRECTORY = '/root/IMG/'
-os.environ['IMAGE_PATH'] = '/root/vIMS/IMG'
-CONFIG_PATH = '/root/vIMS/configurations.json'
-USER_CONFIG_PATH = '/root/vIMS/user_config.json'
+os.environ['IMAGE_PATH'] = PATH+'/IMG'
+CONFIG_PATH = PATH+'/configurations.json'
+USER_CONFIG_PATH = PATH+'/user_config.json'
 STACK_NAME = 'test'
 IMAGE_NAME = 'IMS'
 ############################## Keystone Credentials Functions ############################

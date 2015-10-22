@@ -10,13 +10,20 @@ import json
 import time
 import paramiko
 import select
-############################## logging ########################################
+
+##################################### File path function ###################################
+import subprocess
+p = subprocess.Popen(["pwd"], stdout=subprocess.PIPE , shell=True)
+PATH = p.stdout.read()
+PATH = PATH.rstrip('\n')
+
+############################## logging #####################################################
 import logging
 import datetime											
 now = datetime.datetime.now()
 date_time = now.strftime("%Y-%m-%d_%H-%M")
-filename_activity = '/root/vIMS/logs/Stress_test_' + date_time + '.log'
-filename_error = '/root/vIMS/logs/Stress_test_error_' + date_time + '.log'
+filename_activity = PATH+'/logs/Stress_test_' + date_time + '.log'
+filename_error = PATH+'/logs/Stress_test_error_' + date_time + '.log'
 
 logging.basicConfig(filename=filename_activity, level=logging.INFO, filemode='w', format='%(asctime)s %(levelname)-8s %(name)-23s [-]  %(message)s')
 
@@ -56,11 +63,9 @@ class F:
 
 sys.stdout = F()
 ############################## Global Variables ##########################################
-IMAGE_PATH = '/root/IMG/trusty-server-cloudimg-amd64-disk1.img'
-IMAGE_DIRECTORY = '/root/IMG/'
-os.environ['IMAGE_PATH'] = '/root/vIMS/IMG'
-CONFIG_PATH = '/root/vIMS/configurations.json'
-USER_CONFIG_PATH = '/root/vIMS/user_config.json'
+os.environ['IMAGE_PATH'] = PATH+'/IMG'
+CONFIG_PATH = PATH+'/configurations.json'
+USER_CONFIG_PATH = PATH+'/user_config.json'
 STACK_NAME = 'Test'
 REPO_URL = 'http://repo.cw-ngv.com/stable'
 ############################## User Configuration Functions ##############################
@@ -231,7 +236,7 @@ logger.info("Fetch network ID of private network")
 def create_cluster(heat,cluster_name):
   cluster_full_name=STACK_NAME
 
-  file_main= open('/root/vIMS/test.yaml', 'r')                
+  file_main= open(PATH+'/test.yaml', 'r')                
 
   cluster_body={
    "stack_name":cluster_full_name,

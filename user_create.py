@@ -10,14 +10,40 @@ import json
 import paramiko
 import select
 
+##################################### File path function ###################################
+import subprocess
+p = subprocess.Popen(["pwd"], stdout=subprocess.PIPE , shell=True)
+PATH = p.stdout.read()
+PATH = PATH.rstrip('\n')
+
+############################## Time Stamp Function ########################################
+import sys
+from datetime import datetime as dt
+
+old_f = sys.stdout
+
+class F:
+    nl = True
+
+    def write(self, x):
+        if x == '\n':
+            old_f.write(x)
+            self.nl = True
+        elif self.nl == True:
+            old_f.write('%s> %s' % (str(dt.now()), x))
+            self.nl = False
+        else:
+            old_f.write(x)
+
+sys.stdout = F()
+
 ################################ Global Variables ##########################################
-IMAGE_PATH = '/root/IMG/trusty-server-cloudimg-amd64-disk1.img'
-IMAGE_DIRECTORY = '/root/IMG/'
-os.environ['IMAGE_PATH'] = '/root/vIMS/IMG'
-CONFIG_PATH = '/root/vIMS/configurations.json'
-USER_CONFIG_PATH = '/root/vIMS/user_config.json'
+
+os.environ['IMAGE_PATH'] = PATH+'/IMG'
+CONFIG_PATH = PATH+'/configurations.json'
+USER_CONFIG_PATH = PATH+'/user_config.json'
 STACK_NAME = 'IMS'
-USERS_FILE_PATH = '/root/vIMS/users.csv'
+USERS_FILE_PATH = PATH+'/users.csv'
 USERS_REMOTE_PATH = '/root/users.csv'
 HOMER_CONFIG_PATH = '/root/users.create_xdm.sh'
 

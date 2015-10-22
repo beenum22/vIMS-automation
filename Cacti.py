@@ -10,6 +10,13 @@ import json
 import time
 import paramiko
 import select
+
+##################################### File path function ##################################
+import subprocess
+p = subprocess.Popen(["pwd"], stdout=subprocess.PIPE , shell=True)
+PATH = p.stdout.read()
+PATH = PATH.rstrip('\n')
+
 ############################## Time Stamp Function ########################################
 import sys
 from datetime import datetime as dt
@@ -31,11 +38,10 @@ class F:
 
 sys.stdout = F()
 ############################## Global Variables ##########################################
-IMAGE_PATH = '/root/vIMS/cacti-image.qcow2'
-IMAGE_DIRECTORY = '/root/IMG/'
-os.environ['IMAGE_PATH'] = '/root/vIMS/IMG'
-CONFIG_PATH = '/root/vIMS/configurations.json'
-USER_CONFIG_PATH = '/root/vIMS/user_config.json'
+IMAGE_PATH = PATH+'/cacti-image.qcow2'
+os.environ['IMAGE_PATH'] = PATH+'/IMG'
+CONFIG_PATH = PATH+'/configurations.json'
+USER_CONFIG_PATH = PATH+'/user_config.json'
 STACK_NAME = 'Cacti'
 REPO_URL = 'http://repo.cw-ngv.com/stable'
 ############################## User Configuration Functions ##############################
@@ -95,7 +101,7 @@ neutron = ntrnclient.Client(**credsks)
 #os.system("cd $IMAGE_PATH")
 #os.system("wget http://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img")
 
-Get authorized instance of glance client
+#Get authorized instance of glance client
 creden = get_keystone_creds(config)
 keystone = ksClient.Client(**creden)
 glance_endpoint = keystone.service_catalog.url_for(service_type='image', endpoint_type='publicURL')
@@ -191,7 +197,7 @@ print ('Network ID of private network = ' + private_id)
 def create_cluster(heat,cluster_name):
   cluster_full_name=STACK_NAME
 
-  file_main= open('/root/vIMS/cacti.yaml', 'r')                
+  file_main= open(PATH+'/cacti.yaml', 'r')                
 
   cluster_body={
    "stack_name":cluster_full_name,

@@ -1,0 +1,265 @@
+[H[2J[H[2J[H[2J[H[2J[H[2J[H[2J[H[2J[H[2J2015-10-19 06:13:00.065926> Getting user confiurations...
+2015-10-19 06:13:00.066229> Successfull
+2015-10-19 06:13:00.066252> Getting credentials
+2015-10-19 06:13:00.066270> Credentials Loaded
+2015-10-19 06:13:01.784671> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:13:01.916703> Connected
+2015-10-19 06:13:02.138813> **************************************************************
+2015-10-19 06:13:02.138850> Number of incomming requests in the current 5 minute period= 18
+2015-10-19 06:13:02.138866> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:13:02.138876> **************************************************************
+2015-10-19 06:13:32.183815> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:13:32.328518> Connected
+2015-10-19 06:13:32.552915> **************************************************************
+2015-10-19 06:13:32.553042> Number of incomming requests in the current 5 minute period= 21
+2015-10-19 06:13:32.553059> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:13:32.553073> **************************************************************
+2015-10-19 06:14:02.608649> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:14:02.723223> Connected
+2015-10-19 06:14:02.983157> **************************************************************
+2015-10-19 06:14:02.983214> Number of incomming requests in the current 5 minute period= 24
+2015-10-19 06:14:02.983239> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:14:02.983258> **************************************************************
+2015-10-19 06:14:33.027893> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:14:33.144916> Connected
+2015-10-19 06:14:33.368952> **************************************************************
+2015-10-19 06:14:33.368981> Number of incomming requests in the current 5 minute period= 27
+2015-10-19 06:14:33.368992> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:14:33.369006> **************************************************************
+2015-10-19 06:15:03.414746> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:15:03.549222> Connected
+2015-10-19 06:15:03.770211> **************************************************************
+2015-10-19 06:15:03.770247> Number of incomming requests in the current 5 minute period= 0
+2015-10-19 06:15:03.770258> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:15:03.770276> **************************************************************
+2015-10-19 06:15:33.829902> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:15:33.971826> Connected
+2015-10-19 06:15:34.231670> **************************************************************
+2015-10-19 06:15:34.231694> Number of incomming requests in the current 5 minute period= 3
+2015-10-19 06:15:34.231704> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:15:34.231711> **************************************************************
+2015-10-19 06:16:04.289774> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:16:04.423326> Connected
+2015-10-19 06:16:04.685376> **************************************************************
+2015-10-19 06:16:04.685435> Number of incomming requests in the current 5 minute period= 7
+2015-10-19 06:16:04.685461> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:16:04.685481> **************************************************************
+2015-10-19 06:16:34.730815> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:16:34.873303> Connected
+2015-10-19 06:16:35.061987> **************************************************************
+2015-10-19 06:16:35.062011> Number of incomming requests in the current 5 minute period= 10
+2015-10-19 06:16:35.062025> Number of incomming rejected [H[2J[H[2J[H[2J[H[2J[H[2J[H[2J[H[2J[H[2Jrequests in the current 5 minute period due to overload= 0
+2015-10-19 06:16:35.062123> **************************************************************
+2015-10-19 06:17:05.106784> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:17:05.220109> Connected
+2015-10-19 06:17:05.479529> **************************************************************
+2015-10-19 06:17:05.479567> Number of incomming requests in the current 5 minute period= 13
+2015-10-19 06:17:05.479583> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:17:05.479695> **************************************************************
+2015-10-19 06:17:35.527928> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:17:35.662493> Connected
+2015-10-19 06:17:35.884671> **************************************************************
+2015-10-19 06:17:35.884729> Number of incomming requests in the current 5 minute period= 16
+2015-10-19 06:17:35.884764> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:17:35.884783> **************************************************************
+2015-10-19 06:18:05.937654> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:18:06.072463> Connected
+2015-10-19 06:18:06.293195> **************************************************************
+2015-10-19 06:18:06.293218> Number of incomming requests in the current 5 minute period= 19
+2015-10-19 06:18:06.293228> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:18:06.293235> **************************************************************
+2015-10-19 06:18:36.349817> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:18:36.447724> Connected
+2015-10-19 06:18:36.708507> **************************************************************
+2015-10-19 06:18:36.708537> Number of incomming requests in the current 5 minute period= 22
+2015-10-19 06:18:36.708556> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:18:36.708569> **************************************************************
+2015-10-19 06:19:06.765732> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:19:06.904925> Connected
+2015-10-19 06:19:07.127110> **************************************************************
+2015-10-19 06:19:07.127306> Number of incomming requests in the current 5 minute period= 25
+2015-10-19 06:19:07.127367> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:19:07.127389> **************************************************************
+2015-10-19 06:19:37.181450> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:19:37.316204> Connected
+2015-10-19 06:19:37.540258> **************************************************************
+2015-10-19 06:19:37.540310> Number of incomming requests in the current 5 minute period= 28
+2015-10-19 06:19:37.540321> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:19:37.540376> **************************************************************
+2015-10-19 06:20:07.585761> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:20:07.719681> Connected
+2015-10-19 06:20:07.940181> **************************************************************
+2015-10-19 06:20:07.940246> Number of incomming requests in the current 5 minute period= 1
+2015-10-19 06:20:07.940270> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:20:07.940289> **************************************************************
+2015-10-19 06:20:37.993881> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:20:38.109863> Connected
+2015-10-19 06:20:38.369037> **************************************************************
+2015-10-19 06:20:38.369074> Number of incomming requests in the current 5 minute period= 4
+2015-10-19 06:20:38.369095> Number of incomming rejected requests in the current 5 minute period du[H[2J[H[2J[H[2J[H[2J[H[2J[H[2J[H[2J[H[2Je to overload= 0
+2015-10-19 06:20:38.369144> **************************************************************
+2015-10-19 06:21:08.415965> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:21:08.529987> Connected
+2015-10-19 06:21:08.789602> **************************************************************
+2015-10-19 06:21:08.789657> Number of incomming requests in the current 5 minute period= 7
+2015-10-19 06:21:08.789678> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:21:08.789692> **************************************************************
+2015-10-19 06:21:38.851401> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:21:38.967074> Connected
+2015-10-19 06:21:39.226587> **************************************************************
+2015-10-19 06:21:39.226616> Number of incomming requests in the current 5 minute period= 10
+2015-10-19 06:21:39.226625> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:21:39.226632> **************************************************************
+2015-10-19 06:22:09.294565> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:22:09.595333> Connected
+2015-10-19 06:22:09.819327> **************************************************************
+2015-10-19 06:22:09.819377> Number of incomming requests in the current 5 minute period= 13
+2015-10-19 06:22:09.819413> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:22:09.819428> **************************************************************
+2015-10-19 06:22:39.864960> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:22:39.960652> Connected
+2015-10-19 06:22:40.219376> **************************************************************
+2015-10-19 06:22:40.219432> Number of incomming requests in the current 5 minute period= 16
+2015-10-19 06:22:40.219443> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:22:40.219506> **************************************************************
+2015-10-19 06:23:10.264815> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:23:10.400184> Connected
+2015-10-19 06:23:10.624135> **************************************************************
+2015-10-19 06:23:10.624164> Number of incomming requests in the current 5 minute period= 19
+2015-10-19 06:23:10.624175> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:23:10.624207> **************************************************************
+2015-10-19 06:23:40.668771> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:23:40.803536> Connected
+2015-10-19 06:23:41.024572> **************************************************************
+2015-10-19 06:23:41.024702> Number of incomming requests in the current 5 minute period= 22
+2015-10-19 06:23:41.024725> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:23:41.024736> **************************************************************
+2015-10-19 06:24:11.070220> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:24:11.202416> Connected
+2015-10-19 06:24:11.424474> **************************************************************
+2015-10-19 06:24:11.424512> Number of incomming requests in the current 5 minute period= 25
+2015-10-19 06:24:11.424528> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:24:11.424539> **************************************************************
+2015-10-19 06:24:41.474324> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:24:41.593335> Connected
+2015-10-19 06:24:41.854290> **************************************************************
+2015-10-19 06:24:41.854429> Number of incomming requests in the current 5 minute period= 28
+2015-10-19 06:24:41.854493> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:24:41.8545[H[2J[H[2J[H[2J[H[2J[H[2J[H[2J[H[2J[H[2J05> **************************************************************
+2015-10-19 06:25:11.899836> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:25:12.032798> Connected
+2015-10-19 06:25:12.293676> **************************************************************
+2015-10-19 06:25:12.293724> Number of incomming requests in the current 5 minute period= 1
+2015-10-19 06:25:12.293753> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:25:12.293775> **************************************************************
+2015-10-19 06:25:42.339321> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:25:42.457501> Connected
+2015-10-19 06:25:42.727093> **************************************************************
+2015-10-19 06:25:42.727157> Number of incomming requests in the current 5 minute period= 4
+2015-10-19 06:25:42.727210> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:25:42.727228> **************************************************************
+2015-10-19 06:26:12.772524> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:26:12.890290> Connected
+2015-10-19 06:26:13.151872> **************************************************************
+2015-10-19 06:26:13.152005> Number of incomming requests in the current 5 minute period= 7
+2015-10-19 06:26:13.152030> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:26:13.152049> **************************************************************
+2015-10-19 06:26:43.227197> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:26:43.345051> Connected
+2015-10-19 06:26:43.635082> **************************************************************
+2015-10-19 06:26:43.635166> Number of incomming requests in the current 5 minute period= 10
+2015-10-19 06:26:43.635260> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:26:43.635294> **************************************************************
+2015-10-19 06:27:13.679904> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:27:13.814518> Connected
+2015-10-19 06:27:14.073598> **************************************************************
+2015-10-19 06:27:14.073631> Number of incomming requests in the current 5 minute period= 13
+2015-10-19 06:27:14.073677> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:27:14.073688> **************************************************************
+2015-10-19 06:27:44.118840> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:27:44.235262> Connected
+2015-10-19 06:27:44.496515> **************************************************************
+2015-10-19 06:27:44.496569> Number of incomming requests in the current 5 minute period= 24
+2015-10-19 06:27:44.496595> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:27:44.496618> **************************************************************
+2015-10-19 06:28:14.542128> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:28:14.657346> Connected
+2015-10-19 06:28:14.905761> **************************************************************
+2015-10-19 06:28:14.905905> Number of incomming requests in the current 5 minute period= 27
+2015-10-19 06:28:14.905930> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:28:14.905944> **************************************************************
+2015-10-19 06:28:44.952954> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:28:45.097481> Connected
+2015-10-19 06:28:45.317665> **************************************************************
+2015-10-19 06:28:45.317698> Number of incomming requests in the current 5 minute period= 30
+2015-10-19 06:28:45.317718> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:28:45.317732> ***************************************[H[2J[H[2J[H[2J[H[2J[H[2J[H[2J[H[2J[H[2J***********************
+2015-10-19 06:29:15.362660> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:29:15.494418> Connected
+2015-10-19 06:29:15.752942> **************************************************************
+2015-10-19 06:29:15.752987> Number of incomming requests in the current 5 minute period= 34
+2015-10-19 06:29:15.753121> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:29:15.753130> **************************************************************
+2015-10-19 06:29:45.813954> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:29:45.946122> Connected
+2015-10-19 06:29:46.168266> **************************************************************
+2015-10-19 06:29:46.168302> Number of incomming requests in the current 5 minute period= 37
+2015-10-19 06:29:46.168313> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:29:46.168358> **************************************************************
+2015-10-19 06:30:16.229997> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:30:16.348196> Connected
+2015-10-19 06:30:16.608503> **************************************************************
+2015-10-19 06:30:16.608554> Number of incomming requests in the current 5 minute period= 2
+2015-10-19 06:30:16.608572> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:30:16.608584> **************************************************************
+2015-10-19 06:30:46.653837> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:30:46.788823> Connected
+2015-10-19 06:30:47.011413> **************************************************************
+2015-10-19 06:30:47.011473> Number of incomming requests in the current 5 minute period= 5
+2015-10-19 06:30:47.011487> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:30:47.011497> **************************************************************
+2015-10-19 06:31:17.068757> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:31:17.183886> Connected
+2015-10-19 06:31:17.445430> **************************************************************
+2015-10-19 06:31:17.445462> Number of incomming requests in the current 5 minute period= 8
+2015-10-19 06:31:17.445485> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:31:17.445509> **************************************************************
+2015-10-19 06:31:47.516619> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:31:47.634674> Connected
+2015-10-19 06:31:47.898832> **************************************************************
+2015-10-19 06:31:47.898873> Number of incomming requests in the current 5 minute period= 3489
+2015-10-19 06:31:47.898892> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:31:47.898922> **************************************************************
+2015-10-19 06:32:17.959994> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:32:18.094910> Connected
+2015-10-19 06:32:18.354816> **************************************************************
+2015-10-19 06:32:18.354869> Number of incomming requests in the current 5 minute period= 8368
+2015-10-19 06:32:18.354901> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:32:18.354918> **************************************************************
+2015-10-19 06:32:48.415872> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:32:48.550374> Connected
+2015-10-19 06:32:48.815909> **************************************************************
+2015-10-19 06:32:48.815957> Number of incomming requests in the current 5 minute period= 12845
+2015-10-19 06:32:48.815998> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:32:48.816026> **************************************************************
+2015-10-19 0[H[2J[H[2J6:33:18.873645> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:33:19.007968> Connected
+2015-10-19 06:33:19.270633> **************************************************************
+2015-10-19 06:33:19.270681> Number of incomming requests in the current 5 minute period= 17890
+2015-10-19 06:33:19.270704> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:33:19.270811> **************************************************************
+2015-10-19 06:33:49.315844> Connecting To Homestead Node with IP 10.204.110.58
+2015-10-19 06:33:49.459973> Connected
+2015-10-19 06:33:49.685382> **************************************************************
+2015-10-19 06:33:49.685444> Number of incomming requests in the current 5 minute period= 22978
+2015-10-19 06:33:49.685474> Number of incomming rejected requests in the current 5 minute period due to overload= 0
+2015-10-19 06:33:49.685485> **************************************************************
+2015-10-19 06:33:49.685574> Getting user confiurations...
+Traceback (most recent call last):
+  File "monitor.py", line 209, in <module>
+    Scale.scale_up()
+  File "/vIMS/Scale.py", line 43, in scale_up
+    user_config = get_user_configurations()
+  File "/vIMS/Scale.py", line 37, in get_user_configurations
+    file = open(USER_CONFIG_PATH)
+IOError: [Errno 2] No such file or directory: '/root/vIMS/user_config.json'

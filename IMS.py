@@ -10,15 +10,31 @@ import json
 import time
 import paramiko
 import select
-#import Scale
-#import Scale_down
-############################## logging ########################################
+import Scale
+import Scale_down
+from commands import getoutput
+from multiprocessing import Process
+from os import system
+from time import sleep
+#----------------------------------#
+from keystoneclient.auth.identity import v2
+from keystoneclient import session
+from novaclient import client
+#----------------------------------#
+
+##################################### File path function ###################################
+import subprocess
+p = subprocess.Popen(["pwd"], stdout=subprocess.PIPE , shell=True)
+PATH = p.stdout.read()
+PATH = PATH.rstrip('\n')
+
+############################## logging #####################################################
 import logging
 import datetime
 now = datetime.datetime.now()
 date_time = now.strftime("%Y-%m-%d_%H-%M")
-filename_activity = 'logs/deploy_' + date_time + '.log'
-filename_error = 'logs/deploy_error_' + date_time + '.log'
+filename_activity = PATH+'/logs/deploy_' + date_time + '.log'
+filename_error = PATH+'/logs/deploy_error_' + date_time + '.log'
 
 logging.basicConfig(filename=filename_activity, level=logging.INFO, filemode='w', format='%(asctime)s %(levelname)-8s %(name)-23s [-]  %(message)s')
 
@@ -56,17 +72,19 @@ class F:
             old_f.write(x)
 
 sys.stdout = F()
+
 ############################## Global Variables ##########################################
-IMAGE_PATH = '/root/AB/vIMS.qcow2'
+IMAGE_PATH = PATH+'/vIMS.qcow2'
 COMPRESSED_FILE_PATH = '/root/IMG/vIMS-image.tar.gz'
 IMAGE_DIRECTORY = '/root/IMG/'
 SNMP_CONFIG_PATH = '/etc/snmp/snmpd.conf'
-SNMP_FILE_PATH = '/root/AB/snmpd.conf'
+SNMP_FILE_PATH = PATH+'/snmpd.conf'
 MIB_PATH = "/usr/share/mibs/PROJECT-CLEARWATER-MIB.txt"
-MIB_FILE_PATH = "/root/AB/PROJECT-CLEARWATER-MIB.txt"
-os.environ['IMAGE_PATH'] = '/root/vIMS/IMG'
-CONFIG_PATH = '/root/AB/configurations.json'
-USER_CONFIG_PATH = '/root/AB/user_config.json'
+#MIB_FILE_PATH = "/root/vIMS/PROJECT-CLEARWATER-MIB.txt"
+MIB_FILE_PATH = "/vIMS/PROJECT-CLEARWATER-MIB.txt"
+os.environ['IMAGE_PATH'] = PATH+'/IMG'
+CONFIG_PATH = PATH+'/configurations.json'
+USER_CONFIG_PATH = PATH+'/user_config.json'
 STACK_NAME = 'IMS'
 REPO_URL = 'http://repo.cw-ngv.com/stable'
 ETCD_IP = ''
@@ -79,7 +97,7 @@ DN_RANGE_START = '6505550000'
 DN_RANGE_LENGTH = '1000'
 CALL_THRESHOLD = '20000'
 CALL_LOWER_THRESHOLD = '10'
-LOCAL_IP = '10.204.110.42'
+#LOCAL_IP = '10.204.110.42'
 ############################## User Configuration Functions ##############################
 
 def get_user_configurations():
@@ -109,12 +127,15 @@ def get_keystone_creds(configurations):
     return d
 
 def get_nova_creds(configurations):
-	d = {}
-	d['username'] = configurations['os-creds']['os-user']
-	d['api_key'] = configurations['os-creds']['os-api-key']
-	d['auth_url'] = configurations['os-creds']['os-authurl']
-	d['project_id'] = configurations['os-creds']['os-project-id']
-	return d
+  d = {}
+  d['username'] = configurations['os-creds']['os-user']
+  d['api_key'] = configurations['os-creds']['os-api-key']
+  d['password'] = configurations['os-creds']['os-pass']
+  d['auth_url'] = configurations['os-creds']['os-authurl']
+  d['project_id'] = configurations['os-creds']['os-project-id']
+  d['version'] = "1.1"
+  return d
+
 print('Getting credentials')  
 logger.info("Getting client credentials")
 def get_configurations():
@@ -125,14 +146,29 @@ def get_configurations():
 print('Credentials Loaded')
 logger.info("Credentials Loaded")  
 config = get_configurations()
-
 credsks = get_keystone_creds(config)
 logger.info("Getting Keystone credentials")
 creds = get_nova_creds(config)
 logger_nova.info("Getting of nova credentials")
+
 # Get authorized instance of nova client
-nova = nvclient.Client(**creds) 
-logger_nova.info("Getting authorized instance of nova client")  
+logger_nova.info("Getting authorized instance of nova client")
+
+auth = v2.Password(auth_url=creds['auth_url'],
+               username=creds['username'],
+               password=creds['password'],
+               tenant_name=creds['project_id'])
+sess = session.Session(auth=auth)
+nova = client.Client(creds['version'], session=sess)
+#except:
+#  error_logger.exception("Unable to create nova client instance")
+#  print ("[" + time.strftime("%H:%M:%S")+ "] Error creating nova client")
+#  sys.exit()
+# Get authorized instance of neutron client
+logger_neutron.info("Getting authorized instance of neutron client")
+
+
+#nova = nvclient.Client(**creds) 
 # Get authorized instance of neutron client
 neutron = ntrnclient.Client(**credsks)
 logger_neutron.info("Getting authorized instance of nova client")
@@ -184,7 +220,7 @@ def create_agg(nova):
    logger_nova.info("creating nova aggregate group B and availability zone B")
  except:
    print('Err')
-    error_logger.exception("Unable to create nova aggregate group B and availability zone B")
+   error_logger.exception("Unable to create nova aggregate group B and availability zone B")
    pass
  try:
    nova.aggregates.add_host(aggregate=agg_idA, host=hostnA)
@@ -252,16 +288,16 @@ logger.info("Successfully created a DNS security key")
 def create_cluster(heat,cluster_name):
   cluster_full_name=STACK_NAME
 
-  file_main= open('/root/AB/clearwater.yaml', 'r')                
-  file_bono= open('/root/AB/bono.yaml', 'r')
-  file_sprout= open('/root/AB/sprout.yaml', 'r')
-  file_ralf= open('/root/AB/ralf.yaml', 'r')
-  file_dns= open('/root/AB/dns.yaml', 'r')
-  file_ellis= open('/root/AB/ellis.yaml', 'r')
-  file_network= open('/root/AB/network.yaml', 'r')
-  file_groups= open('/root/AB/security-groups.yaml', 'r')
-  file_homestead= open('/root/AB/homestead.yaml', 'r')
-  file_homer= open('/root/AB/homer.yaml', 'r')
+  file_main= open(PATH+'/clearwater.yaml', 'r')                
+  file_bono= open(PATH+'/bono.yaml', 'r')
+  file_sprout= open(PATH+'/sprout.yaml', 'r')
+  file_ralf= open(PATH+'/ralf.yaml', 'r')
+  file_dns= open(PATH+'/dns.yaml', 'r')
+  file_ellis= open(PATH+'/ellis.yaml', 'r')
+  file_network= open(PATH+'/network.yaml', 'r')
+  file_groups= open(PATH+'/security-groups.yaml', 'r')
+  file_homestead= open(PATH+'/homestead.yaml', 'r')
+  file_homer= open(PATH+'/homer.yaml', 'r')
 
   cluster_body={
    "stack_name":cluster_full_name,
@@ -293,7 +329,7 @@ def create_cluster(heat,cluster_name):
   #print ("There is an Err creating cluster, exiting...")
   #sys.exit()
   print ("Creating stack "+ cluster_full_name )
- logger.info("Creating Heat Stack")
+  logger.info("Creating Heat Stack")
   
 
 ########################### Create Heat Stack from credentials of keystone #####################
@@ -343,12 +379,12 @@ while True:
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     print ("Connecting To DNS Node with IP " + dns_ip)
     logger_ssh.info("Connecting To DNS Node")
-	ssh.connect( hostname = dns_ip , username = "root", password = "root123" )
+    ssh.connect( hostname = dns_ip , username = "root", password = "root123" )
     print ("Connected")
     break
   except:
     error_logger.exception("Unable to connect with DNS server")
-	print("Could not connect. Retrying in 5 seconds...")
+    print("Could not connect. Retrying in 5 seconds...")
     time.sleep(5)
 	
 
@@ -472,14 +508,14 @@ while True:
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     print ("Connecting To Bono Node with IP " + bono_ip)
-	logger_ssh.info("Connecting To Bono Node")
+    logger_ssh.info("Connecting To Bono Node")
     ssh.connect( hostname = bono_ip , username = "root", password = "root123" )
     print ("Connected")
-	logger.info("Connected To Bono Node")
+    logger.info("Connected To Bono Node")
     break
   except:
     print("Could not connect. Retrying in 5 seconds...")
-	error_logger.exception("Unable to Connect To Bono Node")
+    error_logger.exception("Unable to Connect To Bono Node")
     time.sleep(5) 
 
 
@@ -926,7 +962,7 @@ while True:
   if(not stdout.read()):
     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install clearwater-config-manager --yes --force-yes")
     print('Retrying Installation...')
-	logger.info("Retrying Installation.")
+    logger.info("Retrying Installation.")
     time.sleep(5)	
   else:
     break			
@@ -1252,7 +1288,7 @@ while True:
   if(not stdout.read()):
     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install clearwater-cassandra --yes --force-yes -o DPkg::options::=--force-confnew")
     print('Retrying Installation...')
-	logger.info("Retrying Installation.")
+    logger.info("Retrying Installation.")
     time.sleep(5)	
   else:
     break
@@ -1270,7 +1306,7 @@ while True:
   if(not stdout.read()):
     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install homer --yes --force-yes -o DPkg::options::=--force-confnew")
     print('Retrying Installation...')
-	logger.info("Retrying Installation.")
+    logger.info("Retrying Installation.")
     time.sleep(5)	
   else:
     break
@@ -1288,7 +1324,7 @@ while True:
   if(not stdout.read()):
     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install clearwater-management --yes --force-yes")
     print('Retrying Installation...')
-	logger.info("Retrying Installation.")
+    logger.info("Retrying Installation.")
     time.sleep(5)	
   else:
     break
@@ -1563,7 +1599,7 @@ while True:
   if(not stdout.read()):
     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install clearwater-cassandra --yes --force-yes -o DPkg::options::=--force-confnew")
     print('Retrying Installation...')
-	logger.info("Retrying Installation.")
+    logger.info("Retrying Installation.")
     time.sleep(5)	
   else:
     break
@@ -1579,7 +1615,7 @@ while True:
   if(not stdout.read()):
     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install homestead homestead-prov --yes --force-yes -o DPkg::options::=--force-confnew")
     print('Retrying Installation...')
-	logger.info("Retrying Installation.")
+    logger.info("Retrying Installation.")
     time.sleep(5)	
   else:
     break			
@@ -1597,7 +1633,7 @@ while True:
   if(not stdout.read()):
     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install clearwater-management --yes --force-yes")
     print('Retrying Installation...')
-	logger.info("Retrying Installation.")
+    logger.info("Retrying Installation.")
     time.sleep(5)	
   else:
     break		
@@ -1822,14 +1858,14 @@ while True:
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     print ("Connecting To Ellis Node with IP " + ellis_ip)
-	logger_ssh.info("Connecting To Ellis Node")
+    logger_ssh.info("Connecting To Ellis Node")
     ssh.connect( hostname = ellis_ip , username = "root", password = "root123" )
     print ("Connected")
-	logger.info("Connected To Ellis Node")
+    logger.info("Connected To Ellis Node")
     break
   except:
     print("Could not connect. Retrying in 5 seconds...")
-	error_logger.exception("Could not connect to Ellis.")
+    error_logger.exception("Could not connect to Ellis.")
     time.sleep(5) 
 	
 stdin, stdout, stderr = ssh.exec_command("sudo -s")  
@@ -2124,14 +2160,14 @@ while True:
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     logger_ssh.info("Connecting To Ralf Node")
-	print ("Connecting To Ralf Node with IP " + ralf_ip)
+    print ("Connecting To Ralf Node with IP " + ralf_ip)
     ssh.connect( hostname = ralf_ip , username = "root", password = "root123" )
     print ("Connected")
-	logger_ssh.info("Connected To Ralf Node")
+    logger_ssh.info("Connected To Ralf Node")
     break
   except:
     error_logger.exception("Could not connect to Ralf.")
-	print("Could not connect. Retrying in 5 seconds...")
+    print("Could not connect. Retrying in 5 seconds...")
     time.sleep(5) 
 
 # Log all output to file.
@@ -2381,92 +2417,100 @@ print ("Homestead IP = " + homestead_ip)
 print ("Homer IP = " + homer_ip)
 print("*************************")
 
-SCALE_UP = False
-################################## Get Homestead information ###################################
-while True:
+print ('Finished deploying IMS')
+print ('To see the scaling status see file "scale_progress')
+time.sleep(10)
+os.system("nohup python monitor.py > scale_progress&")
+#system("screen -S 'IMS'")
 
-  #Connect to Homestead
-  #k = paramiko.RSAKey.from_private_key_file("/root/.ssh/secure.pem")
-  ssh = paramiko.SSHClient()
-  ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-  print ("Connecting To Homestead Node with IP " + homestead_ip)
-  ssh.connect( hostname = homestead_ip , username = "root", password = "root123" )
-  print ("Connected")
-  stdin, stdout, stderr = ssh.exec_command("sudo -s")  
+# ################################## Get Homestead information ###################################
+# while True:
+
+#   #Connect to Homestead
+#   #k = paramiko.RSAKey.from_private_key_file("/root/.ssh/secure.pem")
+#   ssh = paramiko.SSHClient()
+#   ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+#   print ("Connecting To Homestead Node with IP " + homestead_ip)
+#   ssh.connect( hostname = homestead_ip , username = "root", password = "root123" )
+#   print ("Connected")
+#   stdin, stdout, stderr = ssh.exec_command("sudo -s")  
   
   
-  #print('Checking MIB libraries')
-  #stdin, stdout, stderr = ssh.exec_command("snmpwalk -v2c -c clearwater localhost PROJECT-CLEARWATER-MIB::dataConnection")
-  #while not stdout.channel.exit_status_ready():
-  #	# Only print data if there is data to read in the channel 
-  #	if stdout.channel.recv_ready():
-  #		rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-  #		if len(rl) > 0:
-  #			# Print data from stdout
-  #			print stdout.channel.recv(1024),
+#   #print('Checking MIB libraries')
+#   #stdin, stdout, stderr = ssh.exec_command("snmpwalk -v2c -c clearwater localhost PROJECT-CLEARWATER-MIB::dataConnection")
+#   #while not stdout.channel.exit_status_ready():
+#   #	# Only print data if there is data to read in the channel 
+#   #	if stdout.channel.recv_ready():
+#   #		rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+#   #		if len(rl) > 0:
+#   #			# Print data from stdout
+#   #			print stdout.channel.recv(1024),
       
-  os.system('clear')
+#   os.system('clear')
       
-  stdin, stdout, stderr = ssh.exec_command("snmpwalk -v2c -c clearwater localhost PROJECT-CLEARWATER-MIB::homesteadIncomingRequestsCount.scopeCurrent5MinutePeriod ")
-  mib_data = stdout.read()
-  mib_data = str(mib_data)
-  data = mib_data.split()
-  no_of_incomming_requests =  data[3]
+#   stdin, stdout, stderr = ssh.exec_command("snmpwalk -v2c -c clearwater localhost PROJECT-CLEARWATER-MIB::homesteadIncomingRequestsCount.scopeCurrent5MinutePeriod ")
+#   mib_data = stdout.read()
+#   mib_data = str(mib_data)
+#   data = mib_data.split()
+#   no_of_incomming_requests =  data[3]
   
-  stdin, stdout, stderr = ssh.exec_command("snmpwalk -v2c -c clearwater localhost PROJECT-CLEARWATER-MIB::homesteadRejectedOverloadCount.scopeCurrent5MinutePeriod ")
-  mib_data = stdout.read()
-  mib_data = str(mib_data)
-  data = mib_data.split()
-  no_of_rejected_requests =  data[3]
-  print("*************************")
-  print ("Domain = " + domain)
-  print ("Bono IP = " + bono_ip)
-  print ("Homestead IP = " + homestead_ip)
-  print ("Homer IP = " + homer_ip)
-  print("*************************")
-  print ('*****************************************************************************************************************')
-  print ('Number of incomming requests in the current 5 minute period= '+ no_of_incomming_requests )
-  print ('Number of incomming rejected requests in the current 5 minute period due to overload= '+ no_of_rejected_requests )
-  print ('*****************************************************************************************************************')
+#   stdin, stdout, stderr = ssh.exec_command("snmpwalk -v2c -c clearwater localhost PROJECT-CLEARWATER-MIB::homesteadRejectedOverloadCount.scopeCurrent5MinutePeriod ")
+#   mib_data = stdout.read()
+#   mib_data = str(mib_data)
+#   data = mib_data.split()
+#   no_of_rejected_requests =  data[3]
+#   print("*************************")
+#   print ("Domain = " + domain)
+#   print ("Bono IP = " + bono_ip)
+#   print ("Homestead IP = " + homestead_ip)
+#   print ("Homer IP = " + homer_ip)
+#   print("*************************")
+#   print ('**************************************************************')
+#   print ('Number of incomming requests in the current 5 minute period= '+ no_of_incomming_requests )
+#   print ('Number of incomming rejected requests in the current 5 minute period due to overload= '+ no_of_rejected_requests )
+#   print ('**************************************************************')
   
-  if (int(no_of_incomming_requests) > int(CALL_THRESHOLD) and SCALE_UP == False):
-    #Connect to Local Node
-    #k = paramiko.RSAKey.from_private_key_file("/root/.ssh/secure.pem")
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    print ("Connecting To local Node with IP " + LOCAL_IP)
-    ssh.connect( hostname = LOCAL_IP , username = "root", password = "root123" )
-    print ("Connected")S
-	logger.info("scaling Up")
-    stdin, stdout, stderr = ssh.exec_command("python /root/AB/Scale.py")  
-    while not stdout.channel.exit_status_ready():
-  	# Only print data if there is data to read in the channel 
-  	  if stdout.channel.recv_ready():
-  		  rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-   		  if len(rl) > 0:
-  			# Print data from stdout
-  			  print stdout.channel.recv(1024),    
-    SCALE_UP = True    
-  print(int(no_of_incomming_requests))
-  print(int(CALL_THRESHOLD))  
+#   if (int(no_of_incomming_requests) > int(CALL_THRESHOLD) and SCALE_UP == False):
+#   #   #Connect to Local Node
+#   #   #k = paramiko.RSAKey.from_private_key_file("/root/.ssh/secure.pem")
+#   #   ssh = paramiko.SSHClient()
+#   #   ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+#   #   print ("Connecting To local Node with IP " + LOCAL_IP)
+#   #   ssh.connect( hostname = LOCAL_IP , username = "root", password = "r00tme" )
+#   #   print ("Connected")
+#   #   logger.info("scaling Up")
+#   #   stdin, stdout, stderr = ssh.exec_command("python /root/vIMS/Scale.py")  
+#   #   while not stdout.channel.exit_status_ready():
+#   # 	# Only print data if there is data to read in the channel 
+#   # 	  if stdout.channel.recv_ready():
+#   # 		  rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+#   #  		  if len(rl) > 0:
+#   # 			# Print data from stdout
+#   # 			  print stdout.channel.recv(1024),    
+#     SCALE_UP = True    
+#   # print(int(no_of_incomming_requests))
+#   # print(int(CALL_THRESHOLD))  
+#     Scale.scale_up()
   
   
-  if(int(no_of_incomming_requests) < int(CALL_LOWER_THRESHOLD) and SCALE_UP == True):
-    #Connect to Local Node
-    #k = paramiko.RSAKey.from_private_key_file("/root/.ssh/secure.pem")
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    print ("Connecting To local Node with IP " + LOCAL_IP)
-    ssh.connect( hostname = LOCAL_IP , username = "root", password = "root123" )
-    print ("Connected")
-    stdin, stdout, stderr = ssh.exec_command("python /root/AB/Scale_down.py")  
-    while not stdout.channel.exit_status_ready():
-  	# Only print data if there is data to read in the channel 
-  	  if stdout.channel.recv_ready():
-  		  rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-   		  if len(rl) > 0:
-  			# Print data from stdout
-  			  print stdout.channel.recv(1024),
-    SCALE_UP = False
-  time.sleep(30)
+#   if(int(no_of_incomming_requests) < int(CALL_LOWER_THRESHOLD) and SCALE_UP == True):
+#    #  #Connect to Local Node
+#    #  #k = paramiko.RSAKey.from_private_key_file("/root/.ssh/secure.pem")
+#    #  ssh = paramiko.SSHClient()
+#    #  ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+#    #  print ("Connecting To local Node with IP " + LOCAL_IP)
+#    #  ssh.connect( hostname = LOCAL_IP , username = "root", password = "r00tme" )
+#    #  print ("Connected")
+#    #  stdin, stdout, stderr = ssh.exec_command("python /root/vIMS/Scale_down.py")  
+#    #  while not stdout.channel.exit_status_ready():
+#   	# # Only print data if there is data to read in the channel 
+#   	#   if stdout.channel.recv_ready():
+#   	# 	  rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+#    # 		  if len(rl) > 0:
+#   	# 		# Print data from stdout
+#   	# 		  print stdout.channel.recv(1024),
+#     SCALE_UP = False
+#     Scale_down.scale_down()
+    
+#   time.sleep(30)
 
