@@ -36,7 +36,6 @@ public class AttachSimulator {
 		System.out.println("Attach Request:" + " " +obj.SendAttachPack(AttachArguments));
 		//////////////////////////////////
 
-		sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort()));
 		
 		S1APPacket pac = new S1APPacket("InitiatingMessage", "initialUEMessage", "ignore", 5);
 		
@@ -80,7 +79,6 @@ public class AttachSimulator {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		sctpClient.disconnectFromHost();
 		/** Test S1AP Packet Creation Here!! **/
 	}
 	public static byte[] hexStringToByteArray(String s)
