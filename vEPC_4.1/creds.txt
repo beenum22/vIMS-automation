@@ -1,0 +1,23 @@
+##############################################################
+## This is credentials file required to run the scripts.    ##
+## User is only allowed to edit the values mentioned 		##
+## between the inverted commas "".							##
+## Please refer to the documentation about the values to	##
+## enter against each parameter.							##
+## Any other change in the document is strictly prohibited  ##
+## and may cause an error during the execution of scripts.  ##
+##############################################################
+authentication_url = "http://10.204.111.42:5000/v2.0/"
+os-user-name = "admin"
+os-tenant-name = "admin"
+os-password = "admin"
+os_external_network_name = "net04_ext"
+subnet_for_os_private_network = "10.0.0.0/24"
+subnet_for_S1C_network = "172.16.1.0/24"
+subnet_for_S1U_network = "172.16.2.0/24"
+subnet_for_S6a_network = "172.16.3.0/24"
+subnet_for_RADIUS_network = "172.16.4.0/24"
+subnet_for_SGs_network = "172.16.5.0/24"
+subnet_for_SGi_network = "172.16.6.0/24"
+range_of_ixia_pool_vcm = "192.168.105.10 192.168.105.40"
+nexthop address = "172.17.2.30 00:AC:11:02:1E:00"

@@ -1,0 +1,39 @@
+{
+       "auto-del": "yes", 
+       "vcm-cfg": {
+              "name-prefix": "VCM-", 
+              "ems-vm-name": "EMS", 
+              "vcm-img-name": "VCM_IMG", 
+              "ems-img-name": "EMS_IMG"
+       }, 
+       "deploy-ems": "yes", 
+       "router": {
+              "name": "VCM_Router"
+       }, 
+       "os-creds": {
+              "os-authurl": "http://10.204.111.42:5000/v2.0/", 
+              "os-tenant-name": "admin", 
+              "os-project-id": "admin", 
+              "os-api-key": "admin", 
+              "os-pass": "admin", 
+              "os-user": "admin ", 
+              "os-user-name": "admin"
+       }, 
+       "networks": {
+              "s1u-cidr": "172.16.2.0/24", 
+              "net-ext-name": "net04_ext", 
+              "radius-name": "RADIUS", 
+              "s6a-name": "S6a", 
+              "sgs-name": "SGs", 
+              "s1c-name": "S1C", 
+              "net-int-name": "VCM_Net", 
+              "net-int-cidr": "10.0.0.0/24", 
+              "radius-cidr": "172.16.4.0/24", 
+              "sgs-cidr": "172.16.5.0/24", 
+              "sgi-name": "SGi", 
+              "s1u-name": "S1U", 
+              "s1c-cidr": "172.16.1.0/24", 
+              "s6a-cidr": "172.16.3.0/24", 
+              "sgi-cidr": "172.16.6.0/24"
+       }
+}

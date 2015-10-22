@@ -1,0 +1,4 @@
+#cloud-config
+manage_etc_hosts: True
+hostname: VEM-1
+fqdn: VEM-1.private.xyz
