@@ -98,9 +98,11 @@ while True:
 	
 if chk == 'yes':
 	clear_instance(configurations['vcm-cfg']['ems-vm-name'], nova, configurations['auto-del'], configurations, neutron, logger, error_logger, logger_nova, logger_neutron)
-# except:
-	# print("[" + time.strftime("%H:%M:%S")+ "] vEPC initial deployment doesn't exist ...")
-	# sys.exit()
+	router_id = get_router_id(configurations['router']['name'], neutron)
+	remove_interface(neutron, get_subnet_id(neutron, configurations['networks']['net-int-name']), router_id)
+	clear_network(configurations['networks']['net-int-name'], neutron, configurations, error_logger, logger_neutron)
+
+	delete_router(neutron, configurations['router']['name'])
 
 print("[" + time.strftime("%H:%M:%S")+ "] vEPC Termination complete ...")
 

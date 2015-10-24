@@ -1,1 +1,1 @@
-__all__=['os_defs', 'consts.py']
+__all__=['os_defs', 'consts.py', 'file_defs.py', 'funcs.py']

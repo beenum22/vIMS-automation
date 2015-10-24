@@ -6,10 +6,10 @@
               "vcm-img-name": "VCM_IMG", 
               "ems-img-name": "EMS_IMG"
        }, 
-       "deploy-ems": "yes", 
        "router": {
               "name": "VCM_Router"
        }, 
+       "deploy-ems": "yes", 
        "os-creds": {
               "os-authurl": "http://10.204.111.42:5000/v2.0/", 
               "os-tenant-name": "admin", 

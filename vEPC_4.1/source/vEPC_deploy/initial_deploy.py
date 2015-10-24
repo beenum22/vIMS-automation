@@ -208,10 +208,9 @@ try:
 	nova.security_group_rules.create(group.id, ip_protocol='tcp', from_port=1,
 									to_port=65535, cidr='0.0.0.0/0')
 except:
-	error_logger.exception("Port 5000 for VCM-VEM already allowed")
+	error_logger.exception("Port 5000 for VEM already allowed")
 
 logger_nova.info("Successfully allowed Ping, SSH, EMS and VEM ports")
-
 #check if instances already exist
 logger.info("Checking if VCM-1 components already exist ...")
 for i in range(0, 7):
@@ -291,7 +290,6 @@ except:
 	sys.exit()
 print("[" + time.strftime("%H:%M:%S")+ "] VCM-1 and VCM-2 instances deployment complete! Please wait for configurations..")
 #===============================================================================================#
-write_cfg_file(LOCAL_PATH_DELL_CFG, configurations, nova)
 ems_name = configurations['vcm-cfg']['ems-vm-name']
 #============================EMS Deploy====================================================#
 logger.info("Starting " + ems_name + " deployement")
@@ -301,11 +299,12 @@ if not (is_server_exists(ems_name, nova, logger_nova)):
 		ems_ip = deploy_EMS(configurations['vcm-cfg']['ems-vm-name'], nova, neutron, configurations, avl_zoneA, error_logger, logger_neutron, logger_nova)
 		# deploy EMS
 		print("[" + time.strftime("%H:%M:%S")+ "] Setting up " + ems_name + "...")
+		time.sleep(10)
 		check_ping_status(ems_ip, configurations['vcm-cfg']['ems-vm-name'], logger)
-		#time.sleep(10)
+		
 		create_EMS_hostsfile(configurations, nova)
 		hostname_config(ssh, ems_name, ems_ip, ems_name, 'ems.txt', REMOTE_PATH_HOSTNAME, error_logger, logger_ssh)
-		time.sleep(20)
+		time.sleep(40)
 		while(True):
 			try:
 				logger_ssh.info("Connecting to " + configurations['vcm-cfg']['ems-vm-name'])
@@ -333,7 +332,7 @@ net_name = configurations['networks']['net-int-name']
 server = nova.servers.find(name=ems_name).addresses
 ems_ip = server[net_name][1]['addr']
 logger_ssh.info("Successfully deployed " + ems_name)
-print("[" + time.strftime("%H:%M:%S")+ "] " + ems_name + " GUI can be started from the browser with url http://"+ems_ip+":8980/vcmems/")
+
 #=================================EMS deploy end====================================#
 
 create_host_file(instance_list, instance_list2, configurations, nova)
@@ -354,6 +353,7 @@ for i in range(0, 7):
 						file_list2[i], REMOTE_PATH_HOSTNAME, error_logger, logger_ssh)
 
 #-------update vcm-mme-start file-----#
+write_cfg_file(LOCAL_PATH_DELL_CFG, configurations, nova, neutron)
 mme_file_edit(configurations, neutron, logger)
 #-------------------------------------#
 # start running scripts on VCM-1
@@ -375,10 +375,19 @@ for i in range(0, 7):
 	info_msg = "Connected to " + instance_list[i].name
 	logger_ssh.info(info_msg)
 	print("[" + time.strftime("%H:%M:%S")+ "] \t Running deploy_script..." )
-	info_msg = "executing command: ./deploy_script --vnfc "+name_list[i]+" --instance_id 1 --internal_if eth0"
+	info_msg = "executing deploy_script ..."
 	logger_ssh.info(info_msg)
-	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("./deploy_script --vnfc "+name_list[i]+" --instance_id 1 --internal_if eth0")
-	ssh_stdout.readlines()
+	if i==0 or i==1 or i==2:
+		ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("./deploy_script --vnfc "+name_list[i]+" --instance_id 1 --internal_if eth0")
+	elif i==3 or i==4:
+		ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("./deploy_script --vnfc "+name_list[i]+" --instance_id 1 --internal_if eth1")
+	elif i==5 or i==6:
+		ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("./deploy_script --vnfc "+name_list[i]+" --instance_id 1 --internal_if eth2")
+	
+	output = ssh_stdout.readlines()
+	print("[" + time.strftime("%H:%M:%S")+ "]\n")
+	print output
+	
 	if i == 0 or i == 6:
 		print("[" + time.strftime("%H:%M:%S")+ "] \t Copying config file...")
 		logger_ssh.info("Opening stfp session")	
@@ -394,9 +403,13 @@ for i in range(0, 7):
 	logger_ssh.info(info_msg)
 	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('./validate_deploy.sh')
 	ssh_stdout.readlines()
+	
+	output = ssh_stdout.readlines()
+	print("[" + time.strftime("%H:%M:%S")+ "]\n")
+	print output
+	
 	ssh.close()
-
-#--------------------------------#
+#===========================================================================================#
 '''
 (s1_mme1, s1_u1) = get_assigned_IP_from_file('s1', error_logger)
 sgi1 = get_assigned_IP_from_file('sgi', error_logger)
@@ -407,11 +420,12 @@ update_neutron_port(neutron, get_port_id('sgi', neutron), sgi1, 'SGi', logger_ne
 '''
 # start VCM services on VEM and SDB
 vcm_start(ssh, instance_list[0].ip, instance_list[0].name, logger_ssh)
+time.sleep(10)
 vcm_start(ssh, instance_list[1].ip, instance_list[1].name, logger_ssh)
 
-#---------------configuring vcm-vem-1----------#
+#=====================configuring vcm-vem-1====================#
 print("[" + time.strftime("%H:%M:%S")+ "] Please wait for VEM configuration...")
-print("[" + time.strftime("%H:%M:%S")+ "] Configuring VCM-VEM-1...")
+print("[" + time.strftime("%H:%M:%S")+ "] Configuring VEM-1...")
 time.sleep(5)
 info_msg = "Connecting to " + instance_list[0].name
 logger_ssh.info(info_msg)
@@ -419,7 +433,7 @@ ssh.connect(instance_list[0].ip, username='root', password='root123')
 info_msg = "Connected to " + instance_list[0].name
 logger_ssh.info(info_msg)
 time_out = 0
-while(True):
+for time_out in range (0, 120):
 	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('./validate_deploy.sh')
 	opt = ssh_stdout.readlines()
 	# print(opt)
@@ -437,17 +451,16 @@ while(True):
 	print("[" + time.strftime("%H:%M:%S")+ "] VEM-1 not ready, waiting...")
 	time.sleep(30)
 	time_out = time_out + 30
-	if time_out >= 120:
-		break
+	
 # Source the configuration file Dell-VCM.cfg for VEM-1
 source_config(ssh, logger_ssh)
 
-#----------------------------------------------------------------#
+#==================================================#
 # Start VCM services on rest of components
 for i in range(2, 7):
 	vcm_start(ssh, instance_list[i].ip, instance_list[i].name, logger_ssh)
 
-#---------------------VCM 2-------------------#
+#======================= VCM 2 =======================#
 for i in range(0, 7):
 	print("[" + time.strftime("%H:%M:%S")+ "] Configuring " + instance_list2[i].name)
 	while(True):
@@ -465,14 +478,29 @@ for i in range(0, 7):
 	logger_ssh.info(info_msg)
 	logger_ssh.info("Running deploy_script")
 	print("[" + time.strftime("%H:%M:%S")+ "] \t Running deploy_script..." )
-	info_msg = "executing command: ./deploy_script --vnfc "+name_list[i]+" --instance_id 2 --internal_if eth0"
+	info_msg = "executing deploy_script ..."
 	logger_ssh.info(info_msg)
-	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("./deploy_script --vnfc "+name_list[i]+" --instance_id 2 --internal_if eth0")
-	ssh_stdout.readlines()
 	
+	if i==0 or i==1 or i==2:
+		ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("./deploy_script --vnfc "+name_list[i]+" --instance_id 2 --internal_if eth0")
+	elif i==3 or i==4:
+		ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("./deploy_script --vnfc "+name_list[i]+" --instance_id 2 --internal_if eth1")
+	elif i==5 or i==6:
+		ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("./deploy_script --vnfc "+name_list[i]+" --instance_id 2 --internal_if eth2")
+	
+	output = ssh_stdout.readlines()
+	print("[" + time.strftime("%H:%M:%S")+ "]\n")
+	print output
+	print '\n'
 	logger_ssh.info("executing command: ./validate_deploy.sh")
 	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('./validate_deploy.sh')
 	ssh_stdout.readlines()
+	
+	output = ssh_stdout.readlines()
+	print("[" + time.strftime("%H:%M:%S")+ "]\n")
+	print output
+	print '\n'
+	
 	ssh.close()
 #---------------------#
 '''
@@ -497,7 +525,7 @@ ssh.connect(instance_list2[0].ip, username='root', password='root123')
 info_msg = "Connected to " + instance_list2[0].name
 logger_ssh.info(info_msg)
 time_out = 0
-while(True):
+for time_out in range (0, 120):
 	logger_ssh.info("executing command: ./validate_deploy.sh ")
 	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('./validate_deploy.sh')
 	opt = ssh_stdout.readlines()
@@ -505,7 +533,7 @@ while(True):
 	err = False
 	for temp in opt:
 		if(("Fail" in temp) or("Not Ready" in temp)):
-			logger_ssh.warning("VCM service is not ready on VCM-VEM-2")
+			logger_ssh.warning("VCM service is not ready on VEM-2")
 			print("[" + time.strftime("%H:%M:%S")+ "] VCM service not ready on VEM-2")
 			print ("[" + time.strftime("%H:%M:%S")+ "] SDB Connection check failed")
 			err = True
@@ -516,8 +544,6 @@ while(True):
 	print("[" + time.strftime("%H:%M:%S")+ "] VEM-2 not ready, waiting...")
 	time.sleep(30)
 	time_out = time_out + 30
-	if time_out >= 120:
-		break
 
 logger.info("VCM service up and running on VEM-2")
 
@@ -525,5 +551,6 @@ logger.info("VCM service up and running on VEM-2")
 for i in range(2, 7):
 	vcm_start(ssh, instance_list2[i].ip, instance_list2[i].name, logger_ssh)
 
-#------------------------------------------------------------------------------------------------#
+#======================================== vEPC Deploy END ==================================================#
 
+print("[" + time.strftime("%H:%M:%S")+ "] " + ems_name + " GUI can be started from the browser with url http://"+ems_ip+":8980/vcmems/")

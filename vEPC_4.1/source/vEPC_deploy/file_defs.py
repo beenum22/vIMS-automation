@@ -261,7 +261,7 @@ def get_IP_from_file(f_name):
 	return assigned_ip
 #--------------------------------#
 #-------------------writing IP of VCM config to separate file---------#
-def write_cfg_file(cfg_file_name, configurations, nova):
+def write_cfg_file(cfg_file_name, configurations, nova, neutron):
 	ip_filename = ''
 	sgi_ip = ''
 	
@@ -433,3 +433,14 @@ def create_host_file(instance_list, instance_list2, configurations, nova):
 	target.write(str)
 	target.close()
 #============================================================================#
+
+#------------------getting port ip assigned via dhcp----------#
+def get_port_ip(portname, neutron):
+	p=neutron.list_ports()
+	for port in p['ports']:
+		if (port['name']== portname):
+			list=(port['fixed_ips'])
+			#print list[0]['ip_address']
+			return list[0]['ip_address']
+	return 'port-not-found'
+#-------------------------------------------------------#

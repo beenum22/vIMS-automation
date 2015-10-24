@@ -200,12 +200,7 @@ def del_networks(neutron, configurations, error_logger, logger_neutron):
 	clear_network(configurations['networks']['radius-name'], neutron, configurations, error_logger, logger_neutron)
 	
 	remove_interface(neutron, get_subnet_id(neutron, configurations['networks']['s6a-name']), router_id)
-	clear_network(configurations['networks']['s6a-name'], neutron, configurations, error_logger, logger_neutron)	
-	
-	remove_interface(neutron, get_subnet_id(neutron, configurations['networks']['net-int-name']), router_id)
-	clear_network(configurations['networks']['net-int-name'], neutron, configurations, error_logger, logger_neutron)
-	
-	delete_router(neutron, configurations['router']['name'])
+	clear_network(configurations['networks']['s6a-name'], neutron, configurations, error_logger, logger_neutron)
 	
 #==========================================================================================================================#
 

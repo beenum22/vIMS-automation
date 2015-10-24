@@ -99,15 +99,24 @@ def deploy_instance(vm_name, nova, f_path, neutron, configurations, avl_zone, er
 	net_name = configurations['networks']['net-int-name']
 	server = nova.servers.find(name=vm_name).addresses
 	private_ip = server[net_name][0]['addr']
-	while True:
+	
+	for i in range (0, 2):
 		try:
 			ins_ip = associate_ip(vm_name, nova, configurations['networks']['net-ext-name'], neutron, error_logger, logger_neutron, private_ip)
 			if ins_ip is not 'not-assigned': 
 				return ins_ip 
 		except:
 			print("[" + time.strftime("%H:%M:%S")+ "] Floating IP assignment error. Retrying...")
-			error_logger.exception("Unable to assign floating ip")
-			time.sleep(2)
+			error_logger.exception("Unable to assign floating ip using neutron client")
+		
+		time.sleep(4)
+		try:
+			return associate_ip_nova(vm_name = vm_name, nova = nova, net_ext=configurations['networks']['net-ext-name'], private_ip=private_ip)
+		except:
+			print("[" + time.strftime("%H:%M:%S")+ "] Floating IP assignment error. Retrying...")
+	
+	print("[" + time.strftime("%H:%M:%S")+ "] Floating IP assignment error. Please check logs...")
+	sys.exit()
 #-----------------------------------------------------------------------#
 # ======================= DEPLOY EMS INSTANCE AND ASSIGN NETWORK AND FLOATING IP TO IT ======================#
 def deploy_EMS(ems_name, nova, neutron, configurations, avl_zone, error_logger, logger_neutron, logger_nova):
@@ -147,6 +156,22 @@ def deploy_EMS(ems_name, nova, neutron, configurations, avl_zone, error_logger, 
 	net_name = configurations['networks']['net-int-name']
 	server = nova.servers.find(name=ems_name).addresses
 	private_ip = server[net_name][0]['addr']
+	
+	try:
+		ins_ip = associate_ip(ems_name, nova, configurations['networks']['net-ext-name'], neutron, error_logger, logger_neutron, private_ip)
+		if ins_ip is not 'not-assigned': 
+			return ins_ip 
+	except:
+		print("[" + time.strftime("%H:%M:%S")+ "] Floating IP assignment error. Retrying...")
+		error_logger.exception("Unable to assign floating ip using neutron client")
+		time.sleep(2)
+	
+	try:
+		return associate_ip_nova(vm_name = ems_name, nova = nova, net_ext=configurations['networks']['net-ext-name'], private_ip = private_ip)
+	except:
+		print("[" + time.strftime("%H:%M:%S")+ "] Floating IP assignment error. Please check logs...")
+		sys.exit()
+	'''
 	while True:
 		try:
 			return associate_ip(ems_name, nova, configurations['networks']['net-ext-name'], neutron, error_logger, logger_neutron, private_ip)
@@ -154,6 +179,7 @@ def deploy_EMS(ems_name, nova, neutron, configurations, avl_zone, error_logger, 
 			print("[" + time.strftime("%H:%M:%S")+ "] Floating IP assignment error. Retrying...")
 			error_logger.exception("Unable to assign Floating IP")
 			time.sleep(2)
+	'''
 	
 def get_port_device_id_by_ip(port_ip, neutron):
 	p=neutron.list_ports()
@@ -172,43 +198,8 @@ def is_server_exists(vm_name, nova, logger_nova):
 			server_exists = True
 			break
 	return server_exists
-def clear_instance(vm_name, nova, auto_delete, logger_nova):
-	if is_server_exists(vm_name, nova, logger_nova):
-		inp='yes'
-		if(auto_delete == 'no'):
-			inp = check_input(lambda x: x in ['yes', 'no'], ''+vm_name+' must be deleted to continue deployment. Delete? <yes/no> ')
-		if(inp == 'yes'):
-			delete_instance(vm_name=vm_name, nova=nova)
-		elif(inp == 'no'):
-			print("[" + time.strftime("%H:%M:%S")+ "] Aborting deployment...")
-			sys.exit()
-
-# Delete a VM named vm_name
-def delete_instance(vm_name, nova):
-	servers_list = nova.servers.list()
-	server_del = vm_name
-	server_exists = False
-	
-	for s in servers_list:
-	   if s.name == server_del:
-	       server_exists = True
-	       break
-	if server_exists:
-		nova.servers.delete(s)
-		print("[" + time.strftime("%H:%M:%S")+ "] Terminating "+vm_name+"...")
-		deleted = False
-		while not deleted:
-			deleted = True
-			for s in nova.servers.list():
-				if s.name == vm_name:
-					deleted = False
-					continue
-			time.sleep(1)
-		time.sleep(2)
-	else:
-	      print("[" + time.strftime("%H:%M:%S")+ "] Requested server not found")
-		  
-# Associate floating IP to server vm_name
+#==============================================================================#
+# Associate floating IP to server vm_name using neutron
 def associate_ip(vm_name, nova, net_ext, neutron, error_logger, logger_neutron, private_ip):
 	pool_id = get_network_id(net_ext,neutron)
 	param = {'floatingip': {'floating_network_id': pool_id}}
@@ -234,7 +225,23 @@ def associate_ip(vm_name, nova, net_ext, neutron, error_logger, logger_neutron, 
 	info_msg = "Successfully associated floating IP " + instance_ip + " to " + vm_name
 	logger_neutron.info(info_msg)
 	return instance_ip
-
+#==========================================================================================#
+# Associate floating IP to server vm_name using nova
+def associate_ip_nova(vm_name, nova, net_ext, private_ip):
+	ip_list = nova.floating_ips.list()
+	instance_ip = ''
+	# print ip_list
+	for item in ip_list:
+			if 'None' == str(item.fixed_ip):
+				instance_ip = item.ip
+				break
+	if instance_ip is '':
+		instance_ip = nova.floating_ips.create(pool=net_ext).ip
+	print "[" + time.strftime("%H:%M:%S")+ "] Assigned IP: <" + instance_ip + "> to "+vm_name
+	instance = nova.servers.find(name=vm_name)
+	instance.add_floating_ip(instance_ip, private_ip)
+	return instance_ip
+#=============================================================================================#
 # Check if server hostname can be pinged
 def check_ping(hostname, logger):
     response = os.system("ping -c 1 " + hostname+" > /dev/null 2>&1")
@@ -246,6 +253,7 @@ def check_ping(hostname, logger):
         pingstatus = "Network Error"
         logger.warning("Host is unreachable")
     return pingstatus
+#================================================#
 def check_ping_status(hostname, vm_name, logger):
 	time_sleeping = 0
 	info_msg = "Checking ping status of " + vm_name
