@@ -30,6 +30,12 @@ public class XMLParser {
 	}
 	private S1SignallingParams s1signallingParams = new S1SignallingParams();
 	
+	public class AuthenticationResponseParams{
+		public String EUTRANCGI;
+		public String TAI;
+	}
+	private AuthenticationResponseParams authenticationResponseParams = new AuthenticationResponseParams(); 
+	
 	private String eNBUES1APID;
 	private String TAI;
 	private String EUTRANCGI;
@@ -64,7 +70,10 @@ public class XMLParser {
 	public S1SignallingParams getS1signallingParams() {
 		return s1signallingParams;
 	}
-	
+	public AuthenticationResponseParams getAuthenticationResponseParams() {
+		return authenticationResponseParams;
+	}
+
 	public void readSimulationParameters()
 	{
 		try 
@@ -111,6 +120,11 @@ public class XMLParser {
 					s1signallingParams.eNBname = item.getChild("eNBname").getText();
 					s1signallingParams.SupportedTAs = item.getChild("SupportedTAs").getText();
 					s1signallingParams.DefaultPagingDRX = item.getChild("DefaultPagingDRX").getText();
+				}
+				if(item.getName().equals("AuthenticationResponseParams"))
+				{
+					authenticationResponseParams.EUTRANCGI = item.getChild("EUTRANCGI").getText();
+					authenticationResponseParams.TAI = item.getChild("TAI").getText();
 				}
 			//	System.out.println();        		
 			}

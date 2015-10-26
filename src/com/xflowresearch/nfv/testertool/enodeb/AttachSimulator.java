@@ -7,6 +7,14 @@ import com.xflowresearch.nfv.testertool.enodeb.s1mme.S1APPacket;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.SctpClient;
 import com.xflowresearch.nfv.testertool.ue.nas.AttachSeqDemo;
 
+/**
+ * AttachSimulator class to establish s1 signaling with
+ * MME and initiating the attach sequence for a UE with
+ * the MME..
+ * 
+ * @author Ahmad Arslan
+ *
+ */
 public class AttachSimulator {
 
 	private class Value{
@@ -29,46 +37,220 @@ public class AttachSimulator {
 		sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort()));
 	}
 
-	
-	
-	public void establishS1Signalling(XMLParser xmlparser)
+
+
+	/**
+	 * Establish S1Signalling with MME..
+	 * @param xmlparser
+	 */
+	public Boolean establishS1Signalling(XMLParser xmlparser)
 	{		
 		ArrayList<Value> values = new ArrayList<Value>();
 		values.add(new Value("GlobalENBID", "reject", xmlparser.getS1signallingParams().GlobalENBID));
 		values.add(new Value("eNBname", "ignore", xmlparser.getS1signallingParams().eNBname));
 		values.add(new Value("SupportedTAs", "reject", xmlparser.getS1signallingParams().SupportedTAs));
 		values.add(new Value("DefaultPagingDRX", "ignore", xmlparser.getS1signallingParams().DefaultPagingDRX));
-		
-		sendS1APacket("InitiatingMessage", "S1Setup", "reject", values);
-	}
-	
-	public void initiateAttachSequence(){
 
+		String reply =  sendS1APacket("InitiatingMessage", "S1Setup", "reject", values, true);
+
+		S1APPacket recievedPacket = new S1APPacket();
+		recievedPacket.parsePacket(reply);
+
+		if(recievedPacket.getType().equals("SuccessfulOutcome"))
+		{
+			return true;
+		}
+		else
+			return false;
 	}
 
-	public void sendInitialUEMessage(XMLParser xmlparser)
+
+	/**
+	 * The Attach Sequence is initiated in this
+	 * function..
+	 * @param xmlparser
+	 */
+	public void initiateAttachSequence(XMLParser xmlparser)
+	{
+		S1APPacket reply1 = sendAttachRequest(xmlparser);
+		if(reply1.getProcCode().equals("downlinkNASTransport") )
+		{
+			S1APPacket reply2 = sendAuthenticationResponse(xmlparser, reply1);
+			if(reply2.getProcCode().equals("downlinkNASTransport"))
+			{
+				S1APPacket reply3 = sendSecurityModeComplete(xmlparser, reply2);
+				if(reply3.getProcCode().equals("downlinkNASTransport"))
+				{
+					S1APPacket reply4 = sendESMInformationResponse(xmlparser, reply3);
+					if(reply4.getProcCode().equals("InitialContextSetup"))
+					{
+						sendInitialContextSetupResponse(xmlparser, reply4);
+						sendAttachComplete(xmlparser, reply4);
+					}
+					else
+						System.out.println("Attach(4) failure");
+				}
+				else
+					System.out.println("Attach(3) failure");
+			}
+			else
+				System.out.println("Attach(2) failure");
+		}
+		else{
+			System.out.println("Attach(1) failure");
+		}
+	}
+
+
+
+	/**
+	 * The first packet of the attach sequence, the Attach
+	 * Request is sent to the MME in this function..
+	 * @param xmlparser
+	 */
+	public S1APPacket sendAttachRequest(XMLParser xmlparser)
 	{
 		//////NAS packet Generation////////////////////////////
 		String AttachArguments ="08091132547698214305e0e000000000050202d011d1";
-
 		AttachSeqDemo obj = new AttachSeqDemo();
 		String NASPDU = obj.SendAttachPack(AttachArguments);
 		//////////////////////////////////
-		
+
 		ArrayList<Value> values = new ArrayList<Value>();
 		values.add(new Value("eNBUES1APID", "reject", xmlparser.geteNBUES1APID()));
 		values.add(new Value("NASPDU", "reject", NASPDU));
 		values.add(new Value("TAI", "reject", xmlparser.getTAI()));
 		values.add(new Value("EUTRANCGI", "ignore", xmlparser.getEUTRANCGI()));
 		values.add(new Value("RRCEstablishmentCause", "ignore", xmlparser.getRRCEstablishmentCause()));
-		
-		sendS1APacket("InitiatingMessage", "initialUEMessage", "ignore", values);
+
+		String reply = sendS1APacket("InitiatingMessage", "initialUEMessage", "ignore", values, true);
+
+		S1APPacket recievedPacket = new S1APPacket();
+		recievedPacket.parsePacket(reply);
+		return recievedPacket;
 	}
 
+	/**
+	 * The second packet of the attach sequence, the
+	 * Authentication Response is sent to the MME in this function..
+	 * @param xmlparser
+	 */
+	public S1APPacket sendAuthenticationResponse(XMLParser xmlparser, S1APPacket authenticationRequest){
 
-	public void sendS1APacket(String type, String procCode, 
-			String criticality, ArrayList<Value> values)
-	{
+		//NAS PDU GENERATION
+		String NASPDUInAuthenticationRequest = authenticationRequest.getValue("NASPDU");
+
+		//get the NAS response from the NAS classes!!
+		String NASPDU = "0b075308634f82417968ca98";
+		//////////////////////////////////
+
+		ArrayList<Value> values = new ArrayList<Value>();
+		values.add(new Value("MMEUES1APID", "reject", authenticationRequest.getValue("MMEUES1APID")));
+		values.add(new Value("eNBUES1APID", "reject", "0001"));                               //TODO change it to Dynamic!!!
+		values.add(new Value("NASPDU", "reject", NASPDU));
+		values.add(new Value("EUTRANCGI", "ignore", xmlparser.getAuthenticationResponseParams().EUTRANCGI));
+		values.add(new Value("TAI", "ignore", xmlparser.getAuthenticationResponseParams().TAI));
+
+		String reply = sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, true);
+
+		S1APPacket recievedPacket = new S1APPacket();
+		recievedPacket.parsePacket(reply);
+		return recievedPacket;
+	}
+
+	public S1APPacket sendSecurityModeComplete(XMLParser xmlparser, S1APPacket securityModeCommand){
+
+		//NAS PDU GENERATION
+		String NASPDUInSecurityModeCommand = securityModeCommand.getValue("NASPDU");
+
+		//get the NAS response from the NAS classes!!
+		String NASPDU = "08471136cdbe00075e";
+		//////////////////////////////////
+
+		ArrayList<Value> values = new ArrayList<Value>();
+		values.add(new Value("MMEUES1APID", "reject", securityModeCommand.getValue("MMEUES1APID")));
+		values.add(new Value("eNBUES1APID", "reject", securityModeCommand.getValue("eNBUES1APID")));                               //TODO change it to Dynamic!!!
+		values.add(new Value("NASPDU", "reject", NASPDU));
+		values.add(new Value("EUTRANCGI", "ignore", xmlparser.getAuthenticationResponseParams().EUTRANCGI));
+		values.add(new Value("TAI", "ignore", xmlparser.getAuthenticationResponseParams().TAI));
+
+		String reply = sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, true);
+
+		S1APPacket recievedPacket = new S1APPacket();
+		recievedPacket.parsePacket(reply);
+		return recievedPacket;
+	}
+
+	public S1APPacket sendESMInformationResponse(XMLParser xmlparser, S1APPacket esmInformationRequest){
+		//NAS PDU GENERATION
+		String NASPDUInESMInformationRequest = esmInformationRequest.getValue("NASPDU");
+
+		//get the NAS response from the NAS classes!!
+		String NASPDU = "1d270f6cfb77010202da28120561706e2d310769786961636f6d03636f6d";
+		//////////////////////////////////
+
+		ArrayList<Value> values = new ArrayList<Value>();
+		values.add(new Value("MMEUES1APID", "reject", esmInformationRequest.getValue("MMEUES1APID")));
+		values.add(new Value("eNBUES1APID", "reject", esmInformationRequest.getValue("eNBUES1APID")));                               //TODO change it to Dynamic!!!
+		values.add(new Value("NASPDU", "reject", NASPDU));
+		values.add(new Value("EUTRANCGI", "ignore", xmlparser.getAuthenticationResponseParams().EUTRANCGI));
+		values.add(new Value("TAI", "ignore", xmlparser.getAuthenticationResponseParams().TAI));
+
+		String reply = sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, true);
+
+		S1APPacket recievedPacket = new S1APPacket();
+		recievedPacket.parsePacket(reply);
+		return recievedPacket;
+	}
+
+	public void sendInitialContextSetupResponse(XMLParser xmlparser, S1APPacket initialContextSetupRequest){
+		//NAS PDU GENERATION
+		//String NASPDUInInitialContextSetupRequest = initialContextSetupRequest.getValue("NASPDU");
+
+		//get the NAS response from the NAS classes!!
+		//String NASPDU = "1d270f6cfb77010202da28120561706e2d310769786961636f6d03636f6d";
+		//////////////////////////////////
+
+		ArrayList<Value> values = new ArrayList<Value>();
+		values.add(new Value("MMEUES1APID", "reject", initialContextSetupRequest.getValue("MMEUES1APID")));
+		values.add(new Value("eNBUES1APID", "reject", initialContextSetupRequest.getValue("eNBUES1APID")));
+		values.add(new Value("ERABSetupListCtxtSURes", "ignore", "000032400a0a1fac11012800000021"));  //TODO: make dynamic!!
+
+		sendS1APacket("SuccessfulOutcome", "InitialContextSetup", "reject", values, false);
+	}
+
+	public void sendAttachComplete(XMLParser xmlparser, S1APPacket initialContextSetupRequest){
+		//NAS PDU GENERATION
+		//String NASPDUInInitialContextSetupRequest = initialContextSetupRequest.getValue("NASPDU");
+
+		//get the NAS response from the NAS classes!!
+		String NASPDU = "0d27cd3c638302074300035200c2";
+		//////////////////////////////////
+
+
+		ArrayList<Value> values = new ArrayList<Value>();
+		values.add(new Value("MMEUES1APID", "reject", initialContextSetupRequest.getValue("MMEUES1APID")));
+		values.add(new Value("eNBUES1APID", "reject", initialContextSetupRequest.getValue("eNBUES1APID")));
+		values.add(new Value("NASPDU", "reject", NASPDU));
+		values.add(new Value("EUTRANCGI", "ignore", xmlparser.getAuthenticationResponseParams().EUTRANCGI));
+		values.add(new Value("TAI", "ignore", xmlparser.getAuthenticationResponseParams().TAI));
+
+		sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, false);
+	}
+
+	/**
+	 * Function to generate send any sort of s1AP Packet, 
+	 * packet controlled by the input parameters.. The return
+	 * is the hex-encoded reply received from the MME..
+	 * @param type
+	 * @param procCode
+	 * @param criticality
+	 * @param values
+	 * @return reply
+	 */
+	public String sendS1APacket(String type, String procCode, 
+			String criticality, ArrayList<Value> values, Boolean recieve){
+
 		S1APPacket pac = new S1APPacket(type, procCode, criticality, values.size());
 
 		for(int i=0;i<values.size();i++)
@@ -81,7 +263,12 @@ public class AttachSimulator {
 		byte [] message = pac.getBytePacket();
 
 		sctpClient.sendProtocolPayload(message, 18);
-		sctpClient.recieveSCTPMessage();
+
+		if(recieve == true)
+		{
+			String reply =  sctpClient.recieveSCTPMessage();
+			return reply;
+		}
+		return null;
 	}
-	
 }

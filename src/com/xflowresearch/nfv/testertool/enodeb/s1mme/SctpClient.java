@@ -210,7 +210,7 @@ public class SctpClient {
 	
 	
 	////////////////////new method to recieve synchronous messages/////////////
-	public void recieveSCTPMessage(){
+	public String recieveSCTPMessage(){
 		final ByteBuffer byteBuffer = ByteBuffer.allocate(64000);
 		MessageInfo messageInfo = null;
 
@@ -227,8 +227,8 @@ public class SctpClient {
 		byteBuffer.get(data);
 
 		String hexPayload = bytesToHex(data);
-
-		handleMessageFromHost(messageInfo, hexPayload);
+		return hexPayload;
+		//handleMessageFromHost(messageInfo, hexPayload);
 		
 	}
 

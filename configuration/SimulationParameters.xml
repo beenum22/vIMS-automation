@@ -18,6 +18,11 @@
 		<DefaultPagingDRX>00</DefaultPagingDRX>
 	</S1SignallingParams>
 	
+	<AuthenticationResponseParams>
+		<EUTRANCGI>0010f13201388010</EUTRANCGI>
+		<TAI>0010f1321011</TAI>
+	</AuthenticationResponseParams>
+	
 	<UEParams>
 		<IMSI>1234</IMSI>
 		<IMEI>4567</IMEI>

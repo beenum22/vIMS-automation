@@ -53,7 +53,7 @@ public class S1APPacket
 			this.criticality = criticality;
 			this.lengthOfValue = lengthOfValue;
 			this.value = value;
-		}	
+		}
 	}
 	private ArrayList<Value> values = new ArrayList<Value>();
 
@@ -90,7 +90,14 @@ public class S1APPacket
 	public int getNumOfValues() {
 		return numOfValues;
 	}
-
+	public String getValue(String protocolIE){
+		for(int i=0;i<values.size();i++)
+		{
+			if(values.get(i).protocolIE.equals(protocolIE))
+				return values.get(i).value;
+		}
+		return null;
+	}
 
 
 	public void createPacket(){
@@ -170,7 +177,7 @@ public class S1APPacket
 	/** Functions to parse a packet **/
 	public void parsePacket(String packet)
 	{	
-		System.out.println("New S1AP Packet:");
+		//System.out.println("New S1AP Packet:");
 		header = packet.substring(0, 10);
 		
 		//parse fields from header..
@@ -190,21 +197,21 @@ public class S1APPacket
 			lengthOfValues = Integer.parseInt(header.substring(8, 10), 16);
 			value = packet.substring(10, packet.length());
 		}
-		System.out.println("type:"+type);
+		/*System.out.println("type:"+type);
 		System.out.println("procCode:"+procCode);
 		System.out.println("criticality:"+criticality);
-		System.out.println("lengthOfValues:"+lengthOfValues);
+		System.out.println("lengthOfValues:"+lengthOfValues);*/
 
 		//parse fields from value..
 		numOfValues = Integer.parseInt(value.substring(0, 6), 16);
 
 		int a = 6, b = 10;
 
-		System.out.println("numOfValues:"+numOfValues);
+		//System.out.println("numOfValues:"+numOfValues);
 
 		for(int i=0;i<numOfValues;i++)
 		{
-			System.out.println("\nItem_"+(i+1));
+			//System.out.println("\nItem_"+(i+1));
 			Value temp = new Value();
 			
 			temp.protocolIE = S1APDefinitions.IEDict.hexToIEDict(value.substring(a, b).substring(2, 4));
@@ -225,7 +232,7 @@ public class S1APPacket
 			temp.value = value.substring(a, b);
 			a = b; b += 4;
 
-			System.out.println("protocolIE:"+temp.protocolIE+"\ncriticality:"+temp.criticality+"\nlengthOfValue:"+temp.lengthOfValue+"\nvalue:"+temp.value);
+			//System.out.println("protocolIE:"+temp.protocolIE+"\ncriticality:"+temp.criticality+"\nlengthOfValue:"+temp.lengthOfValue+"\nvalue:"+temp.value);
 
 			values.add(temp);
 		}

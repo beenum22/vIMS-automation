@@ -41,13 +41,23 @@ public class eNodeB implements Runnable
 
 		/** Test Attach Sequence initiation **/
 		AttachSimulator as = new AttachSimulator(xmlparser);
+	
+		/**
+		 * establish s1 signalling with the MME
+		 */
+		if(as.establishS1Signalling(xmlparser)){
+			logger.info("S1Signalling established with MME");
+			
+			
+			/**
+			 * Start the attach sequence with the MME for a UE
+			 */
+			as.initiateAttachSequence(xmlparser);
+		}
+		else{
+			logger.error("Unable to establish S1Signalling with MME");
+		}
 		
-		as.establishS1Signalling(xmlparser);
-		
-		as.sendInitialUEMessage(xmlparser);
-		//as.sendS1SetupMessage(xmlparser);
-		
-//		/as.s1apTestPacket(xmlparser);
 	}
 
 
