@@ -22,17 +22,21 @@ import com.xflowresearch.nfv.testertool.simulationcontrol.SimulationControl;
  */
 public class XMLParser {
 	
+	public class S1SignallingParams{
+		public String GlobalENBID;
+		public String eNBname;
+		public String SupportedTAs;
+		public String DefaultPagingDRX;
+	}
+	private S1SignallingParams s1signallingParams = new S1SignallingParams();
+	
 	private String eNBUES1APID;
 	private String TAI;
 	private String EUTRANCGI;
 	private String RRCEstablishmentCause;
 	private String MMEIP;
 	private String MMEPort;
-	private String PLMN;
 	
-	public String getPLMN(){
-		return PLMN;
-	}
 	public String geteNBUES1APID() {
 		return eNBUES1APID;
 	}
@@ -56,7 +60,11 @@ public class XMLParser {
 	public String getMMEPort() {
 		return MMEPort;
 	}
-
+	
+	public S1SignallingParams getS1signallingParams() {
+		return s1signallingParams;
+	}
+	
 	public void readSimulationParameters()
 	{
 		try 
@@ -96,7 +104,13 @@ public class XMLParser {
 					//System.out.println("MNC: " + item.getChild("MNC").getText());
 					//System.out.println("MCC: "+ item.getChild("MCC").getText());
 					//System.out.println("MMEI: "+ item.getChild("MMEI").getText());
-					PLMN = item.getChild("PLMN").getText();
+				}
+				if(item.getName().equals("S1SignallingParams"))
+				{
+					s1signallingParams.GlobalENBID = item.getChild("GlobalENBID").getText();
+					s1signallingParams.eNBname = item.getChild("eNBname").getText();
+					s1signallingParams.SupportedTAs = item.getChild("SupportedTAs").getText();
+					s1signallingParams.DefaultPagingDRX = item.getChild("DefaultPagingDRX").getText();
 				}
 			//	System.out.println();        		
 			}

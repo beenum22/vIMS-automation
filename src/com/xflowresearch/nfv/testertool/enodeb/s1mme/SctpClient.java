@@ -29,8 +29,7 @@ public class SctpClient {
 	private SctpChannel sctpChannel;
 
 	/** Logger to log the messages and Errors **/
-	private static final Logger logger =
-			LoggerFactory.getLogger(SctpClient.class);
+	private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
 
 
 

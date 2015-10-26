@@ -40,11 +40,14 @@ public class eNodeB implements Runnable
 		logger.info("eNodeB started");
 
 		/** Test Attach Sequence initiation **/
-		AttachSimulator as = new AttachSimulator();
+		AttachSimulator as = new AttachSimulator(xmlparser);
 		
-		as.sendS1SetupMessage(xmlparser);
+		as.establishS1Signalling(xmlparser);
 		
-		as.s1apTestPacket(xmlparser);
+		as.sendInitialUEMessage(xmlparser);
+		//as.sendS1SetupMessage(xmlparser);
+		
+//		/as.s1apTestPacket(xmlparser);
 	}
 
 

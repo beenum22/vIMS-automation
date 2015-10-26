@@ -11,6 +11,13 @@
 		<MMEPort>36412</MMEPort>
 	</SimulationParams>
 	
+	<S1SignallingParams>
+		<GlobalENBID>0010f13200013880</GlobalENBID>
+		<eNBname>050049784c6f61642d654e4231</eNBname>
+		<SupportedTAs>0004044010f132</SupportedTAs>
+		<DefaultPagingDRX>00</DefaultPagingDRX>
+	</S1SignallingParams>
+	
 	<UEParams>
 		<IMSI>1234</IMSI>
 		<IMEI>4567</IMEI>
