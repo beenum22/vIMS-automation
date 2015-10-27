@@ -158,6 +158,14 @@ public class AttachSimulator {
 		return recievedPacket;
 	}
 
+	
+	
+	/**
+	 * The third packet of the attach sequence, the
+	 * SecurityModeComplete packet is sent to the MME 
+	 * in this function..
+	 * @param xmlparser
+	 */
 	public S1APPacket sendSecurityModeComplete(XMLParser xmlparser, S1APPacket securityModeCommand){
 
 		//NAS PDU GENERATION
@@ -181,6 +189,14 @@ public class AttachSimulator {
 		return recievedPacket;
 	}
 
+	
+	
+	/**
+	 * The fourth packet of the attach sequence, the
+	 * ESMInformationResponse is sent to the MME in 
+	 * this function..
+	 * @param xmlparser
+	 */
 	public S1APPacket sendESMInformationResponse(XMLParser xmlparser, S1APPacket esmInformationRequest){
 		//NAS PDU GENERATION
 		String NASPDUInESMInformationRequest = esmInformationRequest.getValue("NASPDU");
@@ -203,6 +219,13 @@ public class AttachSimulator {
 		return recievedPacket;
 	}
 
+	
+	/**
+	 * The fifth packet of the attach sequence, the
+	 * InitialContextSetupResponse is sent to the MME
+	 * in this function..
+	 * @param xmlparser
+	 */
 	public void sendInitialContextSetupResponse(XMLParser xmlparser, S1APPacket initialContextSetupRequest){
 		//NAS PDU GENERATION
 		//String NASPDUInInitialContextSetupRequest = initialContextSetupRequest.getValue("NASPDU");
@@ -219,6 +242,13 @@ public class AttachSimulator {
 		sendS1APacket("SuccessfulOutcome", "InitialContextSetup", "reject", values, false);
 	}
 
+	
+	/**
+	 * The sixth packet of the attach sequence, the
+	 * AttachComplete packet is sent to the MME in 
+	 * this function..
+	 * @param xmlparser
+	 */
 	public void sendAttachComplete(XMLParser xmlparser, S1APPacket initialContextSetupRequest){
 		//NAS PDU GENERATION
 		//String NASPDUInInitialContextSetupRequest = initialContextSetupRequest.getValue("NASPDU");
@@ -238,8 +268,9 @@ public class AttachSimulator {
 		sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, false);
 	}
 
+	
 	/**
-	 * Function to generate send any sort of s1AP Packet, 
+	 * Function to generate and send any sort of s1AP Packet, 
 	 * packet controlled by the input parameters.. The return
 	 * is the hex-encoded reply received from the MME..
 	 * @param type
