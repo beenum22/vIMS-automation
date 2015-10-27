@@ -8,6 +8,7 @@ from datetime import datetime
 import time
 
 #function for configuration input from creds.txt file
+PATH_IP_FILES = 'source/vEPC_deploy/ip_files/' 
 
 def input_configurations(error_logger, logger):
 	try:
@@ -30,6 +31,7 @@ def input_configurations(error_logger, logger):
 	for i in range(1, 10):
 		inp = file_read.readline()
 	
+	global PATH_IP_FILES
 	inp = file_read.readline()
 	inp = inp.split("\"")
 	configurations['os-creds']['os-authurl'] = inp[1]
@@ -67,6 +69,11 @@ def input_configurations(error_logger, logger):
 	(pool_start, pool_stop) = cal_ip_pool(name, cidr, logger)
 	configurations['networks']['s1c-pool-start'] = pool_start
 	configurations['networks']['s1c-pool-end'] = pool_stop
+	ip_file_read = open(PATH_IP_FILES + name + '_available_ips.txt', 'r')
+	available_ip = ip_file_read.readline()
+	available_ip = available_ip.rstrip("\n")
+	configurations['networks']['allowed-ip-s1c'] = available_ip
+	ip_file_read.close()
 
 	inp = file_read.readline()
 	inp = inp.split("\"")
@@ -76,6 +83,11 @@ def input_configurations(error_logger, logger):
 	(pool_start, pool_stop) = cal_ip_pool(name, cidr, logger)
 	configurations['networks']['s1u-pool-start'] = pool_start
 	configurations['networks']['s1u-pool-end'] = pool_stop
+	ip_file_read = open(PATH_IP_FILES + name + '_available_ips.txt', 'r')
+	available_ip = ip_file_read.readline()
+	available_ip = available_ip.rstrip("\n")
+	configurations['networks']['allowed-ip-s1u'] = available_ip
+	ip_file_read.close()
 	
 	inp = file_read.readline()
 	inp = inp.split("\"")
@@ -85,6 +97,14 @@ def input_configurations(error_logger, logger):
 	(pool_start, pool_stop) = cal_ip_pool(name, cidr, logger)
 	configurations['networks']['s6a-pool-start'] = pool_start
 	configurations['networks']['s6a-pool-end'] = pool_stop
+	ip_file_read = open(PATH_IP_FILES + name + '_available_ips.txt', 'r')
+	available_ip_1 = ip_file_read.readline()
+	available_ip_1 = available_ip.rstrip("\n")
+	available_ip_2 = ip_file_read.readline()
+	available_ip_2 = available_ip.rstrip("\n")
+	configurations['networks']['allowed-ip-s6a-1'] = available_ip_1
+	configurations['networks']['allowed-ip-s6a-2'] = available_ip_2
+	ip_file_read.close()
 	
 	inp = file_read.readline()
 	inp = inp.split("\"")
@@ -94,6 +114,11 @@ def input_configurations(error_logger, logger):
 	(pool_start, pool_stop) = cal_ip_pool(name, cidr,logger)
 	configurations['networks']['radius-pool-start'] = pool_start
 	configurations['networks']['radius-pool-end'] = pool_stop
+	ip_file_read = open(PATH_IP_FILES + name + '_available_ips.txt', 'r')
+	available_ip = ip_file_read.readline()
+	available_ip = available_ip.rstrip("\n")
+	configurations['networks']['allowed-ip-radius'] = available_ip
+	ip_file_read.close()
 	
 	inp = file_read.readline()
 	inp = inp.split("\"")
@@ -103,6 +128,12 @@ def input_configurations(error_logger, logger):
 	(pool_start, pool_stop) = cal_ip_pool(name, cidr, logger)
 	configurations['networks']['sgs-pool-start'] = pool_start
 	configurations['networks']['sgs-pool-end'] = pool_stop
+	ip_file_read = open(PATH_IP_FILES + name + '_available_ips.txt', 'r')
+	available_ip = ip_file_read.readline()
+	available_ip = available_ip.rstrip("\n")
+	configurations['networks']['allowed-ip-sgs'] = available_ip
+	ip_file_read.close()
+
 	
 	inp = file_read.readline()
 	inp = inp.split("\"")
@@ -112,6 +143,11 @@ def input_configurations(error_logger, logger):
 	(pool_start, pool_stop) = cal_ip_pool(name, cidr,logger)
 	configurations['networks']['sgi-pool-start'] = pool_start
 	configurations['networks']['sgi-pool-end'] = pool_stop
+	ip_file_read = open(PATH_IP_FILES + name + '_available_ips.txt', 'r')
+	available_ip = ip_file_read.readline()
+	available_ip = available_ip.rstrip("\n")
+	configurations['networks']['allowed-ip-sgi'] = available_ip
+	ip_file_read.close()
 
 	logger.info("Writing configurations from text file to configuration.json")
 	with open('configurations.json', 'w') as outfile:
@@ -182,7 +218,8 @@ def get_available_IP(net_addr, mask, logger):
 #===========================================#
 #=============write available IP list to file=========#
 def write_ip_file(list_ips, netname):
-	filename = 'source/vEPC_deploy/ip_files/' + netname + '_available_ips.txt'
+	global PATH_IP_FILES
+	filename = PATH_IP_FILES + netname + '_available_ips.txt'
 	target = open(filename, 'w')
 	target.write(list_ips)
 	target.close()

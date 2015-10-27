@@ -1,0 +1,7 @@
+This script should be executed for initial deployment of vEPC
+To execute the script, go into the vEPC directory in control node where you have copied the scripts and enter the following command:
+	$ python vEPC_deploy.py
+First the script checks if VCM and EMS images exist and if not creates both the images
+Then it checks if availability zones exists and if not creates availability zones on the basis of host-names of compute nodes and those zones will be added to host aggregate groups
+After that it starts creating Heat stack.
+After successful creation of heat-stack, configurations of VNFCs are started and status of VNFCs are displayed on CLI.

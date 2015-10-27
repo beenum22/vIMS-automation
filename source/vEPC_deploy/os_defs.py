@@ -16,8 +16,10 @@ FILE_PATH_VEM = 'source/vEPC_deploy/heat_templates/VCM_VEM.yaml'
 FILE_PATH_network = 'source/vEPC_deploy/heat_templates/network.yaml'
 FILE_PATH_router = 'source/vEPC_deploy/heat_templates/router.yaml'
 
+DIR_hostnames = 'source/vEPC_deploy/hostnames/'
 DIR_ip_files = 'ip_files/'
 DIR_IMG = '/root/IMGS/'
+
 #----------------------------------------------------------------------------------#
 def create_cluster(heat, cluster_name, configurations, logger_heat, error_logger):
 
@@ -311,23 +313,24 @@ def check_ping(hostname, logger):
         logger.warning("Host is unreachable")
     return pingstatus
 
-def check_ping_status(hostname, vm_name, logger):
+def check_ping_status(hostname, vm_name, logger, instance_id):
 	time_sleeping = 0
-	info_msg = "Checking ping status of " + vm_name
+	info_msg = "Checking ping status of " + vm_name + "-" + str(instance_id)
 	logger.info(info_msg)
 	while check_ping(hostname, logger) != 'Network Active':
 		if time_sleeping > 120:
 			print("[" + time.strftime("%H:%M:%S")+ "] Host unreachable, please check configuration. Exiting..")
 			logger.error("Host unreachable: exiting")
 			sys.exit()
-		print("[" + time.strftime("%H:%M:%S")+ "] " + vm_name + " booting up, please wait...")
+		print("[" + time.strftime("%H:%M:%S")+ "] " + vm_name + "-" + str(instance_id) + " booting up, please wait...")
 		logger.info("Waiting for VM to boot up")
 		time.sleep(5)
 		time_sleeping += 5
-	print("[" + time.strftime("%H:%M:%S")+ "] " + vm_name+" booted up!")
+	print("[" + time.strftime("%H:%M:%S")+ "] " + vm_name + "-" + str(instance_id) + " booted up!")
 
-def run_deploy_script(ssh,instance_obj,logger_ssh, instance_id):
-	print("[" + time.strftime("%H:%M:%S")+ "] Configuring " + instance_obj.name + "-" + str(instance_id))
+def run_deploy_script(ssh,instance_obj,logger_ssh, instance_id,error_logger):
+	print("[" + time.strftime("%H:%M:%S")+ "] Running deploy_script in " + instance_obj.name + "-" + str(instance_id))
+	print "\n"
 	while(True):
 		try:
 			info_msg = "Connecting to " + instance_obj.name
@@ -343,7 +346,7 @@ def run_deploy_script(ssh,instance_obj,logger_ssh, instance_id):
 	
 	info_msg = "Connected to " + instance_obj.name
 	logger_ssh.info(info_msg)
-	print("[" + time.strftime("%H:%M:%S")+ "] \t Running deploy_script..." )
+	#print("[" + time.strftime("%H:%M:%S")+ "] \t Running deploy_script..." )
 	
 	if instance_obj.name == 'UDB' or instance_obj.name == 'CDF':
 		internal_interface = 'eth1'
@@ -358,12 +361,15 @@ def run_deploy_script(ssh,instance_obj,logger_ssh, instance_id):
 	info_msg = "executing command: ./validate_deploy.sh"
 	logger_ssh.info(info_msg)
 	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('./validate_deploy.sh')
-	print("[" + time.strftime("%H:%M:%S")+ "] \t"+str(ssh_stdout.readlines()))
+	output = ssh_stdout.readlines()
+	print("[" + time.strftime("%H:%M:%S")+ "] \t"+(output[6]))
+	print("[" + time.strftime("%H:%M:%S")+ "] \t"+(output[8]))
 	
 	ssh.close()
 
-def start_vcm_service(ssh,instance_obj,logger_ssh):
-	print("[" + time.strftime("%H:%M:%S")+ "] Configuring " + instance_obj.name)
+def start_vcm_service(ssh,instance_obj,logger_ssh,instance_id, error_logger):
+	print("[" + time.strftime("%H:%M:%S")+ "] Starting VCM service in " + instance_obj.name + "-" + str(instance_id))
+	print "\n"
 	while(True):
 		try:
 			info_msg = "Connecting to " + instance_obj.name
@@ -383,12 +389,16 @@ def start_vcm_service(ssh,instance_obj,logger_ssh):
 	info_msg = "executing command: vcm-start"
 	logger_ssh.info(info_msg)
 	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("vcm-start")
-	print("[" + time.strftime("%H:%M:%S")+ "] \t"+str(ssh_stdout.readlines()))
+	ssh_stdout.readlines()
+	time.sleep(2)
+	#print("[" + time.strftime("%H:%M:%S")+ "] \t"+str(ssh_stdout.readlines()))
 	
 	info_msg = "executing command: ./validate_deploy.sh"
 	logger_ssh.info(info_msg)
 	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('./validate_deploy.sh')
-	print("[" + time.strftime("%H:%M:%S")+ "] \t"+str(ssh_stdout.readlines()))
+	output = ssh_stdout.readlines()
+	print("[" + time.strftime("%H:%M:%S")+ "] \t"+(output[10]))
+	print("[" + time.strftime("%H:%M:%S")+ "] \t"+(output[13]))
 
 	ssh.close()
 
@@ -418,4 +428,42 @@ def source_config(ssh, logger_ssh):
 	send_command(chan, 'configure\n', '(configure)# ', logger_ssh)
 	# Source config file and wait for a prompt again.
 	send_command(chan, 'source Dell-VCM.cfg\n', '(configure)# ', logger_ssh)
+	ssh.close()
+
+def hostname_config(ssh, ip, vm_name, file_name, REMOTE_PATH_HOSTNAME, error_logger, logger_ssh):
+	print( "[" + time.strftime("%H:%M:%S")+ "] Host-name configuration for " + vm_name)
+	info_msg = "Starting Host-name configuration for " + vm_name
+	logger_ssh.info(info_msg)
+	while(True):
+		try:
+			info_msg = "Connecting to " + vm_name
+			logger_ssh.info(info_msg)
+			ssh.connect(ip, username='root', password='root123')
+			break
+		except:
+			print("[" + time.strftime("%H:%M:%S")+ "] "+vm_name + " not ready for SSH waiting...")
+			error_msg = vm_name + " not ready for SSH "
+			logger_ssh.warning(error_msg)
+			error_logger.exception(error_msg)
+			time.sleep(5)
+	info_msg = "Connected to " + vm_name
+	logger_ssh.info(info_msg)
+	print( "[" + time.strftime("%H:%M:%S")+ "] \t Copying host-name file..." )
+	logger_ssh.info("Openning SFTP session")
+	sftp = ssh.open_sftp()
+	logger_ssh.info("Copying files")
+	sftp.put(DIR_hostnames + "host_" + file_name, REMOTE_PATH_HOSTNAME)
+
+	if(vm_name == 'VCM-EMS'):
+		sftp.put(DIR_hostnames + "ems.txt", "/etc/hosts")
+		print("[" + time.strftime("%H:%M:%S")+ "] Rebooting EMS to allow host-name changes to take effect")
+		time.sleep(5)
+		#ssh.exec_command("reboot")
+	logger_ssh.info("Successfully Copied files")
+	sftp.close()
+	info_msg = vm_name + "Successfully configured"
+	logger_ssh.info(info_msg)
+	logger_ssh.info("Rebooting VM")
+	print( "[" + time.strftime("%H:%M:%S")+ "] Successfully configured, now rebooting VM " )
+	ssh.exec_command("reboot")
 	ssh.close()

@@ -1,0 +1,7 @@
+This script terminates the initial deployment of vEPC including stack, availability zones and images (on user requirement).
+
+To execute the script, go into the vEPC directory in control node where you have copied the scripts and enter the following command:
+	$ python vEPC_termination.py
+
+This script prompts the user if he/she wants to delete aggregate groups and based on the input (yes/no) performs the required action
+In the end it prompts the user to delete VCM and EMS images and if user selects yes it deletes the images.

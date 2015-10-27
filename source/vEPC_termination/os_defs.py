@@ -10,7 +10,7 @@ def get_configurations(logger, error_logger):
 		logger.info("Getting configurations from file")
 		file = open('configurations.json')
 	except:
-		print "configuration.json: file not found"
+		print("[" + time.strftime("%H:%M:%S")+ "] configuration.json: file not found")
 		error_logger.exception("configuration.json: file not found")
 		sys.exit()
 	configurations = json.load(file)
@@ -33,12 +33,15 @@ def get_nova_creds(configurations):
 	d['version'] = "1.1"
 	return d
 
-def delete_cluster(heat,cluster_full_name):
+def delete_cluster(heat,cluster_full_name, logger_heat, error_logger):
 	try:
+		logger_heat.info("Deleting heat stack")
+		print("[" + time.strftime("%H:%M:%S")+ "] Removing heat stack")
 		heat.stacks.delete(cluster_full_name)
-		print('Removing heat stack')
 	except:
-		print ("Unable to find Heat-stack to be deleted..")
+		print("[" + time.strftime("%H:%M:%S")+ "] Unable to find Heat-stack to be deleted..")
+		error_logger.exception("Unable to find Heat-stack to be deleted")
+		sys.exit()
 
 #----check if image exists-----#
 def image_exists(glance, img_name, error_logger, logger_glance):

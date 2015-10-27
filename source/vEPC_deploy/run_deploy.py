@@ -21,10 +21,16 @@ from novaclient import client
 #----------------------------------#
 
 # global variables
-STACK_NAME = "vEPC_test"
+STACK_NAME = "vEPC"
 name_list = ['VEM', 'SDB', 'CPE', 'CDF', 'UDB', 'DPE', 'RIF']
+
+file_list = ['vem1.txt', 'sdb1.txt', 'cpe1.txt', 'cdf1.txt', 'udb1.txt', 'dpe1.txt', 'rif1.txt']
+file_list2 = ['vem2.txt', 'sdb2.txt', 'cpe2.txt', 'cdf2.txt', 'udb2.txt', 'dpe2.txt', 'rif2.txt']
+
 LOCAL_PATH_DELL_CFG = "Dell-VCM.cfg"
 REMOTE_PATH_DELL_CFG = "/opt/VCM/config/Dell-VCM.cfg"
+
+REMOTE_PATH_HOSTNAME = "/etc/sysconfig/network"
 
 print ("[" + time.strftime("%H:%M:%S")+ "] Start time")
 #------------------ logging configurations ------------------#
@@ -125,40 +131,42 @@ except:
 	print ("[" + time.strftime("%H:%M:%S")+ "] Error creating heat client")
 	sys.exit()
 
-#create_cluster(heatclient,STACK_NAME, configurations, logger_heat, error_logger)
+create_cluster(heatclient,STACK_NAME, configurations, logger_heat, error_logger)
 
 cluster_details=heatclient.stacks.get(STACK_NAME)
 while(cluster_details.status!= 'COMPLETE'):
 	time.sleep(30)
 	if cluster_details.status == 'IN_PROGRESS':
-		print('Stack Creation in progress..')
+		print ("[" + time.strftime("%H:%M:%S")+ "] Please wait, Stack creation in progress")
 	cluster_details=heatclient.stacks.get(STACK_NAME)
 	if cluster_details.status == 'FAILED':
-		print('Stack Creation failed')
+		print ("[" + time.strftime("%H:%M:%S")+ "] Stack Creation failed")
 		sys.exit()
-print cluster_details.outputs
-print ("[" + time.strftime("%H:%M:%S")+ "] Stack created at time")
+
+print ("[" + time.strftime("%H:%M:%S")+ "] Stack creation completed\n")
+#print cluster_details.outputs
 #--------------------- getting IPs from heat client --------------------#
 for vm_name in name_list:
 	vm_ip = get_instance_floatingip(heatclient, cluster_details, vm_name)
 	instance_obj = InstanceObj(vm_name, vm_ip)
 	instance_list.append(instance_obj)
-	print vm_ip
+	#print vm_ip
 	
 for vm_name in name_list:
 	vm_name2 = vm_name + "_2"
 	vm_ip = get_instance_floatingip(heatclient, cluster_details, vm_name2)
 	instance_obj = InstanceObj(vm_name, vm_ip)
 	instance_list2.append(instance_obj)
-	print vm_ip
+	#print vm_ip
 
 #--------------------- Checking ping status --------------------#
 for i in range(0, 7):
-	check_ping_status(instance_list[i].ip, instance_list[i].name, logger)
+	instance_id = 1
+	check_ping_status(instance_list[i].ip, instance_list[i].name, logger, instance_id)
 for i in range(0, 7):
-	check_ping_status(instance_list2[i].ip, instance_list2[i].name, logger)
+	instance_id = 2
+	check_ping_status(instance_list2[i].ip, instance_list2[i].name, logger, instance_id)
 
-print ("[" + time.strftime("%H:%M:%S")+ "] Ping Status-end script")
 #--------------------- paramiko client creation --------------------#
 
 logger_ssh.info("Getting authorized client of paramiko")
@@ -170,20 +178,20 @@ except:
 	print("[" + time.strftime("%H:%M:%S")+ "] Error creating paramiko client")
 	sys.exit()
 
-print "waiting for VMs to boot up"
+print("[" + time.strftime("%H:%M:%S")+ "] waiting for VMs to boot up")
 time.sleep(30)
-
 
 #--------------------- VCM Configurations --------------------#
 for i in range(0, 7):
 	instance_id = 1
-	run_deploy_script(ssh,instance_list[i],logger_ssh, instance_id)
+	run_deploy_script(ssh,instance_list[i],logger_ssh, instance_id, error_logger)
+for i in range(0, 7):
 	instance_id = 2
-	run_deploy_script(ssh,instance_list2[i],logger_ssh, instance_id)
+	run_deploy_script(ssh,instance_list2[i],logger_ssh, instance_id, error_logger)
 
 #starting vcm service on VEM-1 and SDB-1
-start_vcm_service(ssh,instance_list[0],logger_ssh)
-start_vcm_service(ssh,instance_list[1],logger_ssh)
+start_vcm_service(ssh,instance_list[0],logger_ssh,1, error_logger)
+start_vcm_service(ssh,instance_list[1],logger_ssh,1, error_logger)
 
 #VEM-1 configurations
 info_msg = "Connecting to " + instance_list[0].name
@@ -199,8 +207,15 @@ sftp_client.put(LOCAL_PATH_DELL_CFG, REMOTE_PATH_DELL_CFG)
 source_config(ssh, logger_ssh)
 ssh.close()
 
-#--------------------- VCM service start --------------------#
+#VCM service start#
 for i in range(2, 7):
-	start_vcm_service(ssh,instance_list[i],logger_ssh)
+	instance_id = 1
+	start_vcm_service(ssh,instance_list[i],logger_ssh, instance_id, error_logger)
 for i in range(0, 7):
-	start_vcm_service(ssh,instance_list2[i],logger_ssh)
+	instance_id = 2
+	start_vcm_service(ssh,instance_list2[i],logger_ssh, instance_id, error_logger)
+
+for i in range(0, 7):
+	hostname_config(ssh, instance_list[i].ip, instance_list[i].name, file_list[i], REMOTE_PATH_HOSTNAME, error_logger, logger_ssh)
+for i in range(0, 7):
+	hostname_config(ssh, instance_list2[i].ip, instance_list2[i].name, file_list2[i], REMOTE_PATH_HOSTNAME, error_logger, logger_ssh)

@@ -16,17 +16,18 @@ from novaclient import client
 #----------------------------------#
 
 # global variables
-STACK_NAME = "vEPC_test"
+STACK_NAME = "vEPC"
 
 #------------------ logging configurations ------------------#
 now = datetime.datetime.now()
 date_time = now.strftime("%Y-%m-%d_%H-%M")
-filename_activity = 'logs/deploy_' + date_time + '.log'
-filename_error = 'logs/deploy_error_' + date_time + '.log'
+filename_activity = 'logs/termination_' + date_time + '.log'
+filename_error = 'logs/termination_error_' + date_time + '.log'
 
 logging.basicConfig(filename=filename_activity, level=logging.INFO, filemode='w', format='%(asctime)s %(levelname)-8s %(name)-23s [-]  %(message)s')
 
 logger=logging.getLogger(__name__)
+logger_heat=logging.getLogger('HEAT')
 logger_nova=logging.getLogger('nova')
 logger_neutron=logging.getLogger('neutron')
 logger_glance = logging.getLogger('glance')
@@ -97,7 +98,7 @@ except:
 	print ("[" + time.strftime("%H:%M:%S")+ "] Error creating nova client")
 	sys.exit()
 #--------------------- delete heat stack --------------------#
-delete_cluster(heatclient,STACK_NAME)
+delete_cluster(heatclient,STACK_NAME, logger_heat, error_logger)
 
 #------------------ delete aggregate gorups ------------------#
 while True:
@@ -140,9 +141,9 @@ while(True):
 		print ("[" + time.strftime("%H:%M:%S")+ "] Unable to get stack details")
 		break
 	if cluster_details.status == 'IN_PROGRESS':
-		print('Stack Deletion in progress..')
+		print ("[" + time.strftime("%H:%M:%S")+ "] Stack Deletion in progress..")
 	elif cluster_details.status == 'FAILED':
-		print('Stack Deletion failed')
+		print ("[" + time.strftime("%H:%M:%S")+ "] Stack Deletion in Failed \n deleting again")
 		delete_cluster(heatclient,STACK_NAME)
 	elif cluster_details.status == 'COMPLETE':
 		break
