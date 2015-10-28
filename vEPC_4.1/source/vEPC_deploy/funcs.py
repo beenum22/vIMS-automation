@@ -15,7 +15,6 @@ import time
 from os_defs import *
 from consts import *
 from file_defs import *
-from vcm_defs import *
 #==========================================#
 
 # ======================= PROMPT INPUT AND CREDENTIALS FUNCTIONS =====================#
@@ -37,3 +36,4 @@ def take_input(prompt, def_val):
 		return def_val
 	else:
 		return inp
+#==================================================================================#

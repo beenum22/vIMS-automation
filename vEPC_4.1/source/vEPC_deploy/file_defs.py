@@ -1,4 +1,4 @@
-#------------python lib imports-----------#
+#================python lib imports================#
 import os
 import time
 import select
@@ -10,33 +10,34 @@ import json
 import logging
 import datetime
 import time
-#-----------------------------------------#
-#-------------functions import-------------#
+#=========================================#
+#================functions import================#
 from os_defs import *
 from consts import *
 from funcs import *
-from vcm_defs import *
-#-----------------------------------------#
+#===========================================#
 
-#function for configuration input from creds.txt file
+#=========function for input from creds.txt file to configurations.json file and Dell-VCM.cfg file===========#
 def input_configurations(error_logger, logger):
+	#opening configurations.json file
 	try:
 		json_file = open('configurations.json')
 	except:
-         print "configuration.json: file not found"
+         print("configuration.json: file not found")
          error_logger.exception("configuration.json: file not found")
          sys.exit()
 	
 	configurations = json.load(json_file)
-	
+	#open creds.txt file
 	try:
 		logger.info("Getting credentials from file")
 		file_read = open('creds.txt')
 	except:
-		print "creds.txt: file not found"
+		print("creds.txt: file not found")
 		error_logger.exception("creds.txt: file not found")
 		sys.exit()
 	
+	#read creds.txt file and write the parameters to json file
 	for i in range(1, 10):
 		inp = file_read.readline()
 	inp = file_read.readline()
@@ -91,7 +92,7 @@ def input_configurations(error_logger, logger):
 	try:
 		param_file_write = open('source/vEPC_deploy/ip_files/range_nexthop.txt', 'w')
 	except:
-		print "source/vEPC_deploy/ip_files/range_nexthop.txt: file not found"
+		print("source/vEPC_deploy/ip_files/range_nexthop.txt: file not found")
 		error_logger.exception("source/vEPC_deploy/ip_files/range_nexthop.txt: file not found")
 		#sys.exit()
 	inp = file_read.readline()
@@ -107,7 +108,7 @@ def input_configurations(error_logger, logger):
 	param_file_write.close()
 	
 	file_read.close()
-#--------------------------------------------------------#
+#============================================================#
 
 # get configurations from json file
 def get_configurations(logger, error_logger):
@@ -115,14 +116,14 @@ def get_configurations(logger, error_logger):
 		logger.info("Getting configurations from file")
 		file = open('configurations.json')
 	except:
-		print "configuration.json: file not found"
+		print("configuration.json: file not found")
 		error_logger.exception("configuration.json: file not found")
 		sys.exit()
 	configurations = json.load(file)
 	file.close()
 	return configurations
-#-------------------------------------#
-#===========calculate IP pool============#
+#============================================================#
+#===========calculate IP pool for creating networks============#
 def cal_ip_pool(netname, cidr, configurations):
 	
 	net_addr = calculate_subnet_address('network_add', cidr)
@@ -141,11 +142,11 @@ def cal_ip_pool(netname, cidr, configurations):
 		print("Please enter cidr value less than or equal to 27 ... e.g. 10.1.1.0/27")
 		sys.exit()
 	if (netname == configurations['networks']['net-int-name']):
-		ip_pool_start = net_addr[0] +'.' + net_addr[1] +'.' + net_addr[2] +'.' + str(int(net_addr[3]) + 2)
-		ip_pool_end = net_addr[0] +'.' + net_addr[1] +'.' + net_addr[2] +'.' + str(int(net_addr[3]) + 254)
+		ip_pool_start = net_addr[0] + '.' + net_addr[1] + '.' + net_addr[2] + '.' + str(int(net_addr[3]) + 2)
+		ip_pool_end = net_addr[0] + '.' + net_addr[1] + '.' + net_addr[2] + '.' + str(int(net_addr[3]) + 254)
 	else:
-		ip_pool_start = net_addr[0] +'.' + net_addr[1] +'.' + net_addr[2] +'.' + str(int(net_addr[3]) + 4)
-		ip_pool_end = net_addr[0] +'.' + net_addr[1] +'.' + net_addr[2] +'.' + str(int(net_addr[3]) + 21)
+		ip_pool_start = net_addr[0] + '.' + net_addr[1] + '.' + net_addr[2] + '.' + str(int(net_addr[3]) + 4)
+		ip_pool_end = net_addr[0] + '.' + net_addr[1] + '.' + net_addr[2] + '.' + str(int(net_addr[3]) + 21)
 		list_ips = get_available_IP(net_address, mask[3])
 		write_ip_file(list_ips, netname)
 	
@@ -160,14 +161,12 @@ def get_available_IP(net_addr, mask):
 	net_addr = net_addr.split(".")
 	netw_addr = net_addr[0] + '.' + net_addr[1] + '.' + net_addr[2] + '.'
 	rng = 255 - int(mask)
-	#max_ip = 255 - mask - 20
 	pool = int(net_addr[3]) + 22
 	for i in range (pool, rng):
 		ip = netw_addr + str(i)
 		list_ips = list_ips + ip + '\n'
 	
 	return list_ips
-
 #===========================================#
 #=============write available IP list to file=========#
 def write_ip_file(list_ips, netname):
@@ -176,7 +175,7 @@ def write_ip_file(list_ips, netname):
 	target.write(list_ips)
 	target.close()
 #=======================================================#
-#-------------------calculate subnet mask---------------#
+#============calculate subnet mask=================#
 def calculate_subnet_address(name, net_cidr):
 	(addrString, cidrString) = net_cidr.split('/')
 	addr = addrString.split('.')
@@ -196,7 +195,8 @@ def calculate_subnet_address(name, net_cidr):
 	if name == 'network_add':
 		return ".".join(map(str, net))
 
-#-------------------------------------------------------------------#
+#=======================================================#
+#not using the following code in new configurations
 '''
 #--------create availaible IPs file-------#
 def create_IP_file(netname, configurations, logger):
@@ -231,15 +231,15 @@ def create_IP_file(netname, configurations, logger):
 	logger.info("Done creating IP file for " + netname + " ...")
 #-----------------------------------#
 '''
-#------- getting available IP for DELL VCM config file-----#
+#=============== getting available IP for DELL VCM config file ===========#
 def get_IP_from_file(f_name):
 	
 	filename = ''
 	
-	if (f_name == 's1'):
-		filename = 'source/vEPC_deploy/ip_files/s1_available_ips.txt'
-	elif (f_name == 'sgi'):
-		filename = 'source/vEPC_deploy/ip_files/sgi_available_ips.txt'
+	if (f_name == 'S1C'):
+		filename = 'source/vEPC_deploy/ip_files/S1C_available_ips.txt'
+	elif (f_name == 'SGi'):
+		filename = 'source/vEPC_deploy/ip_files/SGi_available_ips.txt'
 
 	file_read = open(filename, 'r')
 	assigned_ip = file_read.readline()
@@ -259,16 +259,16 @@ def get_IP_from_file(f_name):
 	file_write.close()
 	
 	return assigned_ip
-#--------------------------------#
-#-------------------writing IP of VCM config to separate file---------#
+#=======================================================#
+#=========writing IP of VCM config to separate file==============#
 def write_cfg_file(cfg_file_name, configurations, nova, neutron):
 	ip_filename = ''
 	sgi_ip = ''
 	
-	s1_ip_filename = 'source/vEPC_deploy/ip_files/s1c_assigned_ips.txt'
-	sgi_ip_filename = 'source/vEPC_deploy/ip_files/sgi_assigned_ips.txt'
+	s1c_ip_filename = 'source/vEPC_deploy/ip_files/S1C_assigned_ips.txt'
+	sgi_ip_filename = 'source/vEPC_deploy/ip_files/SGi_assigned_ips.txt'
 	
-	s1_ip_file = open(s1_ip_filename, 'a')
+	s1c_ip_file = open(s1c_ip_filename, 'a')
 	sgi_ip_file = open(sgi_ip_filename, 'a')
 		
 	param_file_read = open('source/vEPC_deploy/ip_files/range_nexthop.txt', 'r')
@@ -281,7 +281,7 @@ def write_cfg_file(cfg_file_name, configurations, nova, neutron):
 	
 	net_name = configurations['networks']['net-int-name']
 	ems_name = configurations['vcm-cfg']['ems-vm-name']
-	server = nova.servers.find(name=ems_name).addresses
+	server = nova.servers.find(name = ems_name).addresses
 	ems_private_ip = server[net_name][0]['addr']
 	
 	for line in vcm_cfg_file_read:
@@ -305,19 +305,19 @@ def write_cfg_file(cfg_file_name, configurations, nova, neutron):
 			mme_ip = get_port_ip("s1c_to_rif1", neutron)
 			new_line = "bind s1-mme ipv4-address " + mme_ip + " mask " + s1c_cidr[1] + " interface eth1\n"
 			vcm_cfg_file_write.write(new_line)
-			s1_ip_file.write(new_line)
+			s1c_ip_file.write(new_line)
 		
 		elif line.startswith("gtpu bind s1u-sgw"):
-			assigned_ip = get_IP_from_file('s1')
+			assigned_ip = get_IP_from_file('S1C')
 			assigned_ip = assigned_ip.replace('\n', '')
-			new_line = "gtpu bind s1u-sgw " + assigned_ip + " mask " + s1_cidr[1] + " interface eth1\n"
+			new_line = "gtpu bind s1u-sgw " + assigned_ip + " mask " + s1c_cidr[1] + " interface eth1\n"
 			vcm_cfg_file_write.write(new_line)
-			s1_ip_file.write(new_line)
+			s1c_ip_file.write(new_line)
 		
 		elif line.startswith("sgi-endpoint bind"):
 			sgi_cidr = str(configurations['networks']['sgi-cidr'])
 			sgi_cidr = sgi_cidr.split("/")
-			sgi_ip = get_IP_from_file('sgi')
+			sgi_ip = get_IP_from_file('SGi')
 			sgi_ip = sgi_ip.replace('\n', '')
 			new_line = "sgi-endpoint bind " + sgi_ip + " mask " + sgi_cidr[1] + " interface eth2\n"
 			vcm_cfg_file_write.write(new_line)
@@ -332,26 +332,26 @@ def write_cfg_file(cfg_file_name, configurations, nova, neutron):
 	
 	vcm_cfg_file_write.close()
 	
-	s1_ip_file.close()
+	s1c_ip_file.close()
 	sgi_ip_file.close()
 	
 	param_file_read.close()
 #=============================================================#
-#-------------get assigned IP from file to update port ------#
+#============get assigned IP from file to update port=================#
 def get_assigned_IP_from_file(f_name, error_logger):
 	file_name = ''
 	
-	if f_name == 's1':
-		file_name = 'source/vEPC_deploy/ip_files/s1_assigned_ips.txt'
-	elif f_name == 'sgi':
-		file_name = 'source/vEPC_deploy/ip_files/sgi_assigned_ips.txt'
+	if f_name == 'S1C':
+		file_name = 'source/vEPC_deploy/ip_files/S1C_assigned_ips.txt'
+	elif f_name == 'SGi':
+		file_name = 'source/vEPC_deploy/ip_files/SGi_assigned_ips.txt'
 	try:
 		file_read = open(file_name, 'r')
 	except:
 		error_msg = file_name + ": File not found"
 		error_logger.exception()
 	
-	if f_name == 's1':
+	if f_name == 'S1C':
 		s1_mme = file_read.readline()
 		s1_mme = s1_mme.split(" ")
 		s1_u = file_read.readline()
@@ -359,34 +359,34 @@ def get_assigned_IP_from_file(f_name, error_logger):
 		
 		return (s1_mme[3], s1_u[3])
 	
-	elif f_name == 'sgi':
+	elif f_name == 'SGi':
 		sgi = file_read.readline()
 		sgi = sgi.split(" ")
 		return sgi[2]
 	file_reade.close()
 #=============================================================#
-#------------ vcm mme start edit based on mme ip------#
+#=================vcm mme start edit based on mme ip ===============#
 def mme_file_edit(configurations, neutron, logger):
 	logger.info("editing mme file")
 	file_name = 'source/vEPC_deploy/vcm-mme-start'
 	file_str = open(file_name, 'r').readlines()
 	file_write = open(file_name, 'w')
 	
-	s1_cidr = configurations['networks']['s1c-cidr']
-	s1_cidr = s1_cidr.split("/")
+	s1c_cidr = configurations['networks']['s1c-cidr']
+	s1c_cidr = s1c_cidr.split("/")
 	
 	mme_ip = get_port_ip("s1c_to_rif1", neutron)
 	
 	for line in file_str:
 		if line.startswith("ifconfig eth1:1"):
-			new_line = "ifconfig eth1:1 " + mme_ip + "/" + s1_cidr[1] + " -arp\n"
+			new_line = "ifconfig eth1:1 " + mme_ip + "/" + s1c_cidr[1] # + " -arp\n"
 			file_write.write(new_line)
 		else:
 			file_write.write(line)
 	logger.info("Successfully edited mme file")
 	file_write.close()
 #=============================================================#
-#--------------create EMS hosts file -----------#
+#=============create EMS hosts file===================#
 def create_EMS_hostsfile(configurations, nova):
 
 	filename = 'source/vEPC_deploy/hostnames/ems.txt'
@@ -394,7 +394,7 @@ def create_EMS_hostsfile(configurations, nova):
 	
 	ems_name = configurations['vcm-cfg']['ems-vm-name']
 
-	server = nova.servers.find(name=ems_name).addresses
+	server = nova.servers.find(name = ems_name).addresses
 	private_ip_string = server[net_name][0]['addr'] + "		EMS"
 	public_ip_string = server[net_name][1]['addr'] + "		EMS"
 
@@ -406,6 +406,7 @@ def create_EMS_hostsfile(configurations, nova):
 	str += "::1         localhost localhost.localdomain localhost6 localhost6.localdomain6\n"
 	target.write(str)
 	target.close()
+#=====================================================================#
 #================create /etc/hosts file containing all VCM VMs info===============#
 def create_host_file(instance_list, instance_list2, configurations, nova):
 	
@@ -413,17 +414,17 @@ def create_host_file(instance_list, instance_list2, configurations, nova):
 	net_name = configurations['networks']['net-int-name']
 	
 	for i in range(0, 7):
-		server = nova.servers.find(name=instance_list[i].name).addresses
+		server = nova.servers.find(name = instance_list[i].name).addresses
 		str = str + server[net_name][0]['addr'] + "	" + instance_list[i].name + '\n'
 		str = str + server[net_name][1]['addr'] + "	" + instance_list[i].name + '\n'
 	
 	for i in range(0, 7):
-		server = nova.servers.find(name=instance_list2[i].name).addresses
+		server = nova.servers.find(name = instance_list2[i].name).addresses
 		str = str + server[net_name][0]['addr'] + "	" + instance_list2[i].name + '\n'
 		str = str + server[net_name][1]['addr'] + "	" + instance_list2[i].name + '\n'
 	
 	ems_name = configurations['vcm-cfg']['ems-vm-name']
-	server = nova.servers.find(name=ems_name).addresses
+	server = nova.servers.find(name = ems_name).addresses
 	str = str + server[net_name][0]['addr'] + "	" + ems_name + '\n'
 	str = str + server[net_name][1]['addr'] + "	" + ems_name + '\n'
 	
@@ -434,13 +435,12 @@ def create_host_file(instance_list, instance_list2, configurations, nova):
 	target.close()
 #============================================================================#
 
-#------------------getting port ip assigned via dhcp----------#
+#=============getting port ip assigned via dhcp================#
 def get_port_ip(portname, neutron):
-	p=neutron.list_ports()
+	p = neutron.list_ports()
 	for port in p['ports']:
 		if (port['name']== portname):
-			list=(port['fixed_ips'])
-			#print list[0]['ip_address']
+			list = (port['fixed_ips'])
 			return list[0]['ip_address']
 	return 'port-not-found'
-#-------------------------------------------------------#
+#============================================================================#

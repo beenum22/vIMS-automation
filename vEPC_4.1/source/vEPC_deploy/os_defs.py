@@ -15,68 +15,66 @@ import time
 from consts import *
 from file_defs import *
 from funcs import *
-from vcm_defs import *
 #-----------------------------------------#
 #-----------------------------------------#
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< NOVA FUNCTIONS>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # ======================= DEPLOY A VCM COMPONENT INSTANCE AND ASSIGN NETWORKS AND FLOATING IP TO IT ======================#
 
 def deploy_instance(vm_name, nova, f_path, neutron, configurations, avl_zone, error_logger, logger_nova, logger_neutron):
-	info_msg = "Deploying "+vm_name
+	info_msg = "Deploying " + vm_name
 	logger_nova.info(info_msg)
 	logger_nova.info("Finding Image for instance")
-	image = nova.images.find(name=configurations['vcm-cfg']['vcm-img-name'])
+	image = nova.images.find(name = configurations['vcm-cfg']['vcm-img-name'])
 	logger_nova.info("Finding flavour for instance")
-	flavor = nova.flavors.find(name="m1.medium")
+	flavor = nova.flavors.find(name = "m1.medium")
 	# DPE = SGi, S1 --- RIF = S1
-	net_id_int = get_network_id(netname=configurations['networks']['net-int-name'], neutron = neutron)
-	print("[" + time.strftime("%H:%M:%S")+ "] Deploying "+vm_name+"...")
+	net_id_int = get_network_id(netname = configurations['networks']['net-int-name'], neutron = neutron)
+	print("[" + time.strftime("%H:%M:%S") + "] Deploying " + vm_name + "...")
 	cloud_file = open("source/vEPC_deploy/at/cloud-config/" + f_path)
 	try:
 		if "DPE-1" in vm_name:
-			instance = nova.servers.create(userdata = cloud_file, name=vm_name, image=image,
-						flavor=flavor, nics=[{'port-id':get_port_id('s1u_to_dpe1', neutron)}, 
-												{'port-id':get_port_id('sgi_to_dpe1', neutron)}, 
-												{'net-id':net_id_int}],
-						availability_zone=avl_zone)
+			instance = nova.servers.create(userdata = cloud_file, name = vm_name, image = image,
+											flavor = flavor, nics = [{'port-id':get_port_id('s1u_to_dpe1', neutron)}, 
+											{'port-id':get_port_id('sgi_to_dpe1', neutron)}, 
+											{'net-id':net_id_int}], availability_zone = avl_zone)
 		elif "RIF-1" in vm_name:
-			instance = nova.servers.create(userdata = cloud_file, name=vm_name, image=image, 
-						flavor=flavor, nics=[ {'port-id':get_port_id('s1c_to_rif1', neutron)},
-						{'port-id':get_port_id('sgs_to_rif1', neutron)}, {'net-id':net_id_int},], 
-						availability_zone=avl_zone)
+			instance = nova.servers.create(userdata = cloud_file, name = vm_name, image = image, 
+											flavor = flavor, nics = [ {'port-id':get_port_id('s1c_to_rif1', neutron)},
+											{'port-id':get_port_id('sgs_to_rif1', neutron)}, {'net-id':net_id_int},], 
+											availability_zone = avl_zone)
 		elif "DPE-2" in vm_name:
-			instance = nova.servers.create(userdata = cloud_file, name=vm_name, image=image,
-						flavor=flavor, nics=[ {'port-id':get_port_id('s1u_to_dpe2', neutron)},
-										{'port-id':get_port_id('sgi_to_dpe2', neutron)}, {'net-id':net_id_int}], 
-						availability_zone=avl_zone)
+			instance = nova.servers.create(userdata = cloud_file, name = vm_name, image = image,
+											flavor = flavor, nics = [ {'port-id':get_port_id('s1u_to_dpe2', neutron)},
+											{'port-id':get_port_id('sgi_to_dpe2', neutron)}, {'net-id':net_id_int}], 
+											availability_zone = avl_zone)
 		elif "RIF-2" in vm_name:
-			instance = nova.servers.create(userdata = cloud_file, name=vm_name, image=image, 
-						flavor=flavor, nics=[{'port-id':get_port_id('s1c_to_rif2', neutron)},
-						{'port-id':get_port_id('sgs_to_rif2', neutron)}, {'net-id':net_id_int}], 
-						availability_zone=avl_zone)
+			instance = nova.servers.create(userdata = cloud_file, name = vm_name, image = image, 
+											flavor = flavor, nics = [{'port-id':get_port_id('s1c_to_rif2', neutron)},
+											{'port-id':get_port_id('sgs_to_rif2', neutron)}, {'net-id':net_id_int}], 
+											availability_zone = avl_zone)
 		elif "UDB-1" in vm_name:
-			instance = nova.servers.create(userdata = cloud_file, name=vm_name, image=image, 
-						flavor=flavor, nics=[{'port-id':get_port_id('s6a_to_udb1', neutron)}, {'net-id':net_id_int}], 
-						availability_zone=avl_zone)
+			instance = nova.servers.create(userdata = cloud_file, name = vm_name, image = image, 
+											flavor = flavor, nics = [{'port-id':get_port_id('s6a_to_udb1', neutron)}, 
+											{'net-id':net_id_int}], availability_zone = avl_zone)
 		elif "UDB-2" in vm_name:
-			instance = nova.servers.create(userdata = cloud_file, name=vm_name, image=image, 
-						flavor=flavor, nics=[{'port-id':get_port_id('s6a_to_udb2', neutron)}, {'net-id':net_id_int}], 
-						availability_zone=avl_zone)
+			instance = nova.servers.create(userdata = cloud_file, name = vm_name, image = image, 
+											flavor = flavor, nics = [{'port-id':get_port_id('s6a_to_udb2', neutron)}, 
+											{'net-id':net_id_int}], availability_zone = avl_zone)
 		elif "CDF-1" in vm_name:
-			instance = nova.servers.create(userdata = cloud_file, name=vm_name, image=image, 
-						flavor=flavor, nics=[{'port-id':get_port_id('radius_to_cdf1', neutron)}, {'net-id':net_id_int}], 
-						availability_zone=avl_zone)
+			instance = nova.servers.create(userdata = cloud_file, name = vm_name, image = image, 
+											flavor = flavor, nics = [{'port-id':get_port_id('radius_to_cdf1', neutron)}, 
+											{'net-id':net_id_int}], availability_zone = avl_zone)
 		elif "CDF-2" in vm_name:
-			instance = nova.servers.create(userdata = cloud_file, name=vm_name, image=image, 
-						flavor=flavor, nics=[{'port-id':get_port_id('radius_to_cdf2', neutron)}, {'net-id':net_id_int}], 
-						availability_zone=avl_zone)
+			instance = nova.servers.create(userdata = cloud_file, name = vm_name, image = image, 
+											flavor = flavor, nics = [{'port-id':get_port_id('radius_to_cdf2', neutron)}, 
+											{'net-id':net_id_int}], availability_zone=avl_zone)
 		else:
-			instance = nova.servers.create(userdata = cloud_file, name=vm_name, image=image, 
-						flavor=flavor, nics=[{'net-id':net_id_int}], availability_zone=avl_zone)
+			instance = nova.servers.create(userdata = cloud_file, name = vm_name, image = image, 
+											flavor = flavor, nics = [{'net-id':net_id_int}], availability_zone = avl_zone)
 	except:
 		error_msg = "Unable to create instance " + vm_name
 		error_logger.exception(error_msg)
-		print("[" + time.strftime("%H:%M:%S")+ "] Error occurred while deploying VM please check logs...")
+		print("[" + time.strftime("%H:%M:%S") + "] Error occurred while deploying VM please check logs...")
 		sys.exit()
 	# Poll at 5 second intervals, until the status is no longer 'BUILD'
 	status = instance.status
@@ -86,10 +84,10 @@ def deploy_instance(vm_name, nova, f_path, neutron, configurations, avl_zone, er
 		instance = nova.servers.get(instance.id)
 		status = instance.status
 	cloud_file.close()
-	print "[" + time.strftime("%H:%M:%S")+ "] Status: %s" % status
+	print("[" + time.strftime("%H:%M:%S") + "] Status: %s" % status)
 	time.sleep(2)
 	if(status == 'ERROR'):
-		print("[" + time.strftime("%H:%M:%S")+ "] Error occurred while deploying VM please check logs...")
+		print("[" + time.strftime("%H:%M:%S") + "] Error occurred while deploying VM please check logs...")
 		error_msg = "Unable to Create instance " + vm_name
 		error_logger.error(error_msg)
 		fault = instance.fault
@@ -97,21 +95,23 @@ def deploy_instance(vm_name, nova, f_path, neutron, configurations, avl_zone, er
 		error_logger.error(fault)
 		sys.exit()
 	net_name = configurations['networks']['net-int-name']
-	server = nova.servers.find(name=vm_name).addresses
+	server = nova.servers.find(name = vm_name).addresses
 	private_ip = server[net_name][0]['addr']
 	
 	for i in range (0, 2):
 		try:
-			ins_ip = associate_ip(vm_name, nova, configurations['networks']['net-ext-name'], neutron, error_logger, logger_neutron, private_ip)
+			ins_ip = associate_ip(vm_name, nova, configurations['networks']['net-ext-name'], 
+									neutron, error_logger, logger_neutron, private_ip)
 			if ins_ip is not 'not-assigned': 
 				return ins_ip 
 		except:
-			print("[" + time.strftime("%H:%M:%S")+ "] Floating IP assignment error. Retrying...")
+			print("[" + time.strftime("%H:%M:%S") + "] Floating IP assignment error. Retrying...")
 			error_logger.exception("Unable to assign floating ip using neutron client")
 		
 		time.sleep(4)
 		try:
-			return associate_ip_nova(vm_name = vm_name, nova = nova, net_ext=configurations['networks']['net-ext-name'], private_ip=private_ip)
+			return associate_ip_nova(vm_name = vm_name, nova = nova, 
+										net_ext = configurations['networks']['net-ext-name'], private_ip = private_ip)
 		except:
 			print("[" + time.strftime("%H:%M:%S")+ "] Floating IP assignment error. Retrying...")
 	
@@ -122,14 +122,15 @@ def deploy_instance(vm_name, nova, f_path, neutron, configurations, avl_zone, er
 def deploy_EMS(ems_name, nova, neutron, configurations, avl_zone, error_logger, logger_neutron, logger_nova):
 	
 	logger_nova.info("Finding Image for instance")
-	image = nova.images.find(name=configurations['vcm-cfg']['ems-img-name'])
+	image = nova.images.find(name = configurations['vcm-cfg']['ems-img-name'])
 	logger_nova.info("Finding flavour for instance")
-	flavor = nova.flavors.find(name="m1.large")
+	flavor = nova.flavors.find(name = "m1.large")
 	# DPE = SGi, S1 --- RIF = S1
-	net_id_int = get_network_id(netname=configurations['networks']['net-int-name'], neutron = neutron)
-	print("[" + time.strftime("%H:%M:%S")+ "] Deploying " + configurations['vcm-cfg']['ems-vm-name'] + "...")
+	net_id_int = get_network_id(netname = configurations['networks']['net-int-name'], neutron = neutron)
+	print("[" + time.strftime("%H:%M:%S") + "] Deploying " + configurations['vcm-cfg']['ems-vm-name'] + "...")
 	try:
-		instance = nova.servers.create(name=ems_name, image=image, flavor=flavor, nics=[{'net-id':net_id_int}], availability_zone=avl_zone)
+		instance = nova.servers.create(name = ems_name, image = image, flavor = flavor, 
+										nics = [{'net-id':net_id_int}], availability_zone = avl_zone)
 	except:
 		error_msg = "Unable to create instance " + ems_name
 		error_logger.exception(error_msg)
@@ -141,10 +142,10 @@ def deploy_EMS(ems_name, nova, neutron, configurations, avl_zone, error_logger, 
 		# Retrieve the instance again so the status field updates
 		instance = nova.servers.get(instance.id)
 		status = instance.status
-	print "[" + time.strftime("%H:%M:%S")+ "] Status: %s" % status
+	print("[" + time.strftime("%H:%M:%S") + "] Status: %s" % status)
 	time.sleep(2)
 	if(status == 'ERROR'):
-		print("[" + time.strftime("%H:%M:%S")+ "] Error occurred while deploying EMS please check logs")
+		print("[" + time.strftime("%H:%M:%S") + "] Error occurred while deploying EMS please check logs")
 		error_msg = "Unable to creating instance " + ems_name
 		error_logger.error(error_msg)
 		fault = instance.fault
@@ -154,41 +155,38 @@ def deploy_EMS(ems_name, nova, neutron, configurations, avl_zone, error_logger, 
 	info_msg = "Successfully deployed " + ems_name
 	logger_nova.info(info_msg)
 	net_name = configurations['networks']['net-int-name']
-	server = nova.servers.find(name=ems_name).addresses
+	server = nova.servers.find(name = ems_name).addresses
 	private_ip = server[net_name][0]['addr']
 	
-	try:
-		ins_ip = associate_ip(ems_name, nova, configurations['networks']['net-ext-name'], neutron, error_logger, logger_neutron, private_ip)
-		if ins_ip is not 'not-assigned': 
-			return ins_ip 
-	except:
-		print("[" + time.strftime("%H:%M:%S")+ "] Floating IP assignment error. Retrying...")
-		error_logger.exception("Unable to assign floating ip using neutron client")
-		time.sleep(2)
-	
-	try:
-		return associate_ip_nova(vm_name = ems_name, nova = nova, net_ext=configurations['networks']['net-ext-name'], private_ip = private_ip)
-	except:
-		print("[" + time.strftime("%H:%M:%S")+ "] Floating IP assignment error. Please check logs...")
-		sys.exit()
-	'''
-	while True:
+	for i in range (0, 2):
 		try:
-			return associate_ip(ems_name, nova, configurations['networks']['net-ext-name'], neutron, error_logger, logger_neutron, private_ip)
+			ins_ip = associate_ip(ems_name, nova, configurations['networks']['net-ext-name'], 
+								neutron, error_logger, logger_neutron, private_ip)
+			if ins_ip is not 'not-assigned': 
+				return ins_ip 
 		except:
-			print("[" + time.strftime("%H:%M:%S")+ "] Floating IP assignment error. Retrying...")
-			error_logger.exception("Unable to assign Floating IP")
-			time.sleep(2)
-	'''
+			print("[" + time.strftime("%H:%M:%S") + "] Floating IP assignment error. Retrying...")
+			error_logger.exception("Unable to assign floating ip using neutron client")
+		
+		time.sleep(4)
+		try:
+			return associate_ip_nova(vm_name = ems_name, nova = nova, 
+								net_ext = configurations['networks']['net-ext-name'], private_ip = private_ip)
+		except:
+			print("[" + time.strftime("%H:%M:%S") + "] Floating IP assignment error. Retrying...")
 	
+	print("[" + time.strftime("%H:%M:%S") + "] Floating IP assignment error. Please check logs...")
+	sys.exit()
+
+#==== get device id of port using ip=====#	
 def get_port_device_id_by_ip(port_ip, neutron):
-	p=neutron.list_ports()
+	p = neutron.list_ports()
 	for port in p['ports']:
 		if port['fixed_ips'][0]['ip_address'] == port_ip:
 			return port['device_id']
 	return 'port-not-found'
-
-	
+#=========================================#
+#========= check if server exists =========#
 def is_server_exists(vm_name, nova, logger_nova):
 	server_exists = False
 	for item in nova.servers.list():
@@ -198,7 +196,7 @@ def is_server_exists(vm_name, nova, logger_nova):
 			server_exists = True
 			break
 	return server_exists
-#==============================================================================#
+#========================================#
 # Associate floating IP to server vm_name using neutron
 def associate_ip(vm_name, nova, net_ext, neutron, error_logger, logger_neutron, private_ip):
 	pool_id = get_network_id(net_ext,neutron)
@@ -210,12 +208,12 @@ def associate_ip(vm_name, nova, net_ext, neutron, error_logger, logger_neutron, 
 		error_logger.exception("Unable to Create floating IP from pool")
 		sys.exit()
 	instance_ip = floating_ip['floatingip']['floating_ip_address']
-	instance = nova.servers.find(name=vm_name)
+	instance = nova.servers.find(name = vm_name)
 	info_msg = "Associating floating IP " + instance_ip + " to " + vm_name
 	logger_neutron.info(info_msg)
 	try:
 		instance.add_floating_ip(instance_ip, private_ip)
-		print "[" + time.strftime("%H:%M:%S")+ "] Assigned IP: <" + instance_ip + "> to "+vm_name
+		print "[" + time.strftime("%H:%M:%S") + "] Assigned IP: <" + instance_ip + "> to "+vm_name
 	except:
 		floating_ip_id = get_port_device_id_by_ip(instance_ip, neutron)
 		neutron.delete_floatingip(floating_ip_id)
@@ -236,15 +234,15 @@ def associate_ip_nova(vm_name, nova, net_ext, private_ip):
 				instance_ip = item.ip
 				break
 	if instance_ip is '':
-		instance_ip = nova.floating_ips.create(pool=net_ext).ip
-	print "[" + time.strftime("%H:%M:%S")+ "] Assigned IP: <" + instance_ip + "> to "+vm_name
-	instance = nova.servers.find(name=vm_name)
+		instance_ip = nova.floating_ips.create(pool = net_ext).ip
+	print "[" + time.strftime("%H:%M:%S") + "] Assigned IP: <" + instance_ip + "> to " + vm_name
+	instance = nova.servers.find(name = vm_name)
 	instance.add_floating_ip(instance_ip, private_ip)
 	return instance_ip
 #=============================================================================================#
 # Check if server hostname can be pinged
 def check_ping(hostname, logger):
-    response = os.system("ping -c 1 " + hostname+" > /dev/null 2>&1")
+    response = os.system("ping -c 1 " + hostname +" > /dev/null 2>&1")
     # and then check the response...
     if response == 0:
         pingstatus = "Network Active"
@@ -260,17 +258,17 @@ def check_ping_status(hostname, vm_name, logger):
 	logger.info(info_msg)
 	while check_ping(hostname, logger) != 'Network Active':
 		if time_sleeping > 120:
-			print("[" + time.strftime("%H:%M:%S")+ "] Host unreachable, please check configuration. Exiting..")
+			print("[" + time.strftime("%H:%M:%S") + "] Host unreachable, please check configuration. Exiting..")
 			logger.error("Host unreachable: exiting")
 			sys.exit()
 		print("[" + time.strftime("%H:%M:%S")+ "] " + vm_name + " booting up, please wait...")
 		logger.info("Waiting for VM to boot up")
 		time.sleep(5)
 		time_sleeping += 5
-	print("[" + time.strftime("%H:%M:%S")+ "] " + vm_name+" booted up!")
+	print("[" + time.strftime("%H:%M:%S")+ "] " + vm_name +" booted up!")
 
 #================= copying hostname file in VMs =================#
-def hostname_config(ssh, cmp_name, ip, vm_name, file_name, REMOTE_PATH_HOSTNAME, error_logger, logger_ssh):
+def hostname_config(ssh, cmp_name, ip, vm_name, file_name, remote_path_hostname, error_logger, logger_ssh):
 	print( "[" + time.strftime("%H:%M:%S")+ "] Host-name configuration for " + vm_name)
 	info_msg = "Starting Host-name configuration for " + vm_name
 	logger_ssh.info(info_msg)
@@ -278,10 +276,10 @@ def hostname_config(ssh, cmp_name, ip, vm_name, file_name, REMOTE_PATH_HOSTNAME,
 		try:
 			info_msg = "Connecting to " + vm_name
 			logger_ssh.info(info_msg)
-			ssh.connect(ip, username='root', password='root123')
+			ssh.connect(ip, username = 'root', password = 'root123')
 			break
 		except:
-			print("[" + time.strftime("%H:%M:%S")+ "] "+vm_name + " not ready for SSH waiting...")
+			print("[" + time.strftime("%H:%M:%S") + "] " + vm_name + " not ready for SSH waiting...")
 			
 			error_msg = vm_name + " not ready for SSH "
 			logger_ssh.warning(error_msg)
@@ -289,15 +287,15 @@ def hostname_config(ssh, cmp_name, ip, vm_name, file_name, REMOTE_PATH_HOSTNAME,
 			time.sleep(5)
 	info_msg = "Connected to " + vm_name
 	logger_ssh.info(info_msg)
-	print( "[" + time.strftime("%H:%M:%S")+ "] \t Copying host-name file..." )
+	print("[" + time.strftime("%H:%M:%S") + "] \t Copying host-name file...")
 	logger_ssh.info("Openning SFTP session")
 	sftp = ssh.open_sftp()
 	logger_ssh.info("Copying files")
-	sftp.put("source/vEPC_deploy/hostnames/host_"+file_name, REMOTE_PATH_HOSTNAME)
+	sftp.put("source/vEPC_deploy/hostnames/host_" + file_name, remote_path_hostname)
 	
 	if(vm_name == 'EMS'):
 		sftp.put("source/vEPC_deploy/hostnames/ems.txt", "/etc/hosts")
-		print("[" + time.strftime("%H:%M:%S")+ "] Rebooting EMS to allow host-name changes to take effect")
+		print("[" + time.strftime("%H:%M:%S") + "] Rebooting EMS to allow host-name changes to take effect...")
 	else:
 		sftp.put("source/vEPC_deploy/hostnames/hosts.txt", "/etc/hosts")
 	logger_ssh.info("Successfully Copied hostname files")
@@ -308,17 +306,17 @@ def hostname_config(ssh, cmp_name, ip, vm_name, file_name, REMOTE_PATH_HOSTNAME,
 	ssh.exec_command("reboot")
 	ssh.close()
 #======================================================================================#
-
+#======== start vcm service =========#
 def vcm_start(ssh, ip, name, logger_ssh):
 	info_msg = "Connecting to " + name
 	logger_ssh.info(info_msg)
-	ssh.connect(ip, username='root', password='root123')
+	ssh.connect(ip, username = 'root', password = 'root123')
 	logger_ssh.info("Successfully connected")
 	logger_ssh.info("Starting opensafd service")
-	print("[" + time.strftime("%H:%M:%S")+ "] Starting VCM services on %s..." % name)
+	print("[" + time.strftime("%H:%M:%S") + "] Starting VCM services on %s..." % name)
 	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('service opensafd start')
 	logger_ssh.info("Started opensafd service")
-	print("[" + time.strftime("%H:%M:%S")+ "] \t"+ssh_stdout.readlines()[0])
+	print("[" + time.strftime("%H:%M:%S")+ "] \t" + ssh_stdout.readlines()[0])
 	ssh.close()
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< NEUTRON FUNCTIONS>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # Fetch network ID of network netname
@@ -329,22 +327,24 @@ def get_network_id(netname, neutron):
 			# print(net['id'])
 			return net['id']
 	return 'net-not-found'
+#==================================#
 # Fetch port ID
 def get_port_id(portname, neutron):
-	p=neutron.list_ports()
+	p = neutron.list_ports()
 	for port in p['ports']:
-		if (port['name']== portname):
+		if (port['name'] == portname):
 			return port['id']
 	return 'port-not-found'
-
+#==================================#
 # Fetch subnet ID
 def get_subnet_id(subname, neutron):
-	sn=neutron.list_subnets()
+	sn = neutron.list_subnets()
 	for subnet in sn['subnets']:
-		if (subnet['name']== subname):
+		if (subnet['name'] == subname):
 			return subnet['id']
 	return 'subnet-not-found'
-
+#==================================#
+#=======delete network if already exist======#
 def clear_network(network_name, neutron, configurations):
 	
 	if(network_name == configurations['networks']['s1c-name']):
@@ -352,70 +352,71 @@ def clear_network(network_name, neutron, configurations):
 		s1c_to_rif2 = get_port_id('s1c_to_rif2', neutron)
 		if(s1c_to_rif1 != 'port-not-found'):
 			neutron.delete_port(s1c_to_rif1)
-			print("[" + time.strftime("%H:%M:%S")+ "] Port s1c_to_rif1 deleted.")
+			print("[" + time.strftime("%H:%M:%S") + "] Port s1c_to_rif1 deleted.")
 		if(s1c_to_rif2 != 'port-not-found'):
 			neutron.delete_port(s1c_to_rif2)
-			print("[" + time.strftime("%H:%M:%S")+ "] Port s1c_to_rif2 deleted.")
+			print("[" + time.strftime("%H:%M:%S") + "] Port s1c_to_rif2 deleted.")
 	
 	elif(network_name == configurations['networks']['s1u-name']):
 		s1u_to_dpe1 = get_port_id('s1u_to_dpe1', neutron)
 		s1u_to_dpe2 = get_port_id('s1u_to_dpe2', neutron)
 		if(s1u_to_dpe1 != 'port-not-found'):
 			neutron.delete_port(s1u_to_dpe1)
-			print("[" + time.strftime("%H:%M:%S")+ "] Port s1u_to_dpe1 deleted.")
+			print("[" + time.strftime("%H:%M:%S") + "] Port s1u_to_dpe1 deleted.")
 		if(s1u_to_dpe2 != 'port-not-found'):
 			neutron.delete_port(s1u_to_dpe2)
-			print("[" + time.strftime("%H:%M:%S")+ "] Port s1u_to_dpe2 deleted.")
+			print("[" + time.strftime("%H:%M:%S") + "] Port s1u_to_dpe2 deleted.")
 	
 	elif(network_name == configurations['networks']['s6a-name']):
 		s6a_to_udb1 = get_port_id('s6a_to_udb1', neutron)
 		s6a_to_udb2 = get_port_id('s6a_to_udb2', neutron)
 		if(s6a_to_udb1 != 'port-not-found'):
 			neutron.delete_port(s6a_to_udb1)
-			print("[" + time.strftime("%H:%M:%S")+ "] Port s6a_to_udb1 deleted.")
+			print("[" + time.strftime("%H:%M:%S") + "] Port s6a_to_udb1 deleted.")
 		if(s6a_to_udb2 != 'port-not-found'):
 			neutron.delete_port(s6a_to_udb2)
-			print("[" + time.strftime("%H:%M:%S")+ "] Port s6a_to_udb2 deleted.")
+			print("[" + time.strftime("%H:%M:%S") + "] Port s6a_to_udb2 deleted.")
 	
 	elif(network_name == configurations['networks']['radius-name']):
 		radius_to_cdf1 = get_port_id('radius_to_cdf1', neutron)
 		radius_to_cdf2 = get_port_id('radius_to_cdf2', neutron)
 		if(radius_to_cdf1 != 'port-not-found'):
 			neutron.delete_port(radius_to_cdf1)
-			print("[" + time.strftime("%H:%M:%S")+ "] Port radius_to_cdf1 deleted.")
+			print("[" + time.strftime("%H:%M:%S") + "] Port radius_to_cdf1 deleted.")
 		if(radius_to_cdf2 != 'port-not-found'):
 			neutron.delete_port(radius_to_cdf2)
-			print("[" + time.strftime("%H:%M:%S")+ "] Port radius_to_cdf2 deleted.")
+			print("[" + time.strftime("%H:%M:%S") + "] Port radius_to_cdf2 deleted.")
 	
 	elif(network_name == configurations['networks']['sgs-name']):
 		sgs_to_rif1 = get_port_id('sgs_to_rif1', neutron)
 		sgs_to_rif2 = get_port_id('sgs_to_rif2', neutron)
 		if(sgs_to_rif1 != 'port-not-found'):
 			neutron.delete_port(sgs_to_rif1)
-			print("[" + time.strftime("%H:%M:%S")+ "] Port sgs_to_rif1 deleted.")
+			print("[" + time.strftime("%H:%M:%S") + "] Port sgs_to_rif1 deleted.")
 		if(sgs_to_rif2 != 'port-not-found'):
 			neutron.delete_port(sgs_to_rif2)
-			print("[" + time.strftime("%H:%M:%S")+ "] Port sgs_to_rif2 deleted.")
+			print("[" + time.strftime("%H:%M:%S") + "] Port sgs_to_rif2 deleted.")
 	
 	elif(network_name == configurations['networks']['sgi-name']):
 		sgi_to_dpe1 = get_port_id('sgi_to_dpe1', neutron)
 		sgi_to_dpe2 = get_port_id('sgi_to_dpe2', neutron)
 		if(sgi_to_dpe1 != 'port-not-found'):
 			neutron.delete_port(sgi_to_dpe1)
-			print("[" + time.strftime("%H:%M:%S")+ "] Port sgi_to_dpe1 deleted.")
+			print("[" + time.strftime("%H:%M:%S") + "] Port sgi_to_dpe1 deleted.")
 		if(sgi_to_dpe2 != 'port-not-found'):
 			neutron.delete_port(sgi_to_dpe2)
-			print("[" + time.strftime("%H:%M:%S")+ "] Port sgi_to_dpe2 deleted.")
+			print("[" + time.strftime("%H:%M:%S") + "] Port sgi_to_dpe2 deleted.")
 	
 	neutron.delete_network(get_network_id(network_name, neutron))
-	print("[" + time.strftime("%H:%M:%S")+ "] Network "+network_name+' deleted.')
+	print("[" + time.strftime("%H:%M:%S") + "] Network " + network_name+' deleted.')
+#===================================================================================#
 
-# Create network network_name and assign ports to it. If it already exists ask user for appropriate action
+# Create network network_name and assign ports to it.
 def create_network(network_name, cfg_name, neutron, configurations, logger_neutron):
 	# Check if the network already exists
 	info_msg = "Checking if network " + network_name + " already exits"
 	logger_neutron.info(info_msg)
-	network_exists = get_network_id(netname=network_name, neutron=neutron)
+	network_exists = get_network_id(netname = network_name, neutron=neutron)
 	#deleting network if already exists
 	if network_exists != 'net-not-found':
 		warning_msg = "Network " + network_name + " already exits..."
@@ -438,10 +439,10 @@ def create_network(network_name, cfg_name, neutron, configurations, logger_neutr
 	body_sample = {'network': {'name': network_name,
 				'admin_state_up': True}}
  
-	netw = neutron.create_network(body=body_sample)
+	netw = neutron.create_network(body = body_sample)
 	net_dict = netw['network']
 	network_id = net_dict['id']
-	print("[" + time.strftime("%H:%M:%S")+ "] Network %s created for %s" % (network_id, network_name))
+	print("[" + time.strftime("%H:%M:%S") + "] Network %s created for %s" % (network_id, network_name))
 	logger_neutron.info("Successfully created network")
 	#'gateway_ip': None,
 	
@@ -459,7 +460,7 @@ def create_network(network_name, cfg_name, neutron, configurations, logger_neutr
 									"end": end_pool }]}]}
  
 	logger_neutron.info("Creating subnet...")
-	subnet = neutron.create_subnet(body=body_create_subnet)
+	subnet = neutron.create_subnet(body = body_create_subnet)
 	print("[" + time.strftime("%H:%M:%S")+ "] Created subnet %s" % cidr)
 	logger_neutron.info("Successfully created subnet")
 	ports = []
@@ -541,7 +542,7 @@ def add_port_to_subnet(name, network_id, subnet, neutron, logger_neutron):
                             "network_id": network_id
                      }
                 }
-	response = neutron.create_port(body=body_value)
+	response = neutron.create_port(body = body_value)
 	logger_neutron.info("Successfully added port")
 	return response['port']['id']
 
@@ -555,6 +556,7 @@ def get_network_cidr(network_name, configurations):
 		return configurations['networks']['s1-cidr']
 	else:
 		print("[" + time.strftime("%H:%M:%S")+ "] Invalid network")
+#==================================================#
 # Update neutron port to allow address
 def update_neutron_port(neutron, port_id, allowed_ip, port_nm, logger_neutron, error_logger):
 	body_value = {
@@ -613,15 +615,6 @@ def source_config(ssh, logger_ssh):
 	send_command(chan, 'configure\n', '(configure)# ', logger_ssh)
 	# Source config file and wait for a prompt again.
 	send_command(chan, 'source Dell-VCM.cfg\n', '(configure)# ', logger_ssh)
-	'''
-	print "exit config"
-	# Exit configuration
-	send_command(chan, 'end\n', 'VEM-2(exec)> ')
-	print "exit config"
-	# Exit admin mode
-	send_command(chan, 'end\n', '[root@VEM-2 ~]# ')
-	print "exit config"
-	'''
 	ssh.close()
 
 #-----------------availability_zones and aggregate_group-------------------#

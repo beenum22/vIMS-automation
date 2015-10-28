@@ -23,13 +23,13 @@ date_time = now.strftime("%Y-%m-%d_%H-%M")
 filename_activity = 'logs/termination_' + date_time + '.log'
 filename_error = 'logs/termination_error_' + date_time + '.log'
 
-logging.basicConfig(filename=filename_activity, level=logging.INFO, filemode='w', format='%(asctime)s %(levelname)-8s %(name)-23s [-]  %(message)s')
+logging.basicConfig(filename = filename_activity, level = logging.INFO, filemode = 'w', format = '%(asctime)s %(levelname)-8s %(name)-23s [-]  %(message)s')
 
-logger=logging.getLogger(__name__)
-logger_nova=logging.getLogger('nova')
-logger_neutron=logging.getLogger('neutron')
+logger = logging.getLogger(__name__)
+logger_nova = logging.getLogger('nova')
+logger_neutron = logging.getLogger('neutron')
 logger_glance = logging.getLogger('glance')
-logger_ssh=logging.getLogger('paramiko')
+logger_ssh = logging.getLogger('paramiko')
 error_logger = logging.getLogger('error_log')
 
 # create logger with 'Error Loging'
@@ -44,7 +44,7 @@ logger.info("Starting termination")
 
 while True:
 	logger.info("Confirming terminations")
-	prompt = raw_input("[" + time.strftime("%H:%M:%S")+ "] Are you sure you want to terminate vEPC ? <yes/no> ")
+	prompt = raw_input("[" + time.strftime("%H:%M:%S") + "] Are you sure you want to terminate vEPC ? <yes/no> ")
 	if prompt == 'no':
 	    sys.exit()
 	elif prompt == 'yes':
@@ -63,12 +63,12 @@ nova_creds = get_nova_creds(configurations)
 # Get authorized instance of nova client
 logger_nova.info("Getting authorized instance of nova client")
 try:
-	auth = v2.Password(auth_url=nova_creds['auth_url'],
-						   username=nova_creds['username'],
-						   password=nova_creds['password'],
-						   tenant_name=nova_creds['project_id'])
-	sess = session.Session(auth=auth)
-	nova = client.Client(nova_creds['version'], session=sess)
+	auth = v2.Password(auth_url = nova_creds['auth_url'],
+						   username = nova_creds['username'],
+						   password = nova_creds['password'],
+						   tenant_name = nova_creds['project_id'])
+	sess = session.Session(auth = auth)
+	nova = client.Client(nova_creds['version'], session = sess)
 except:
 	error_logger.exception("Unable to create nova client instance")
 # Get authorized instance of neutron client
@@ -84,41 +84,46 @@ configurations['deploy-ems'] = 'yes'
 for i in range(0, 7):
 	instance_name = name_list[i]+"-1"
 	instance_name2 = name_list[i]+"-2"
-	clear_instance(instance_name, nova, configurations['auto-del'], configurations, neutron, logger, error_logger, logger_nova, logger_neutron)
-	clear_instance(instance_name2, nova, configurations['auto-del'], configurations, neutron, logger, error_logger, logger_nova, logger_neutron)
+	clear_instance(instance_name, nova, configurations['auto-del'], configurations,
+					neutron, logger, error_logger, logger_nova, logger_neutron)
+	clear_instance(instance_name2, nova, configurations['auto-del'], configurations,
+					neutron, logger, error_logger, logger_nova, logger_neutron)
 
 del_networks(neutron, configurations, error_logger, logger_neutron)
 
 while True:
-	chk = raw_input("[" + time.strftime("%H:%M:%S")+ "] Do you also want to terminate EMS ? <yes/no> ")
+	chk = raw_input("[" + time.strftime("%H:%M:%S") + "] Do you also want to terminate EMS ? <yes/no> ")
 	if chk == 'no' or chk == 'yes':
 		break
 	else:
 		print("Illegal input")
 	
 if chk == 'yes':
-	clear_instance(configurations['vcm-cfg']['ems-vm-name'], nova, configurations['auto-del'], configurations, neutron, logger, error_logger, logger_nova, logger_neutron)
+	clear_instance(configurations['vcm-cfg']['ems-vm-name'], nova, configurations['auto-del'], 
+					configurations, neutron, logger, error_logger, logger_nova, logger_neutron)
 	router_id = get_router_id(configurations['router']['name'], neutron)
 	remove_interface(neutron, get_subnet_id(neutron, configurations['networks']['net-int-name']), router_id)
 	clear_network(configurations['networks']['net-int-name'], neutron, configurations, error_logger, logger_neutron)
 
 	delete_router(neutron, configurations['router']['name'])
-
-print("[" + time.strftime("%H:%M:%S")+ "] vEPC Termination complete ...")
+#------clearing IP files-----#
+clear_IP_files(logger)
+#-----------------------------#
+print("[" + time.strftime("%H:%M:%S") + "] vEPC Termination complete ...")
 
 while True:
-	chk = raw_input("[" + time.strftime("%H:%M:%S")+ "] Do you want to delete aggregate groups ? <yes/no> ")
+	chk = raw_input("[" + time.strftime("%H:%M:%S") + "] Do you want to delete aggregate groups ? <yes/no> ")
 	if chk == 'no' or chk == 'yes':
 	    break
 	else:
 	    print("Illegal input")
 if chk == 'yes':
-	print("[" + time.strftime("%H:%M:%S")+ "] Deleting Aggregates : ")
+	print("[" + time.strftime("%H:%M:%S") + "] Deleting Aggregates : ")
 	del_agg(nova, error_logger, logger_nova)
-	print("[" + time.strftime("%H:%M:%S")+ "] Successful ... ")
+	print("[" + time.strftime("%H:%M:%S") + "] Successful ... ")
 
 while True:
-	chk = raw_input("[" + time.strftime("%H:%M:%S")+ "] Do you want to delete Images of VCM and EMS ? <yes/no> ")
+	chk = raw_input("[" + time.strftime("%H:%M:%S") + "] Do you want to delete Images of VCM and EMS ? <yes/no> ")
 	if chk == 'no':
 	    sys.exit()
 	elif chk == 'yes':
@@ -128,21 +133,21 @@ while True:
 logger.info("Getting authorized instance of keystone client")
 keystone = ksClient.Client(**credsks)
 logger_glance.info("Getting authorized instance of glance client")
-glance_endpoint = keystone.service_catalog.url_for(service_type='image', endpoint_type='publicURL')
-glance = glanceclient.Client('2', glance_endpoint, token=keystone.auth_token)
+glance_endpoint = keystone.service_catalog.url_for(service_type = 'image', endpoint_type = 'publicURL')
+glance = glanceclient.Client('2', glance_endpoint, token = keystone.auth_token)
 
 if chk == 'yes':
 	img_name = 'EMS_IMG'
 	if (image_exists(glance, img_name, error_logger, logger_glance)):
 		del_image(glance, img_name, error_logger, logger_glance)
-		print("[" + time.strftime("%H:%M:%S")+ "] EMS image deleted")
+		print("[" + time.strftime("%H:%M:%S") + "] EMS image deleted")
 	
 	img_name = 'VCM_IMG'
 	if (image_exists(glance, img_name, error_logger, logger_glance)):
 		del_image(glance, img_name, error_logger, logger_glance)
-		print("[" + time.strftime("%H:%M:%S")+ "] VCM image deleted")
+		print("[" + time.strftime("%H:%M:%S") + "] VCM image deleted")
 	
-print ("[" + time.strftime("%H:%M:%S")+ "] All vEPC components have been terminated...")
+print("[" + time.strftime("%H:%M:%S") + "] All vEPC components have been terminated...")
 
 logger.info("Successfully terminated vEPC")	
 	
