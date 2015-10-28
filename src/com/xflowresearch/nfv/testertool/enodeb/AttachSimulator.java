@@ -227,12 +227,6 @@ public class AttachSimulator {
 	 * @param xmlparser
 	 */
 	public void sendInitialContextSetupResponse(XMLParser xmlparser, S1APPacket initialContextSetupRequest){
-		//NAS PDU GENERATION
-		//String NASPDUInInitialContextSetupRequest = initialContextSetupRequest.getValue("NASPDU");
-
-		//get the NAS response from the NAS classes!!
-		//String NASPDU = "1d270f6cfb77010202da28120561706e2d310769786961636f6d03636f6d";
-		//////////////////////////////////
 
 		ArrayList<Value> values = new ArrayList<Value>();
 		values.add(new Value("MMEUES1APID", "reject", initialContextSetupRequest.getValue("MMEUES1APID")));
