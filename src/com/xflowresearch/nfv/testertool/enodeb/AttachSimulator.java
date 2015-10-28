@@ -1,6 +1,10 @@
 package com.xflowresearch.nfv.testertool.enodeb;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+
+import javax.xml.bind.DatatypeConverter;
 
 import com.xflowresearch.nfv.testertool.common.XMLParser;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.S1APPacket;
@@ -158,8 +162,8 @@ public class AttachSimulator {
 		return recievedPacket;
 	}
 
-	
-	
+
+
 	/**
 	 * The third packet of the attach sequence, the
 	 * SecurityModeComplete packet is sent to the MME 
@@ -189,8 +193,8 @@ public class AttachSimulator {
 		return recievedPacket;
 	}
 
-	
-	
+
+
 	/**
 	 * The fourth packet of the attach sequence, the
 	 * ESMInformationResponse is sent to the MME in 
@@ -216,10 +220,11 @@ public class AttachSimulator {
 
 		S1APPacket recievedPacket = new S1APPacket();
 		recievedPacket.parsePacket(reply);
+		extractGTPData(recievedPacket);
 		return recievedPacket;
 	}
 
-	
+
 	/**
 	 * The fifth packet of the attach sequence, the
 	 * InitialContextSetupResponse is sent to the MME
@@ -236,7 +241,7 @@ public class AttachSimulator {
 		sendS1APacket("SuccessfulOutcome", "InitialContextSetup", "reject", values, false);
 	}
 
-	
+
 	/**
 	 * The sixth packet of the attach sequence, the
 	 * AttachComplete packet is sent to the MME in 
@@ -262,7 +267,7 @@ public class AttachSimulator {
 		sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, false);
 	}
 
-	
+
 	/**
 	 * Function to generate and send any sort of s1AP Packet, 
 	 * packet controlled by the input parameters.. The return
@@ -295,5 +300,38 @@ public class AttachSimulator {
 			return reply;
 		}
 		return null;
+	}
+
+
+	
+	
+	public void extractGTPData(S1APPacket attachComplete)
+	{
+		String value =  attachComplete.getValue("ERABToBeSetupListCtxtSUReq");
+		value = value.substring(24, value.length());
+		
+		String ip1 = value.substring(0, 8);
+		String TEID = value.substring(8, 16);
+		String ip2 = value.substring(146, 154);
+		
+		
+		InetAddress transportLayerAddress = null;
+		InetAddress PDNIpv4 = null;
+		try {
+			transportLayerAddress = InetAddress.getByAddress(DatatypeConverter.parseHexBinary(ip1));
+			PDNIpv4 = InetAddress.getByAddress(DatatypeConverter.parseHexBinary(ip2));
+		} catch (UnknownHostException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(transportLayerAddress.toString());
+		System.out.println(PDNIpv4.toString());
+		
+		 
+		System.out.println(TEID);
+		
+		System.out.println(value);
+
 	}
 }
