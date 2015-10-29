@@ -21,6 +21,11 @@ import com.xflowresearch.nfv.testertool.ue.nas.AttachSeqDemo;
  */
 public class AttachSimulator {
 
+	InetAddress transportLayerAddress;
+	InetAddress PDNIpv4;
+	String TEID;
+
+
 	private class Value{
 		public String typeOfValue;
 		public String criticality;
@@ -39,6 +44,20 @@ public class AttachSimulator {
 	public AttachSimulator(XMLParser xmlparser){
 		sctpClient = new SctpClient();
 		sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort()));
+	}
+
+
+	/**
+	 * Getters
+	 */
+	public InetAddress getTransportLayerAddress() {
+		return transportLayerAddress;
+	}
+	public InetAddress getPDNIpv4() {
+		return PDNIpv4;
+	}
+	public String getTEID() {
+		return TEID;
 	}
 
 
@@ -303,20 +322,17 @@ public class AttachSimulator {
 	}
 
 
-	
-	
+
+
 	public void extractGTPData(S1APPacket attachComplete)
 	{
 		String value =  attachComplete.getValue("ERABToBeSetupListCtxtSUReq");
 		value = value.substring(24, value.length());
-		
+
 		String ip1 = value.substring(0, 8);
-		String TEID = value.substring(8, 16);
+		TEID = value.substring(8, 16);
 		String ip2 = value.substring(146, 154);
-		
-		
-		InetAddress transportLayerAddress = null;
-		InetAddress PDNIpv4 = null;
+
 		try {
 			transportLayerAddress = InetAddress.getByAddress(DatatypeConverter.parseHexBinary(ip1));
 			PDNIpv4 = InetAddress.getByAddress(DatatypeConverter.parseHexBinary(ip2));
@@ -327,11 +343,11 @@ public class AttachSimulator {
 		}
 		System.out.println(transportLayerAddress.toString());
 		System.out.println(PDNIpv4.toString());
-		
-		 
+
+
 		System.out.println(TEID);
-		
-		System.out.println(value);
+
+//		/System.out.println(value);
 
 	}
 }
