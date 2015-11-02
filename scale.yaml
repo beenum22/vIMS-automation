@@ -15,7 +15,10 @@ parameters:
     description: ID of private network
     constraints:
       - custom_constraint: neutron.network
-        description: Must be a valid network ID        
+        description: Must be a valid network ID 
+  availability_zone:
+    type: string
+    description: The Availability Zone to launch the instance.            
   flavor:
     type: string
     description: Flavor to use
@@ -99,7 +102,7 @@ parameters:
   sprout2_security_group:
     type: string
     description: ID of base security group for sprout nodes
-    default: IMS-sprout2             
+    default: IMS-sprout2               
 resources:
   bono:
     type: OS::Heat::ResourceGroup
@@ -116,6 +119,7 @@ resources:
           key_name: { get_param: key_name }
           base_security_group: { get_param: base_security_group }
           bono_security_group: { get_param: bono_security_group }
+          availability_zone: { get_param: availability_zone}
           repo_url: { get_param: repo_url }
           zone: { get_param: zone }
           dns_ip: { get_param: dns_ip }
@@ -138,6 +142,7 @@ resources:
           base_security_group: { get_param: base_security_group }
           sprout_security_group: { get_param: sprout_security_group }
           sprout2_security_group: { get_param: sprout2_security_group }
+          availability_zone: { get_param: availability_zone}
           repo_url: { get_param: repo_url }
           zone: { get_param: zone }
           dns_ip: { get_param: dns_ip }
@@ -159,6 +164,7 @@ resources:
           key_name: { get_param: key_name }
           base_security_group: { get_param: base_security_group }
           homestead_security_group: { get_param: homestead_security_group }
+          availability_zone: { get_param: availability_zone}
           repo_url: { get_param: repo_url }
           zone: { get_param: zone }
           dns_ip: { get_param: dns_ip }
@@ -181,8 +187,31 @@ resources:
           base_security_group: { get_param: base_security_group }
           ralf_security_group: { get_param: ralf_security_group }
           repo_url: { get_param: repo_url }
+          availability_zone: { get_param: availability_zone}
           zone: { get_param: zone }
           dns_ip: { get_param: dns_ip }
+          dnssec_key: { get_param: dnssec_key }
+          etcd_ip: { get_param: etcd_ip }
+          index: { get_param: index }
+  homer:
+    type: OS::Heat::ResourceGroup
+    properties:
+      index_var: __index__
+      resource_def:
+        type: homer.yaml
+        properties:
+          public_net_id: { get_param: public_net_id }
+          private_net_id: { get_param: private_net_id }
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          key_name: { get_param: key_name }
+          key_name: { get_param: key_name }
+          base_security_group: { get_param: base_security_group }
+          homer_security_group: { get_param: ralf_security_group }
+          repo_url: { get_param: repo_url }
+          zone: { get_param: zone }
+          dns_ip: { get_param: dns_ip }
+          availability_zone: { get_param: availability_zone}
           dnssec_key: { get_param: dnssec_key }
           etcd_ip: { get_param: etcd_ip }
           index: { get_param: index }
@@ -202,3 +231,22 @@ outputs:
   ralf_ip:
     description: IP address of Ralf
     value: { get_attr: [ ralf, public_ip] }
+  homer_ip:
+    description: IP address of Homer
+    value: { get_attr: [ homer, public_ip] }
+
+  homer_ip_private:
+    description: private IP address of Homer
+    value: { get_attr: [ homer, private_ip] }
+  sprout_ip_private:
+    description: private IP address of Sprout
+    value: { get_attr: [ sprout, private_ip] }
+  ralf_ip_private:
+    description: private IP address of Ralf
+    value: { get_attr: [ ralf, private_ip] }
+  homestead_ip_private:
+    description: private IP address of Homestead
+    value: { get_attr: [ homestead, private_ip] }
+  bono_ip_private:
+    description: private IP address of Bono
+    value: { get_attr: [ bono, private_ip] }

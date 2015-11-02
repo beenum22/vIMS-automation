@@ -22,6 +22,9 @@ parameters:
     constraints:
       - custom_constraint: nova.flavor
         description: Must be a valid flavor name
+  availability_zone:
+    type: string
+    description: The Availability Zone to launch the instance.
   image:
     type: string
     description: Name of image to use
@@ -87,6 +90,7 @@ resources:
       name: { str_replace: { params: { __index__: { get_param: index }, __zone__: { get_param: zone } }, template: homer-__index__.__zone__ } }
       image: { get_param: image }
       flavor: { get_param: flavor }
+      availability_zone: { get_param: availability_zone}
       key_name: { get_param: key_name }
       networks:
         - port: { get_resource: port }

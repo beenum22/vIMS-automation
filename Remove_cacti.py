@@ -37,12 +37,13 @@ class F:
 sys.stdout = F()
 
 ############################## Global Variables ##########################################
+IMAGE_PATH = PATH+'/cacti-image.qcow2'
 os.environ['IMAGE_PATH'] = PATH+'/IMG'
 CONFIG_PATH = PATH+'/configurations.json'
 USER_CONFIG_PATH = PATH+'/user_config.json'
-STACK_NAME = 'IMS'
-STACK_HA_NAME = 'IMS-HA'
-IMAGE_NAME = 'IMS'
+STACK_NAME = 'Cacti'
+IMAGE_NAME = 'Cacti-image'
+REPO_URL = 'http://repo.cw-ngv.com/stable'
 ############################## Keystone Credentials Functions ############################
 
 def get_keystone_creds(configurations):
@@ -86,6 +87,7 @@ def delete_cluster(heat,cluster_name):
     print('Removing heat stack')
    except:
      print ("Cannot find the Cluster to be deleted. Exiting ...") 
+     sys.exit()
      
 # Get authorized instance of heat client
 cred = get_keystone_creds(config)
@@ -94,11 +96,10 @@ heat_endpoint = ks_client.service_catalog.url_for(service_type='orchestration', 
 heatclient = Heat_Client('1', heat_endpoint, token=ks_client.auth_token)
 
 delete_cluster(heatclient, STACK_NAME)
-delete_cluster(heatclient, STACK_HA_NAME)
 
 ########################## Delete Nova Key Pair ##########################################
 try:
-  nova.keypairs.delete('secure')
+  nova.keypairs.delete('test')
   print('Deleted keypair')
 except:
   print('Could not delete keypair')

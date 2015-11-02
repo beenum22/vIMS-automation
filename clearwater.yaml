@@ -18,6 +18,9 @@ parameters:
     type: string
     description: Private network gateway address
     default: 192.168.0.254
+  availability_zone:
+    type: string
+    description: The Availability Zone to launch the instance.
   private_net_pool_start:
     type: string
     description: Start of private network IP address pool
@@ -122,6 +125,7 @@ resources:
       flavor: { get_param: flavor }
       image: { get_param: image }
       key_name: { get_param: key_name }
+      availability_zone: { get_param: availability_zone}
       dns_security_group: { get_attr: [ security_groups, dns ] }
       zone: { get_param: zone }
       dnssec_key: { get_param: dnssec_key }
@@ -134,6 +138,7 @@ resources:
       flavor: { get_param: flavor }
       image: { get_param: image }
       key_name: { get_param: key_name }
+      availability_zone: { get_param: availability_zone}
       base_security_group: { get_attr: [ security_groups, base ] }
       ellis_security_group: { get_attr: [ security_groups, ellis ] }
       repo_url: { get_param: repo_url }
@@ -156,6 +161,7 @@ resources:
           flavor: { get_param: flavor }
           image: { get_param: image }
           key_name: { get_param: key_name }
+          availability_zone: { get_param: availability_zone}
           base_security_group: { get_attr: [ security_groups, base ] }
           bono_security_group: { get_attr: [ security_groups, bono ] }
           repo_url: { get_param: repo_url }
@@ -178,6 +184,7 @@ resources:
           flavor: { get_param: flavor }
           image: { get_param: image }
           key_name: { get_param: key_name }
+          availability_zone: { get_param: availability_zone}
           base_security_group: { get_attr: [ security_groups, base ] }
           sprout_security_group: { get_attr: [ security_groups, sprout ] }
           sprout2_security_group: { get_attr: [ security_groups, sprout2 ] }
@@ -201,6 +208,7 @@ resources:
           flavor: { get_param: flavor }
           image: { get_param: image }
           key_name: { get_param: key_name }
+          availability_zone: { get_param: availability_zone}
           base_security_group: { get_attr: [ security_groups, base ] }
           homer_security_group: { get_attr: [ security_groups, homer ] }
           repo_url: { get_param: repo_url }
@@ -224,6 +232,7 @@ resources:
           image: { get_param: image }
           key_name: { get_param: key_name }
           base_security_group: { get_attr: [ security_groups, base ] }
+          availability_zone: { get_param: availability_zone}
           homestead_security_group: { get_attr: [ security_groups, homestead ] }
           repo_url: { get_param: repo_url }
           zone: { get_param: zone }
@@ -245,6 +254,7 @@ resources:
           flavor: { get_param: flavor }
           image: { get_param: image }
           key_name: { get_param: key_name }
+          availability_zone: { get_param: availability_zone}
           base_security_group: { get_attr: [ security_groups, base ] }
           ralf_security_group: { get_attr: [ security_groups, ralf ] }
           repo_url: { get_param: repo_url }
@@ -260,7 +270,7 @@ outputs:
     value: { get_param: zone }
   dnssec_key:
     description: DNS key
-    value: { get_param: dnssec_key }  
+    value: { get_param: dnssec_key }
   dns_ip:
     description: IP address of DNS
     value: { get_attr: [ dns, public_ip ] }
@@ -281,4 +291,25 @@ outputs:
     value: { get_attr: [ ellis, public_ip] }
   ralf_ip:
     description: IP address of Ralf
-    value: { get_attr: [ ralf, public_ip] }
+    value: { get_attr: [ ralf, public_ip] }	
+  dns_ip_private:
+    description: private IP address of DNS
+    value: { get_attr: [ dns, private_ip ] }
+  homer_ip_private:
+    description: private IP address of Homer
+    value: { get_attr: [ homer, private_ip] }
+  sprout_ip_private:
+    description: private IP address of Sprout
+    value: { get_attr: [ sprout, private_ip] }
+  ellis_ip_private:
+    description: private IP address of Ellis
+    value: { get_attr: [ ellis, private_ip ] }
+  ralf_ip_private:
+    description: private IP address of Ralf
+    value: { get_attr: [ ralf, private_ip] }
+  homestead_ip_private:
+    description: private IP address of Homestead
+    value: { get_attr: [ homestead, private_ip] }
+  bono_ip_private:
+    description: private IP address of Bono
+    value: { get_attr: [ bono, private_ip] }

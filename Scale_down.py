@@ -11,7 +11,12 @@ import time
 import paramiko
 import select
 
-def scale_down():
+def scale_down(index):
+  ##################################### File path function ###################################
+  import subprocess
+  p = subprocess.Popen(["pwd"], stdout=subprocess.PIPE , shell=True)
+  PATH = p.stdout.read()
+  PATH = PATH.rstrip('\n')
   ############################## Time Stamp Function ########################################
   import sys
   from datetime import datetime as dt
@@ -35,22 +40,22 @@ def scale_down():
   ############################## Global Variables ##########################################
   IMAGE_PATH = '/root/IMG/trusty-server-cloudimg-amd64-disk1.img'
   IMAGE_DIRECTORY = '/root/IMG/'
-  os.environ['IMAGE_PATH'] = '/root/vIMS/IMG'
-  CONFIG_PATH = '/root/vIMS/configurations.json'
-  USER_CONFIG_PATH = '/root/vIMS/user_config.json'
+  os.environ['IMAGE_PATH'] = PATH+'/IMG'
+  CONFIG_PATH = PATH+'/configurations.json'
+  USER_CONFIG_PATH = PATH+'/user_config.json'
   STACK_NAME = 'IMS'
   REPO_URL = 'http://repo.cw-ngv.com/stable'
   ETCD_IP = ''
   SNMP_CONFIG_PATH = '/etc/snmp/snmpd.conf'
-  SNMP_FILE_PATH = '/root/vIMS/snmpd.conf'
+  SNMP_FILE_PATH = PATH+'/snmpd.conf'
   MIB_PATH = "/usr/share/mibs/PROJECT-CLEARWATER-MIB.txt"
-  MIB_FILE_PATH = "/root/vIMS/PROJECT-CLEARWATER-MIB.txt"
+  MIB_FILE_PATH =PATH+"/PROJECT-CLEARWATER-MIB.txt"
   HOMER_INDEX = '0'
   DN_RANGE_START = '6505550000'
   DN_RANGE_LENGTH = '1000'
   CALL_THRESHOLD = '20000'
-  SCALE_STACK_NAME = 'Scale'
-  index = '1' #delete when merge in autoscaling script
+  SCALE_STACK_NAME = 'Scale'+ index
+  
   ############################## User Configuration Functions ##############################
 
   def get_user_configurations():
@@ -513,7 +518,86 @@ def scale_down():
   stdin, stdout, stderr = ssh.exec_command('sudo monit unmonitor clearwater_config_manager')
   stdin, stdout, stderr = ssh.exec_command('sudo monit unmonitor -g etcd')
   stdin, stdout, stderr = ssh.exec_command('sudo service clearwater-etcd decommission') 
+  
+  #################################### Get Homer IP ##############################################
 
+  def get_homer_ip(heat, cluster_name):
+   temp_list=[]
+   cluster_full_name=cluster_name
+   cluster_details=heat.stacks.get(cluster_full_name)
+   
+   for i in cluster_details.outputs:
+     if i['output_key']=='homer_ip':
+        homer_ip= i['output_value']
+   return homer_ip[0]
+
+  ################################# Configure Homer Node #########################################
+  #Get Homer IP
+  homer_ip = get_homer_ip(heatclient , STACK_NAME)
+
+  #Connect to Homer
+  #k = paramiko.RSAKey.from_private_key_file("/root/.ssh/secure.pem")
+  ssh = paramiko.SSHClient()
+  ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+  print ("Connecting To Homer Node with IP " + homer_ip)
+  ssh.connect( hostname = homer_ip , username = "root", password = "root123")
+  print ("Connected")
+  stdin, stdout, stderr = ssh.exec_command("sudo -s")  
+
+  stdin, stdout, stderr = ssh.exec_command("(hostname -I)")
+  homer_host = stdout.read()
+  homer_host = str(homer_host)
+  
+  #Update DNS Server
+  print('Updating DNS server')
+  stdin, stdout, stderr = ssh.exec_command("cat > update.sh")
+  stdin.write('#!/bin/bash\n')
+  stdin.flush()
+  stdin.write('retries=0\n')
+  stdin.flush()
+  stdin.write('while ! { nsupdate -y "'+domain+':evGkzu+RcZA1FMu/JnbTO55yMNbnrCNVHGyQ24z/hTpSRIo6Bm9+QYmr48Lps6DsYKGepmUUwEpeBoZIiv8c1Q==" -v << EOF\n')
+  stdin.flush()
+  stdin.write('server '+dns_ip+'\n')
+  stdin.flush()
+  stdin.write('debug yes\n')
+  stdin.flush()
+  stdin.write('update delete homer-'+HOMER_INDEX+'.'+domain+'. 30 A '+homer_ip+'\n')
+  stdin.flush()
+  stdin.write('update delete homer.'+domain+'. 30 A '+homer_host+'\n')
+  stdin.flush()
+  stdin.write('send\n') 
+  stdin.flush()
+  stdin.write('EOF\n')
+  stdin.flush()
+  stdin.write('} && [ $retries -lt 10 ]\n')
+  stdin.flush()
+  stdin.write('do')
+  stdin.flush()
+  stdin.write('  retries=$((retries + 1))\n')
+  stdin.flush()
+  stdin.write("echo 'nsupdate failed - retrying (retry '$retries')...'\n")
+  stdin.flush()
+  stdin.write("sleep 5\n")
+  stdin.flush()
+  stdin.write("done\n")
+  stdin.flush()
+  stdin.channel.shutdown_write()
+
+  stdin, stdout, stderr = ssh.exec_command('chmod 755 update.sh')
+  stdin, stdout, stderr = ssh.exec_command('./update.sh')
+  while not stdout.channel.exit_status_ready():
+  # Only print data if there is data to read in the channel 
+   if stdout.channel.recv_ready():
+    rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+    if len(rl) > 0:
+      # Print data from stdout
+      print stdout.channel.recv(1024),
+  
+  stdin, stdout, stderr = ssh.exec_command('sudo service homer stop')
+  stdin, stdout, stderr = ssh.exec_command('sudo monit unmonitor clearwater_cluster_manager')
+  stdin, stdout, stderr = ssh.exec_command('sudo monit unmonitor clearwater_config_manager')
+  stdin, stdout, stderr = ssh.exec_command('sudo monit unmonitor -g etcd')
+  stdin, stdout, stderr = ssh.exec_command('sudo service clearwater-etcd decommission') 
   ############################ Delete Heat Stack ###########################################
 
   def delete_cluster(heat,cluster_name):

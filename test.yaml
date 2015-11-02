@@ -19,7 +19,7 @@ parameters:
     description: ID of private network
     constraints:
       - custom_constraint: neutron.network
-        description: Must be a valid network ID
+        description: Must be a valid network ID      
   flavor:
     type: string
     description: Flavor to use

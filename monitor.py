@@ -67,6 +67,7 @@ DN_RANGE_START = '6505550000'
 DN_RANGE_LENGTH = '1000'
 CALL_THRESHOLD = '20000'
 CALL_LOWER_THRESHOLD = '10'
+Index = 2
 #LOCAL_IP = '10.204.110.42'
 ############################## User Configuration Functions ##############################
 
@@ -141,7 +142,7 @@ homestead_ip = get_homestead_ip(heatclient , STACK_NAME)
 SCALE_UP = False
 ################################## Get Homestead information ###################################
 while True:
-
+  
   #Connect to Homestead
   #k = paramiko.RSAKey.from_private_key_file("/root/.ssh/secure.pem")
   ssh = paramiko.SSHClient()
@@ -175,57 +176,26 @@ while True:
   mib_data = str(mib_data)
   data = mib_data.split()
   no_of_rejected_requests =  data[3]
-  # print("*************************")
-  # print ("Domain = " + domain)
-  # print ("Bono IP = " + bono_ip)
-  # print ("Homestead IP = " + homestead_ip)
-  # print ("Homer IP = " + homer_ip)
-  # print("*************************")
+
   print ('**************************************************************')
   print ('Number of incomming requests in the current 5 minute period= '+ no_of_incomming_requests )
   print ('Number of incomming rejected requests in the current 5 minute period due to overload= '+ no_of_rejected_requests )
   print ('**************************************************************')
   
-  if (int(no_of_incomming_requests) > int(CALL_THRESHOLD) and SCALE_UP == False):
-  #   #Connect to Local Node
-  #   #k = paramiko.RSAKey.from_private_key_file("/root/.ssh/secure.pem")
-  #   ssh = paramiko.SSHClient()
-  #   ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-  #   print ("Connecting To local Node with IP " + LOCAL_IP)
-  #   ssh.connect( hostname = LOCAL_IP , username = "root", password = "r00tme" )
-  #   print ("Connected")
-  #   logger.info("scaling Up")
-  #   stdin, stdout, stderr = ssh.exec_command("python /root/vIMS/Scale.py")  
-  #   while not stdout.channel.exit_status_ready():
-  # 	# Only print data if there is data to read in the channel 
-  # 	  if stdout.channel.recv_ready():
-  # 		  rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-  #  		  if len(rl) > 0:
-  # 			# Print data from stdout
-  # 			  print stdout.channel.recv(1024),    
+  if (int(no_of_rejected_requests) > 5 and SCALE_UP == False):
     SCALE_UP = True    
-  # print(int(no_of_incomming_requests))
-  # print(int(CALL_THRESHOLD))  
-    Scale.scale_up()
-  
+    Stack_index = str(Index)
+    Scale.scale_up(Stack_index)
+    Index=Index + 1  
   
   if(int(no_of_incomming_requests) < int(CALL_LOWER_THRESHOLD) and SCALE_UP == True):
-   #  #Connect to Local Node
-   #  #k = paramiko.RSAKey.from_private_key_file("/root/.ssh/secure.pem")
-   #  ssh = paramiko.SSHClient()
-   #  ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-   #  print ("Connecting To local Node with IP " + LOCAL_IP)
-   #  ssh.connect( hostname = LOCAL_IP , username = "root", password = "r00tme" )
-   #  print ("Connected")
-   #  stdin, stdout, stderr = ssh.exec_command("python /root/vIMS/Scale_down.py")  
-   #  while not stdout.channel.exit_status_ready():
-  	# # Only print data if there is data to read in the channel 
-  	#   if stdout.channel.recv_ready():
-  	# 	  rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-   # 		  if len(rl) > 0:
-  	# 		# Print data from stdout
-  	# 		  print stdout.channel.recv(1024),
+
     SCALE_UP = False
-    Scale_down.scale_down()
+    Stack_index = str(Index)
+    Scale_down.scale_down(Stack_index)
+    Index=Index - 1
     
   time.sleep(30)
+
+  
+  

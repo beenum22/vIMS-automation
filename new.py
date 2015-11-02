@@ -2,6 +2,7 @@ import novaclient.v1_1.client as nvclient
 import neutronclient.v2_0.client as ntrnclient
 import sys
 import os
+from os_fun import *
 from heatclient.client import Client as Heat_Client
 from keystoneclient.v2_0 import Client as Keystone_Client
 import glanceclient 
@@ -86,6 +87,7 @@ os.environ['IMAGE_PATH'] = PATH+'/IMG'
 CONFIG_PATH = PATH+'/configurations.json'
 USER_CONFIG_PATH = PATH+'/user_config.json'
 STACK_NAME = 'IMS'
+STACK_HA_NAME = 'IMS-HA'
 REPO_URL = 'http://repo.cw-ngv.com/stable'
 ETCD_IP = ''
 ELLIS_INDEX = '0'
@@ -115,16 +117,6 @@ ext_net = str(ext_net)
 domain = user_config['domain']['zone']
 domain = str(domain)
 
-print('Successfull')
-logger.info("Getting initial user confiurations Successfull.")
-############################## Keystone Credentials Functions ############################
-cred = get_keystone_creds(config)
-ks_client = Keystone_Client(**cred)
-heat_endpoint = ks_client.service_catalog.url_for(service_type='orchestration', endpoint_type='publicURL')
-heatclient = Heat_Client('1', heat_endpoint, token=ks_client.auth_token, username='admin', passwork='admin')
-############################## Keystone Credentials Functions ############################
-
-
 def get_keystone_creds(configurations):
     d = {}
     d['username'] = configurations['os-creds']['os-user']
@@ -132,7 +124,6 @@ def get_keystone_creds(configurations):
     d['auth_url'] = configurations['os-creds']['os-authurl']
     d['tenant_name'] = configurations['os-creds']['os-tenant-name']
     return d
-
 def get_nova_creds(configurations):
   d = {}
   d['username'] = configurations['os-creds']['os-user']
@@ -142,18 +133,28 @@ def get_nova_creds(configurations):
   d['project_id'] = configurations['os-creds']['os-project-id']
   d['version'] = "1.1"
   return d
-
-print('Getting credentials')  
-logger.info("Getting client credentials")
 def get_configurations():
 	file = open(CONFIG_PATH)
 	configurations = json.load(file)
 	file.close()
 	return configurations
+print('Successfull')
+logger.info("Getting initial user confiurations Successfull.")
+############################## Keystone Credentials Functions ############################
+print('Getting credentials')  
+logger.info("Getting client credentials")
+
 print('Credentials Loaded')
 logger.info("Credentials Loaded")  
 config = get_configurations()
-credsks = get_keystone_creds(config)
+
+cred = get_keystone_creds(config)
+ks_client = Keystone_Client(**cred)
+heat_endpoint = ks_client.service_catalog.url_for(service_type='orchestration', endpoint_type='publicURL')
+heatclient = Heat_Client('1', heat_endpoint, token=ks_client.auth_token, username='admin', passwork='admin')
+############################## Keystone Credentials Functions ############################
+
+
 logger.info("Getting Keystone credentials")
 creds = get_nova_creds(config)
 logger_nova.info("Getting of nova credentials")
@@ -173,26 +174,7 @@ nova = client.Client(creds['version'], session=sess)
 #  sys.exit()
 # Get authorized instance of neutron client
 logger_neutron.info("Getting authorized instance of neutron client")
-
-
-#nova = nvclient.Client(**creds) 
-# Get authorized instance of neutron client
-neutron = ntrnclient.Client(**credsks)
-logger_neutron.info("Getting authorized instance of nova client")
-
-################################# Fetch network ID of network netname ###########################
-
-def get_network_id(netname, neutron):
-	netw = neutron.list_networks()
-	for net in netw['networks']:
-	  if(net['name'] == netname):
-	    # print(net['id'])
-	    return net['id']
-	return 'net-not-found'
-
-net_id = get_network_id(netname= ext_net, neutron = neutron)
-net_id = str(net_id)
-private_net_id = get_network_id(netname = "IMS-private", neutron = neutron)
-private_net_id = str(private_net_id)
-print private_net_id
-print ('Network ID of external network =' + net_id)
+print ('Finished deploying IMS')
+print ('To see the scaling status see file "scale_progress')
+time.sleep(10)
+os.system("nohup python monitor.py > scale_progress&")
