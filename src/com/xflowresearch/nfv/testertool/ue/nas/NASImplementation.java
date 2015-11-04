@@ -177,16 +177,23 @@ public void parametersetter(String Filepath) throws IOException{
 		
 	 secondbyte=Integer.toHexString(Integer.parseInt(secondbyte,2));
 	 
-	 String AuthRespParameter= RES + AuthRespLength;
-	 
-	 
-	 String Packet=firstbyte + secondbyte + AuthRespParameter;
+	 String AuthRespParameter= RES;
+	 String Packet=null;
+	 if(AuthRespLength.length()==2)
+	 {
+	  Packet=firstbyte + secondbyte +AuthRespLength + AuthRespParameter;
+	 }
+	 else if (AuthRespLength.length()==1)
+	 {
+		 Packet=firstbyte + secondbyte + '0' + AuthRespLength + AuthRespParameter; 
+		 
+	 }
 	 
 	 
 	 //System.out.println( firstbyte );
 	// System.out.println(secondbyte );
 	// System.out.println(  AuthRespParameter );
-	 System.out.println( "Authentication Response Packet:" + " " +Packet );
+	 //System.out.println( "Authentication Response Packet:" + " " +Packet );
 	 return Packet;
 	 
  }
