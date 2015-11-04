@@ -1,0 +1,4 @@
+2015-11-04 22:33:34 INFO  Thread:eNBThread1 eNodeB:41 - eNodeB started
+2015-11-04 22:33:34 ERROR Thread:eNBThread1 SctpClient:67 - SCTP connection to server was refused!
+2015-11-04 22:33:34 ERROR Thread:eNBThread1 SctpClient:122 - SCTP connection not active!
+2015-11-04 22:33:34 ERROR Thread:eNBThread1 SctpClient:220 - SCTP Message read error!
