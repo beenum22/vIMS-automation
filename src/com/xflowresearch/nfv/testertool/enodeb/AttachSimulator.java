@@ -172,13 +172,15 @@ public class AttachSimulator {
 		
 		
 		String NASPDUInAuthenticationRequest=NASPDUInAuthentication.substring(2);
-		System.out.println(NASPDUInAuthenticationRequest);
+		//System.out.println(NASPDUInAuthenticationRequest);
 		String r= obj.ParseAuthRequest(NASPDUInAuthenticationRequest); //Parse Authentication Request Message and obtain Rand value
 		
-		System.out.println (r);
+		//System.out.println (r);
 		
 		//get the NAS response from the NAS classes!!
 		String NASPDU = obj.SendAuthResp ( r, k, op );
+		//NASPDU=(NASPDU.length()/2) + NASPDU ;
+		//System.out.println(NASPDU);
 		//////////////////////////////////
 
 		ArrayList<Value> values = new ArrayList<Value>();

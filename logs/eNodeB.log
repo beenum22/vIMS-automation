@@ -128,3 +128,9 @@
 2015-11-04 23:56:38 INFO  Thread:eNBThread1 eNodeB:41 - eNodeB started
 2015-11-04 23:56:38 INFO  Thread:eNBThread1 SctpClient:70 - SCTP Connection Established ip:127.0.0.1 port:36412
 2015-11-04 23:56:38 INFO  Thread:eNBThread1 eNodeB:51 - S1Signalling established with MME
+2015-11-05 00:10:31 INFO  Thread:eNBThread1 eNodeB:41 - eNodeB started
+2015-11-05 00:10:31 INFO  Thread:eNBThread1 SctpClient:70 - SCTP Connection Established ip:127.0.0.1 port:36412
+2015-11-05 00:10:31 INFO  Thread:eNBThread1 eNodeB:51 - S1Signalling established with MME
+2015-11-05 00:13:48 INFO  Thread:eNBThread1 eNodeB:41 - eNodeB started
+2015-11-05 00:13:48 INFO  Thread:eNBThread1 SctpClient:70 - SCTP Connection Established ip:127.0.0.1 port:36412
+2015-11-05 00:13:48 INFO  Thread:eNBThread1 eNodeB:51 - S1Signalling established with MME
