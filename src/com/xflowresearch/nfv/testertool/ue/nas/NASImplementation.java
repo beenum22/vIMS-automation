@@ -70,7 +70,6 @@ public void parametersetter(String Filepath) throws IOException{
 	{
 		
 	
-	 //String value1="710BF600F1100001011234567802C0C000050201D031D15200F1100001"; //representing a particular UE
 		
 	    String value1=packetval;
 	    
@@ -166,25 +165,6 @@ public void parametersetter(String Filepath) throws IOException{
 	}
  
 
- public String [] AttachRepParser(String Reply){
-	 
-	 String SecurityHeaderType=NASDefinitions.SecurityHeaderType.hexToType(hexToBinary(Reply.substring(0,1 )));//SecurityHeaderType
-	 //System.out.println(Reply.substring(0,1 )); //debugging
-	 
-	 String ProtocolDiscriminator=NASDefinitions.ProtocolDiscriminatorValue.hexToType(hexToBinary(Reply.substring(1,2 ))); //PD
-	 String EPSMobilityManagementMsg=NASDefinitions.MobilityManagementMessageType.hexToType(Reply.substring(2,4));//EPS Mobility Management Message
-	 String AuthParameterRandValue=Reply.substring( 6,38); 
-	 String AUTNvalue=Reply.substring(40);
-	
-	 String Output [] ={SecurityHeaderType,ProtocolDiscriminator,EPSMobilityManagementMsg,AuthParameterRandValue, };//parameters to be set
-	 return Output;
-		
-		
- }
- 
- 
-
- 
  public String NASAuthenticationResponse(String RES,String AuthRespLength)
  {
 	 
@@ -414,6 +394,32 @@ public void parametersetter(String Filepath) throws IOException{
 	
 	
 	 
- } 
+ }
+
+public String[] respParser(String authReqString) {
+	// TODO Auto-generated method stub
+	 String SecurityHeaderType=NASDefinitions.SecurityHeaderType.hexToType(hexToBinary(authReqString.substring(0,1 )));//SecurityHeaderType
+	 //System.out.println(Reply.substring(0,1 )); //debugging
+	 
+	 String ProtocolDiscriminator=NASDefinitions.ProtocolDiscriminatorValue.hexToType(hexToBinary(authReqString.substring(1,2 ))); //PD
+	 String EPSMobilityManagementMsg=NASDefinitions.MobilityManagementMessageType.hexToType(authReqString.substring(2,4));//EPS Mobility Management Message
+	 String AuthParameterRandValue=null;
+	 String AUTNvalue=null;
+	 
+	 if((EPSMobilityManagementMsg.equals ("5c"))||(EPSMobilityManagementMsg.equals("5c"))||(EPSMobilityManagementMsg.equals("54")))
+	 {
+        AUTNvalue="N/A";
+        AuthParameterRandValue="N/A";
+	 }
+	 else if ((EPSMobilityManagementMsg.equals("52")))
+	 {
+		 AuthParameterRandValue=authReqString.substring( 6,38); 
+		 AUTNvalue=authReqString.substring(40);
+	 }
+	 
+	 String Output [] ={SecurityHeaderType,ProtocolDiscriminator,EPSMobilityManagementMsg,AuthParameterRandValue };
+	
+		 return Output;
+} 
 } 
 

@@ -156,7 +156,7 @@ public class NASDefinitions {
 		}
 		
 		
-		
+	
 		
 		public enum ProtocolDiscriminatorValue{
 			
