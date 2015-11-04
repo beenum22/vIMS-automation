@@ -160,11 +160,18 @@ public class AttachSimulator {
 	 */
 	public S1APPacket sendAuthenticationResponse(XMLParser xmlparser, S1APPacket authenticationRequest){
 
+		
+		AttachSeqDemo obj =new AttachSeqDemo();
 		//NAS PDU GENERATION
+		String k= "465B5CE8B199B49FAA5F0A2EE238A6BC"; //key
+		String op= "1918b840195c97017228127009ca194e"; //op values
+		
+		
 		String NASPDUInAuthenticationRequest = authenticationRequest.getValue("NASPDU");
-
+		String r= obj.ParseAuthRequest(NASPDUInAuthenticationRequest); //Parse Authentication Request Message and obtain Rand value
+		
 		//get the NAS response from the NAS classes!!
-		String NASPDU = "0b075308634f82417968ca98";
+		String NASPDU = obj.SendAuthResp ( r, k, op );
 		//////////////////////////////////
 
 		ArrayList<Value> values = new ArrayList<Value>();
@@ -211,7 +218,6 @@ public class AttachSimulator {
 		recievedPacket.parsePacket(reply);
 		return recievedPacket;
 	}
-
 
 
 	/**

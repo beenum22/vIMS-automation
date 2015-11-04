@@ -69,8 +69,7 @@ public void parametersetter(String Filepath) throws IOException{
  public String NASAttachRequest(String packetval)
 	{
 		
-	
-		
+
 	    String value1=packetval;
 	    
 	    String firstbyte=(NASDefinitions.SecurityHeaderType.PlainNASMessage.getHexCode()
