@@ -412,15 +412,19 @@ public String[] respParser(String authReqString) {
 	 String AuthParameterRandValue=null;
 	 String AUTNvalue=null;
 	 
-	 if((EPSMobilityManagementMsg.equals ("5c"))||(EPSMobilityManagementMsg.equals("5c"))||(EPSMobilityManagementMsg.equals("54")))
+	 if((authReqString.substring(2,4).equals ("5c"))||(authReqString.substring(2,4).equals("5c"))||(authReqString.substring(2,4).equals("54")))
 	 {
         AUTNvalue="N/A";
         AuthParameterRandValue="N/A";
 	 }
-	 else if ((EPSMobilityManagementMsg.equals("52")))
+	 
+	 //System.out.println(authReqString.substring(2,4));
+	 //System.out.println(EPSMobilityManagementMsg);
+	  if ((authReqString.substring(2,4).equals("52")))
 	 {
 		 AuthParameterRandValue=authReqString.substring( 6,38); 
 		 AUTNvalue=authReqString.substring(40);
+		// System.out.println("inside if");
 	 }
 	 
 	 String Output [] ={SecurityHeaderType,ProtocolDiscriminator,EPSMobilityManagementMsg,AuthParameterRandValue };
