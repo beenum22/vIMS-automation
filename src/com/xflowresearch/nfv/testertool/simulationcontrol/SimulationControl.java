@@ -59,10 +59,12 @@ public class SimulationControl
 		Thread eNBThread = new Thread(enodeb);
 		eNBThread.setName("eNBThread1");
 		eNBThread.start();
+		logger.info("eNodeB Thread Spawned");
 
 		Thread UEThread = new Thread(ue);
 		UEThread.setName("UEThread1");
 		UEThread.start();
+		logger.info("UE Thread Spawned");
 
 	}
 

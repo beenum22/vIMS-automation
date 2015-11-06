@@ -18,9 +18,9 @@ import com.xflowresearch.nfv.testertool.enodeb.s1u.GTP;
 public class eNodeB implements Runnable
 {
 	private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
-	
+
 	private XMLParser xmlparser;
-	
+
 	public void setXMLParser(XMLParser xmlparser){
 		this.xmlparser = xmlparser;
 	}
@@ -37,50 +37,49 @@ public class eNodeB implements Runnable
 
 	@Override
 	public void run() {
-		
+
 		logger.info("eNodeB started");
 
 		/** Test Attach Sequence initiation **/
 		AttachSimulator as = new AttachSimulator(xmlparser);
 		GTP simulateUserTraffic = new GTP();
-	
+
 		/**
 		 * establish s1 signalling with the MME
 		 */
-		if(as.establishS1Signalling(xmlparser)){
-			logger.info("S1Signalling established with MME");
-			
-			
+		if(as.establishS1Signalling(xmlparser))
+		{		
+
+			logger.info("S1 Signaling Successfully Established");
 			/**
 			 * Start the attach sequence with the MME for a UE
 			 */
-			as.initiateAttachSequence(xmlparser);
-			
-			
-			try 
+			if(as.initiateAttachSequence(xmlparser))
 			{
-				Thread.sleep(2000);
-			} 
-			catch (InterruptedException e) {
-				e.printStackTrace();
+				try 
+				{
+					Thread.sleep(2000);
+				} 
+				catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+
+				/**
+				 * Simulate HTTP Traffic towards S-GW
+				 */
+				simulateUserTraffic.simulateGTPEchoRequest(as.getTransportLayerAddress(), 
+						as.getPDNIpv4(), 
+						as.getTEID());
 			}
-			
-			
-			/**
-			 * Simulate HTTP Traffic towards S-GW
-			 */
-			simulateUserTraffic.simulateGTPEchoRequest(as.getTransportLayerAddress(), 
-					as.getPDNIpv4(), 
-					as.getTEID());
 		}
 		else{
 			logger.error("Unable to establish S1Signalling with MME");
 		}
-		
+
 	}
 
 
 
-	
-	
+
+
 }

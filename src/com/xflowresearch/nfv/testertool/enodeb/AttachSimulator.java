@@ -6,6 +6,9 @@ import java.util.ArrayList;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.xflowresearch.nfv.testertool.common.XMLParser;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.S1APPacket;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.SctpClient;
@@ -20,6 +23,7 @@ import com.xflowresearch.nfv.testertool.ue.nas.AttachSeqDemo;
  *
  */
 public class AttachSimulator {
+	private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
 
 	InetAddress transportLayerAddress;
 	InetAddress PDNIpv4;
@@ -43,7 +47,10 @@ public class AttachSimulator {
 
 	public AttachSimulator(XMLParser xmlparser){
 		sctpClient = new SctpClient();
-		sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort()));
+		if( !sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort())) )
+		{
+			System.exit(1);
+		}	
 	}
 
 
@@ -74,10 +81,7 @@ public class AttachSimulator {
 		values.add(new Value("SupportedTAs", "reject", xmlparser.getS1signallingParams().SupportedTAs));
 		values.add(new Value("DefaultPagingDRX", "ignore", xmlparser.getS1signallingParams().DefaultPagingDRX));
 
-		String reply =  sendS1APacket("InitiatingMessage", "S1Setup", "reject", values, true);
-
-		S1APPacket recievedPacket = new S1APPacket();
-		recievedPacket.parsePacket(reply);
+		S1APPacket recievedPacket = sendS1APacket("InitiatingMessage", "S1Setup", "reject", values, true);
 
 		if(recievedPacket.getType().equals("SuccessfulOutcome"))
 		{
@@ -93,8 +97,10 @@ public class AttachSimulator {
 	 * function..
 	 * @param xmlparser
 	 */
-	public void initiateAttachSequence(XMLParser xmlparser)
+	public boolean initiateAttachSequence(XMLParser xmlparser)
 	{
+		logger.info("Initiating Attach Sequence");
+		
 		S1APPacket reply1 = sendAttachRequest(xmlparser);
 		if(reply1.getProcCode().equals("downlinkNASTransport") )
 		{
@@ -109,6 +115,7 @@ public class AttachSimulator {
 					{
 						sendInitialContextSetupResponse(xmlparser, reply4);
 						sendAttachComplete(xmlparser, reply4);
+						return true;
 					}
 					else
 						System.out.println("Attach(4) failure");
@@ -122,6 +129,7 @@ public class AttachSimulator {
 		else{
 			System.out.println("Attach(1) failure");
 		}
+		return false;
 	}
 
 
@@ -146,10 +154,8 @@ public class AttachSimulator {
 		values.add(new Value("EUTRANCGI", "ignore", xmlparser.getEUTRANCGI()));
 		values.add(new Value("RRCEstablishmentCause", "ignore", xmlparser.getRRCEstablishmentCause()));
 
-		String reply = sendS1APacket("InitiatingMessage", "initialUEMessage", "ignore", values, true);
+		S1APPacket recievedPacket = sendS1APacket("InitiatingMessage", "initialUEMessage", "ignore", values, true);
 
-		S1APPacket recievedPacket = new S1APPacket();
-		recievedPacket.parsePacket(reply);
 		return recievedPacket;
 	}
 
@@ -160,23 +166,23 @@ public class AttachSimulator {
 	 */
 	public S1APPacket sendAuthenticationResponse(XMLParser xmlparser, S1APPacket authenticationRequest){
 
-		
+
 		AttachSeqDemo obj =new AttachSeqDemo();
 		//NAS PDU GENERATION
 		String k= "465B5CE8B199B49FAA5F0A2EE238A6BC"; //key
 		String op= "1918b840195c97017228127009ca194e"; //op values
-		
-		
+
+
 		String NASPDUInAuthentication= authenticationRequest.getValue("NASPDU");
 		//String NASPDUInAuthentication = "07520067c6697351ff4aec29cdbaabf2fbe3461008199eed4aa3b9b93ba100c2e82de53c";
-		
-		
+
+
 		String NASPDUInAuthenticationRequest=NASPDUInAuthentication.substring(2);
 		//System.out.println(NASPDUInAuthenticationRequest);
 		String r= obj.ParseAuthRequest(NASPDUInAuthenticationRequest); //Parse Authentication Request Message and obtain Rand value
-		
+
 		//System.out.println (r);
-		
+
 		//get the NAS response from the NAS classes!!
 		String NASPDU = obj.SendAuthResp ( r, k, op );
 		//NASPDU=(NASPDU.length()/2) + NASPDU ;
@@ -190,12 +196,10 @@ public class AttachSimulator {
 		values.add(new Value("EUTRANCGI", "ignore", xmlparser.getAuthenticationResponseParams().EUTRANCGI));
 		values.add(new Value("TAI", "ignore", xmlparser.getAuthenticationResponseParams().TAI));
 
-		String reply = sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, true);
+		S1APPacket recievedPacket = sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, true);
 
-		S1APPacket recievedPacket = new S1APPacket();
-		recievedPacket.parsePacket(reply);
 		return recievedPacket;
-		
+
 	}
 
 
@@ -222,10 +226,8 @@ public class AttachSimulator {
 		values.add(new Value("EUTRANCGI", "ignore", xmlparser.getAuthenticationResponseParams().EUTRANCGI));
 		values.add(new Value("TAI", "ignore", xmlparser.getAuthenticationResponseParams().TAI));
 
-		String reply = sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, true);
+		S1APPacket recievedPacket = sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, true);
 
-		S1APPacket recievedPacket = new S1APPacket();
-		recievedPacket.parsePacket(reply);
 		return recievedPacket;
 	}
 
@@ -251,11 +253,9 @@ public class AttachSimulator {
 		values.add(new Value("EUTRANCGI", "ignore", xmlparser.getAuthenticationResponseParams().EUTRANCGI));
 		values.add(new Value("TAI", "ignore", xmlparser.getAuthenticationResponseParams().TAI));
 
-		String reply = sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, true);
-
-		S1APPacket recievedPacket = new S1APPacket();
-		recievedPacket.parsePacket(reply);
+		S1APPacket recievedPacket = sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, true);
 		extractGTPData(recievedPacket);
+		
 		return recievedPacket;
 	}
 
@@ -313,7 +313,7 @@ public class AttachSimulator {
 	 * @param values
 	 * @return reply
 	 */
-	public String sendS1APacket(String type, String procCode, 
+	public S1APPacket sendS1APacket(String type, String procCode, 
 			String criticality, ArrayList<Value> values, Boolean recieve){
 
 		S1APPacket pac = new S1APPacket(type, procCode, criticality, values.size());
@@ -327,12 +327,20 @@ public class AttachSimulator {
 		pac.createPacket();
 		byte [] message = pac.getBytePacket();
 
+		logger.info("Sending Packet -- "+pac.toString());
+
 		sctpClient.sendProtocolPayload(message, 18);
 
 		if(recieve == true)
 		{
 			String reply =  sctpClient.recieveSCTPMessage();
-			return reply;
+
+			S1APPacket recievedPacket = new S1APPacket();
+			recievedPacket.parsePacket(reply);
+
+			logger.info("Received Packet -- "+recievedPacket.toString());
+
+			return recievedPacket;
 		}
 		return null;
 	}
@@ -363,7 +371,7 @@ public class AttachSimulator {
 
 		System.out.println(TEID);
 
-//		/System.out.println(value);
+		//		/System.out.println(value);
 
 	}
 }

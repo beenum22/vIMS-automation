@@ -47,7 +47,7 @@ public class SctpClient {
 	/**
 	 * Connect to the SCTP Server
 	 */
-	public void connectToHost(String ip, int port)
+	public boolean connectToHost(String ip, int port)
 	{
 		InetAddress address = null;
 		try {
@@ -65,17 +65,11 @@ public class SctpClient {
 			sctpChannel.connect(socketAddress, 1 ,1);
 		} catch (IOException e) {
 			logger.error("SCTP connection to server was refused!");
-			return;
+			return false;
 		}
 		logger.info("SCTP Connection Established ip:{} port:{}",ip, port);
 		isConnected = true;
-
-		/** start the asynchronous receiving thread **/
-		/*new Thread(){
-			public void run(){
-				recievingThread();
-			}
-		}.start();*/
+		return true;
 	}
 
 

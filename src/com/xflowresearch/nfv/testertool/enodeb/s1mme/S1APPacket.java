@@ -2,6 +2,9 @@ package com.xflowresearch.nfv.testertool.enodeb.s1mme;
 
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * S1APPacket
  * 
@@ -14,6 +17,7 @@ import java.util.ArrayList;
  */
 public class S1APPacket
 {
+	private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
 
 	private String header;
 	private String value;
@@ -239,9 +243,8 @@ public class S1APPacket
 	}
 	/** Functions to parse a packet **/
 
-
-
-
+	
+	
 	public static byte[] hexStringToByteArray(String s)
 	{
 		byte[] b = new byte[s.length() / 2];
@@ -253,4 +256,11 @@ public class S1APPacket
 		}
 		return b;
 	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return new String("S1AP Packet - Type:"+ type + " procCode:"+procCode);
+	}
+
 }
