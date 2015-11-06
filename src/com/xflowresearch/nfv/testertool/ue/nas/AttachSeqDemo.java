@@ -64,9 +64,18 @@ public class AttachSeqDemo {
 		
 		
 		String length =Integer.toString(RES.length()/2);
-	                           
+	           
 		String AuthResponse= NASobject.NASAuthenticationResponse(RES,length);
+		
+		
 		AuthResponse = Integer.toHexString(AuthResponse.length()/2) + AuthResponse;
+		//System.out.println(length);
+	    if (length.length()==1)
+	    {
+	    	AuthResponse= '0' + AuthResponse;
+	    }
+	    
+		System.out.println(AuthResponse);
 		return AuthResponse;
 		
 	}
