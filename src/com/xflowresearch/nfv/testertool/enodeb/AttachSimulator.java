@@ -370,6 +370,7 @@ public class AttachSimulator {
 
 
 		System.out.println(TEID);
+		logger.info("Data Extracted From ESM InformationResponse - TransportLayerAddress:"+transportLayerAddress+" PDNIPv4:"+PDNIpv4+" TEID:"+TEID);
 
 		//		/System.out.println(value);
 

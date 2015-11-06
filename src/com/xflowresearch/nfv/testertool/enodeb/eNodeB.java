@@ -75,11 +75,5 @@ public class eNodeB implements Runnable
 		else{
 			logger.error("Unable to establish S1Signalling with MME");
 		}
-
 	}
-
-
-
-
-
 }
