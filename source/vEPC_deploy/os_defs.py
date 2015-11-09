@@ -5,39 +5,38 @@ import readline
 import json
 
 # Paths for configuration files
-FILE_PATH_MAIN = 'source/vEPC_deploy/heat_templates/vEPC.yaml'
-FILE_PATH_CDF = 'source/vEPC_deploy/heat_templates/VCM_CDF.yaml'
-FILE_PATH_CPE = 'source/vEPC_deploy/heat_templates/VCM_CPE.yaml'
-FILE_PATH_DPE = 'source/vEPC_deploy/heat_templates/VCM_DPE.yaml'
-FILE_PATH_RIF = 'source/vEPC_deploy/heat_templates/VCM_RIF.yaml'
-FILE_PATH_SDB = 'source/vEPC_deploy/heat_templates/VCM_SDB.yaml'
-FILE_PATH_UDB = 'source/vEPC_deploy/heat_templates/VCM_UDB.yaml'
-FILE_PATH_VEM = 'source/vEPC_deploy/heat_templates/VCM_VEM.yaml'
-FILE_PATH_network = 'source/vEPC_deploy/heat_templates/network.yaml'
-FILE_PATH_router = 'source/vEPC_deploy/heat_templates/router.yaml'
+file_path_main = 'source/vEPC_deploy/heat_templates/vEPC.yaml'
+file_path_CDF = 'source/vEPC_deploy/heat_templates/VCM_CDF.yaml'
+file_path_CPE = 'source/vEPC_deploy/heat_templates/VCM_CPE.yaml'
+file_path_DPE = 'source/vEPC_deploy/heat_templates/VCM_DPE.yaml'
+file_path_RIF = 'source/vEPC_deploy/heat_templates/VCM_RIF.yaml'
+file_path_SDB = 'source/vEPC_deploy/heat_templates/VCM_SDB.yaml'
+file_path_UDB = 'source/vEPC_deploy/heat_templates/VCM_UDB.yaml'
+file_path_VEM = 'source/vEPC_deploy/heat_templates/VCM_VEM.yaml'
+file_path_network = 'source/vEPC_deploy/heat_templates/network.yaml'
+file_path_router = 'source/vEPC_deploy/heat_templates/router.yaml'
 
-DIR_hostnames = 'source/vEPC_deploy/hostnames/'
-DIR_ip_files = 'ip_files/'
-DIR_IMG = '/root/IMGS/'
+dir_hostnames = 'source/vEPC_deploy/hostnames/'
+dir_images = '/root/IMGS/'
 
 #----------------------------------------------------------------------------------#
 def create_cluster(heat, cluster_name, configurations, logger_heat, error_logger):
 
 	try:
-		file_main= open(FILE_PATH_MAIN, 'r')
-		file_VEM = open(FILE_PATH_VEM, 'r')
-		file_CPE = open(FILE_PATH_CPE, 'r')
-		file_SDB = open(FILE_PATH_SDB, 'r')
-		file_CDF = open(FILE_PATH_CDF, 'r')
-		file_UDB = open(FILE_PATH_UDB, 'r')
-		file_RIF = open(FILE_PATH_RIF, 'r')
-		file_DPE = open(FILE_PATH_DPE, 'r')
-		file_net = open(FILE_PATH_network, 'r')
-		file_router = open(FILE_PATH_router, 'r')
+		file_main = open(file_path_main, 'r')
+		file_VEM = open(file_path_VEM, 'r')
+		file_CPE = open(file_path_CPE, 'r')
+		file_SDB = open(file_path_SDB, 'r')
+		file_CDF = open(file_path_CDF, 'r')
+		file_UDB = open(file_path_UDB, 'r')
+		file_RIF = open(file_path_RIF, 'r')
+		file_DPE = open(file_path_DPE, 'r')
+		file_net = open(file_path_network, 'r')
+		file_router = open(file_path_router, 'r')
 	except:
 		error_logger.exception("Unable to open file")
-		print ("[" + time.strftime("%H:%M:%S")+ "] Unable to open file")
-	cluster_body={
+		print("[" + time.strftime("%H:%M:%S")+ "] Unable to open file")
+	cluster_body = {
 	"stack_name":cluster_name,
 	"template":file_main.read(),
 	"files":{
@@ -102,7 +101,7 @@ def create_cluster(heat, cluster_name, configurations, logger_heat, error_logger
 		heat.stacks.create(**cluster_body)
 	except:
 		error_logger.exception("Unable to create heat stack")
-		print ("[" + time.strftime("%H:%M:%S")+ "] Unable to create heat stack")
+		print("[" + time.strftime("%H:%M:%S")+ "] Unable to create heat stack")
 		sys.exit()
 
 def get_keystone_creds(configurations):
@@ -128,7 +127,7 @@ def get_configurations(logger, error_logger):
 		logger.info("Getting configurations from file")
 		file = open('configurations.json')
 	except:
-		print "configuration.json: file not found"
+		print("configuration.json: file not found")
 		error_logger.exception("configuration.json: file not found")
 		sys.exit()
 	configurations = json.load(file)
@@ -139,15 +138,15 @@ def get_configurations(logger, error_logger):
 def get_instance_floatingip(heat, cluster_details, vm_name):
    output = vm_name + '_ip'
    for i in cluster_details.outputs:
-     if i['output_key']== output:
-        insatnce_ip= i['output_value']
+     if i['output_key'] == output:
+        insatnce_ip = i['output_value']
    return insatnce_ip[0]
 
 def get_instance_private_ip(heat, cluster_details, vm_name):
    output = vm_name + '_private_ip'
    for i in cluster_details.outputs:
-     if i['output_key']== output:
-        insatnce_ip= i['output_value']
+     if i['output_key'] == output:
+        insatnce_ip = i['output_value']
    return insatnce_ip[0]
 
 def image_exists(glance, img_name, error_logger, logger_glance):
@@ -163,37 +162,36 @@ def image_exists(glance, img_name, error_logger, logger_glance):
 				info_msg = "Image " + img_name + "exists"
 				logger_glance.info(info_msg)
 				return img_exists
-			#print image.name + ' - ' + image.id
 		except StopIteration:
 			error_logger.exception("Image not exists")
 			break
 	return img_exists
 
 def check_image_directory(img_name, logger_glance, error_logger):
-	global DIR_IMG
-	info_msg = "Checking if image " + img_name + " exists in the directory " + DIR_IMG
+	global dir_images
+	info_msg = "Checking if image " + img_name + " exists in the directory " + dir_images
 	logger_glance.info(info_msg)
-	PATH = DIR_IMG + img_name + ".qcow2"
+	PATH = dir_images + img_name + ".qcow2"
 	if not os.path.isfile(PATH):
 		error_msg = "Image file " + img_name + " does not exist in the directory vEPC/IMGS/, please download image files and copy to the directory vEPC/IMGS/ "
-		print ("[" + time.strftime("%H:%M:%S")+ "] " + error_msg)
+		print("[" + time.strftime("%H:%M:%S")+ "] " + error_msg)
 		logger_glance.error(error_msg)
 		error_logger.error(error_msg)
 		sys.exit()
 
 #-----------create VCM and EMS image--------#
 def create_image(glance, img_name, logger_glance, error_logger):
-	global DIR_IMG
+	global dir_images
 	info_msg = "Creating image " + img_name
 	logger_glance.info(info_msg)
-	IMAGE_PATH =  DIR_IMG + img_name + ".qcow2"
+	image_path = dir_images + img_name + ".qcow2"
 	try:
-		image = glance.images.create(name=img_name,disk_format = 'qcow2', container_format = 'bare')
-		image = glance.images.upload(image.id, open(IMAGE_PATH, 'rb'))
+		image = glance.images.create(name=img_name, disk_format='qcow2', container_format='bare')
+		image = glance.images.upload(image.id, open(image_path, 'rb'))
 		info_msg = "Successfully Created image " + img_name
 		logger_glance.info(info_msg)
 	except:
-		print ("[" + time.strftime("%H:%M:%S")+ "] Unable to create glance image, please check logs")
+		print("[" + time.strftime("%H:%M:%S")+ "] Unable to create glance image, please check logs")
 		error_msg = "Creating image " + img_name
 		error_logger.exception(error_msg)
 		sys.exit()
@@ -265,12 +263,10 @@ def create_aggregate_groups(nova, error_logger, logger_nova):
 			id = get_aggregate_id(nova, get_aggnameA(), logger_nova)
 			if not check_host_added_to_aggregate(nova, id, hostnA, logger_nova):
 				logger_nova.info("Adding host " + hostnA + " to Aggregate Group A")
-				#print("Compute 1 doesn't already added, trying to add...") #dont print in actual code, just for test
 				nova.aggregates.add_host(aggregate=id, host=hostnA)
 				logger_nova.info("Successfully added host " + hostnA + " to Aggregate Group A") 
 			else:
 				pass
-				#check
 	except:
 		error_logger.exception("Unable to create Aggregate Group A")
 		print("Unable to create Aggregate Group A, please check logs")
@@ -288,20 +284,16 @@ def create_aggregate_groups(nova, error_logger, logger_nova):
 			id = get_aggregate_id(nova, get_aggnameB(), logger_nova)
 			if not check_host_added_to_aggregate(nova, id, hostnB, logger_nova):
 				logger_nova.info("Adding host " + hostnB + " to Aggregate Group B")
-				#print("Compute 2 doesn't already added, trying to add...") #dont print in actual code, just for test
 				nova.aggregates.add_host(aggregate=id, host=hostnB)
 				logger_nova.info("Successfully added host " + hostnB + " to Aggregate Group B")
-				#print("Successfull...") #dont print in actual code, just for test
 			else:
 				pass
-				#check
 	except:
 		error_logger.exception("Unable to Create Aggregate Group B")
 		print("Unable to create Aggregate Group B, please check logs")
 		sys.exit()
 
 #-----------------------------------------------------------------------#
-# Check if server hostname can be pinged
 def check_ping(hostname, logger):
     response = os.system("ping -c 1 " + hostname+" > /dev/null 2>&1")
     # and then check the response...
@@ -328,7 +320,7 @@ def check_ping_status(hostname, vm_name, logger, instance_id):
 		time_sleeping += 5
 	print("[" + time.strftime("%H:%M:%S")+ "] " + vm_name + "-" + str(instance_id) + " booted up!")
 
-def run_deploy_script(ssh,instance_obj,logger_ssh, instance_id,error_logger):
+def run_deploy_script(ssh, instance_obj, logger_ssh, instance_id,error_logger):
 	print("[" + time.strftime("%H:%M:%S")+ "] Running deploy_script in " + instance_obj.name + "-" + str(instance_id))
 	print "\n"
 	while(True):
@@ -346,7 +338,6 @@ def run_deploy_script(ssh,instance_obj,logger_ssh, instance_id,error_logger):
 	
 	info_msg = "Connected to " + instance_obj.name
 	logger_ssh.info(info_msg)
-	#print("[" + time.strftime("%H:%M:%S")+ "] \t Running deploy_script..." )
 	
 	if instance_obj.name == 'UDB' or instance_obj.name == 'CDF':
 		internal_interface = 'eth1'
@@ -354,6 +345,7 @@ def run_deploy_script(ssh,instance_obj,logger_ssh, instance_id,error_logger):
 		internal_interface = 'eth2'
 	else:
 		internal_interface = 'eth0'
+
 	info_msg = "executing command: ./deploy_script --vnfc "+instance_obj.name+" --instance_id "+ str(instance_id) +" --internal_if " + internal_interface
 	logger_ssh.info(info_msg)
 	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("./deploy_script --vnfc " + instance_obj.name + " --instance_id " + str(instance_id) + " --internal_if " + internal_interface)
@@ -367,7 +359,7 @@ def run_deploy_script(ssh,instance_obj,logger_ssh, instance_id,error_logger):
 	
 	ssh.close()
 
-def start_vcm_service(ssh,instance_obj,logger_ssh,instance_id, error_logger):
+def start_vcm_service(ssh, instance_obj, logger_ssh,instance_id, error_logger):
 	print("[" + time.strftime("%H:%M:%S")+ "] Starting VCM service in " + instance_obj.name + "-" + str(instance_id))
 	print "\n"
 	while(True):
@@ -391,7 +383,6 @@ def start_vcm_service(ssh,instance_obj,logger_ssh,instance_id, error_logger):
 	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("vcm-start")
 	ssh_stdout.readlines()
 	time.sleep(2)
-	#print("[" + time.strftime("%H:%M:%S")+ "] \t"+str(ssh_stdout.readlines()))
 	
 	info_msg = "executing command: ./validate_deploy.sh"
 	logger_ssh.info(info_msg)
@@ -410,12 +401,12 @@ def send_command(chan, cmd, end_phrase, logger_ssh):
 	while not buff.endswith(end_phrase):
 		resp = chan.recv(9999)
 		buff += resp
-		# print buff
 	print 'buff', buff
 	info_msg = "Reponse buffer:" + buff 
 	logger_ssh.info(info_msg)
 	time.sleep(2)
-# MAIN FUNCTION TO SOURCE CONFIG FILE
+
+# configuration of VEM1-1
 def source_config(ssh, logger_ssh):
 	chan = ssh.invoke_shell()
 	# Ssh and wait for the password prompt.
@@ -430,7 +421,7 @@ def source_config(ssh, logger_ssh):
 	send_command(chan, 'source Dell-VCM.cfg\n', '(configure)# ', logger_ssh)
 	ssh.close()
 
-def hostname_config(ssh, ip, vm_name, file_name, REMOTE_PATH_HOSTNAME, error_logger, logger_ssh):
+def hostname_config(ssh, ip, vm_name, file_name, remote_path_hostname, error_logger, logger_ssh):
 	print( "[" + time.strftime("%H:%M:%S")+ "] Host-name configuration for " + vm_name)
 	info_msg = "Starting Host-name configuration for " + vm_name
 	logger_ssh.info(info_msg)
@@ -452,13 +443,12 @@ def hostname_config(ssh, ip, vm_name, file_name, REMOTE_PATH_HOSTNAME, error_log
 	logger_ssh.info("Openning SFTP session")
 	sftp = ssh.open_sftp()
 	logger_ssh.info("Copying files")
-	sftp.put(DIR_hostnames + "host_" + file_name, REMOTE_PATH_HOSTNAME)
+	sftp.put(dir_hostnames + "host_" + file_name, remote_path_hostname)
 
 	if(vm_name == 'VCM-EMS'):
-		sftp.put(DIR_hostnames + "ems.txt", "/etc/hosts")
+		sftp.put(dir_hostnames + "ems.txt", "/etc/hosts")
 		print("[" + time.strftime("%H:%M:%S")+ "] Rebooting EMS to allow host-name changes to take effect")
 		time.sleep(5)
-		#ssh.exec_command("reboot")
 	logger_ssh.info("Successfully Copied files")
 	sftp.close()
 	info_msg = vm_name + "Successfully configured"

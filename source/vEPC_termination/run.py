@@ -16,7 +16,7 @@ from novaclient import client
 #----------------------------------#
 
 # global variables
-STACK_NAME = "vEPC"
+stack_name = "vEPC"
 
 #------------------ logging configurations ------------------#
 now = datetime.datetime.now()
@@ -26,17 +26,17 @@ filename_error = 'logs/termination_error_' + date_time + '.log'
 
 logging.basicConfig(filename=filename_activity, level=logging.INFO, filemode='w', format='%(asctime)s %(levelname)-8s %(name)-23s [-]  %(message)s')
 
-logger=logging.getLogger(__name__)
-logger_heat=logging.getLogger('HEAT')
-logger_nova=logging.getLogger('nova')
-logger_neutron=logging.getLogger('neutron')
+logger = logging.getLogger(__name__)
+logger_heat = logging.getLogger('HEAT')
+logger_nova = logging.getLogger('nova')
+logger_neutron = logging.getLogger('neutron')
 logger_glance = logging.getLogger('glance')
-logger_ssh=logging.getLogger('paramiko')
+logger_ssh = logging.getLogger('paramiko')
 error_logger = logging.getLogger('error_log')
 
 # create logger with 'Error Loging'
 error_logger.setLevel(logging.ERROR)
-fh = logging.FileHandler(filename_error, mode = 'w')
+fh = logging.FileHandler(filename_error, mode='w')
 fh.setLevel(logging.ERROR)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 fh.setFormatter(formatter)
@@ -52,7 +52,7 @@ while True:
 	elif prompt == 'yes':
 	    break
 	else:
-	    print("Illegal input")
+	    print("Invalid input")
 
 #------------------ input configurations ------------------#
 configurations = get_configurations(logger, error_logger)
@@ -64,7 +64,7 @@ try:
 	keystone = ksClient.Client(**cred)
 except:
 	error_logger.exception("Unable to create keystone client instance")
-	print ("[" + time.strftime("%H:%M:%S")+ "] Error creating keystone client")
+	print("[" + time.strftime("%H:%M:%S")+ "] Error creating keystone client")
 	sys.exit()
 logger_glance.info("Getting authorized instance of glance client")
 try:
@@ -72,14 +72,14 @@ try:
 	glance = glanceclient.Client('2', glance_endpoint, token=keystone.auth_token)
 except:
 	error_logger.exception("Unable to create glance client instance")
-	print ("[" + time.strftime("%H:%M:%S")+ "] Error creating glance client")
+	print("[" + time.strftime("%H:%M:%S")+ "] Error creating glance client")
 	sys.exit()
 try:
 	heat_endpoint = keystone.service_catalog.url_for(service_type='orchestration', endpoint_type='publicURL')
 	heatclient = Heat_Client('1', heat_endpoint, token=keystone.auth_token)
 except:
 	error_logger.exception("Unable to create heat client instance")
-	print ("[" + time.strftime("%H:%M:%S")+ "] Error creating heat client")
+	print("[" + time.strftime("%H:%M:%S")+ "] Error creating heat client")
 	sys.exit()
 #--------------------- nova client --------------------#
 logger_nova.info("Getting nova credentials")
@@ -95,10 +95,10 @@ try:
 	nova = client.Client(nova_creds['version'], session=sess)
 except:
 	error_logger.exception("Unable to create nova client instance")
-	print ("[" + time.strftime("%H:%M:%S")+ "] Error creating nova client")
+	print("[" + time.strftime("%H:%M:%S")+ "] Error creating nova client")
 	sys.exit()
 #--------------------- delete heat stack --------------------#
-delete_cluster(heatclient,STACK_NAME, logger_heat, error_logger)
+delete_cluster(heatclient, stack_name, logger_heat, error_logger)
 
 #------------------ delete aggregate gorups ------------------#
 while True:
@@ -106,7 +106,7 @@ while True:
 	if chk == 'no' or chk == 'yes':
 	    break
 	else:
-	    print("Illegal input")
+	    print("Invalid input")
 if chk == 'yes':
 	print("[" + time.strftime("%H:%M:%S")+ "] Deleting Aggregates : ")
 	delete_aggregate_group(nova, error_logger, logger_nova)
@@ -118,7 +118,7 @@ while True:
 	if chk == 'no' or chk == 'yes':
 	    break
 	else:
-	    print("Illegal input")
+	    print("Invalid input")
 
 if chk == 'yes':
 	img_name = 'EMS_IMG'
@@ -135,15 +135,15 @@ if chk == 'yes':
 while(True):
 	time.sleep(30)
 	try:
-		cluster_details=heatclient.stacks.get(STACK_NAME)
+		cluster_details=heatclient.stacks.get(stack_name)
 	except:
 		error_logger.exception("Unable to get stack details")
-		print ("[" + time.strftime("%H:%M:%S")+ "] Unable to get stack details")
+		print("[" + time.strftime("%H:%M:%S")+ "] Unable to get stack details")
 		break
 	if cluster_details.status == 'IN_PROGRESS':
-		print ("[" + time.strftime("%H:%M:%S")+ "] Stack Deletion in progress..")
+		print("[" + time.strftime("%H:%M:%S")+ "] Stack Deletion in progress..")
 	elif cluster_details.status == 'FAILED':
-		print ("[" + time.strftime("%H:%M:%S")+ "] Stack Deletion in Failed \n deleting again")
-		delete_cluster(heatclient,STACK_NAME)
+		print("[" + time.strftime("%H:%M:%S")+ "] Stack Deletion in Failed \n deleting again")
+		delete_cluster(heatclient,stack_name)
 	elif cluster_details.status == 'COMPLETE':
 		break

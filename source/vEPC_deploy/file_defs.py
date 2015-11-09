@@ -8,13 +8,13 @@ from datetime import datetime
 import time
 
 #function for configuration input from creds.txt file
-PATH_IP_FILES = 'source/vEPC_deploy/ip_files/' 
+path_ip_files = 'source/vEPC_deploy/ip_files/' 
 
 def input_configurations(error_logger, logger):
 	try:
 		json_file = open('configurations.json')
 	except:
-         print "configuration.json: file not found"
+         print("configuration.json: file not found")
          error_logger.exception("configuration.json: file not found")
          sys.exit()
 	
@@ -24,14 +24,14 @@ def input_configurations(error_logger, logger):
 		logger.info("Getting credentials from file")
 		file_read = open('creds.txt')
 	except:
-		print "creds.txt: file not found"
+		print("creds.txt: file not found")
 		error_logger.exception("creds.txt: file not found")
 		sys.exit()
 	
 	for i in range(1, 10):
 		inp = file_read.readline()
 	
-	global PATH_IP_FILES
+	global path_ip_files
 	inp = file_read.readline()
 	inp = inp.split("\"")
 	configurations['os-creds']['os-authurl'] = inp[1]
@@ -69,7 +69,7 @@ def input_configurations(error_logger, logger):
 	(pool_start, pool_stop) = cal_ip_pool(name, cidr, logger)
 	configurations['networks']['s1c-pool-start'] = pool_start
 	configurations['networks']['s1c-pool-end'] = pool_stop
-	ip_file_read = open(PATH_IP_FILES + name + '_available_ips.txt', 'r')
+	ip_file_read = open(path_ip_files + name + '_available_ips.txt', 'r')
 	available_ip = ip_file_read.readline()
 	available_ip = available_ip.rstrip("\n")
 	configurations['networks']['allowed-ip-s1c'] = available_ip
@@ -83,7 +83,7 @@ def input_configurations(error_logger, logger):
 	(pool_start, pool_stop) = cal_ip_pool(name, cidr, logger)
 	configurations['networks']['s1u-pool-start'] = pool_start
 	configurations['networks']['s1u-pool-end'] = pool_stop
-	ip_file_read = open(PATH_IP_FILES + name + '_available_ips.txt', 'r')
+	ip_file_read = open(path_ip_files + name + '_available_ips.txt', 'r')
 	available_ip = ip_file_read.readline()
 	available_ip = available_ip.rstrip("\n")
 	configurations['networks']['allowed-ip-s1u'] = available_ip
@@ -97,7 +97,7 @@ def input_configurations(error_logger, logger):
 	(pool_start, pool_stop) = cal_ip_pool(name, cidr, logger)
 	configurations['networks']['s6a-pool-start'] = pool_start
 	configurations['networks']['s6a-pool-end'] = pool_stop
-	ip_file_read = open(PATH_IP_FILES + name + '_available_ips.txt', 'r')
+	ip_file_read = open(path_ip_files + name + '_available_ips.txt', 'r')
 	available_ip_1 = ip_file_read.readline()
 	available_ip_1 = available_ip.rstrip("\n")
 	available_ip_2 = ip_file_read.readline()
@@ -114,7 +114,7 @@ def input_configurations(error_logger, logger):
 	(pool_start, pool_stop) = cal_ip_pool(name, cidr,logger)
 	configurations['networks']['radius-pool-start'] = pool_start
 	configurations['networks']['radius-pool-end'] = pool_stop
-	ip_file_read = open(PATH_IP_FILES + name + '_available_ips.txt', 'r')
+	ip_file_read = open(path_ip_files + name + '_available_ips.txt', 'r')
 	available_ip = ip_file_read.readline()
 	available_ip = available_ip.rstrip("\n")
 	configurations['networks']['allowed-ip-radius'] = available_ip
@@ -128,13 +128,12 @@ def input_configurations(error_logger, logger):
 	(pool_start, pool_stop) = cal_ip_pool(name, cidr, logger)
 	configurations['networks']['sgs-pool-start'] = pool_start
 	configurations['networks']['sgs-pool-end'] = pool_stop
-	ip_file_read = open(PATH_IP_FILES + name + '_available_ips.txt', 'r')
+	ip_file_read = open(path_ip_files + name + '_available_ips.txt', 'r')
 	available_ip = ip_file_read.readline()
 	available_ip = available_ip.rstrip("\n")
 	configurations['networks']['allowed-ip-sgs'] = available_ip
 	ip_file_read.close()
 
-	
 	inp = file_read.readline()
 	inp = inp.split("\"")
 	configurations['networks']['sgi-cidr'] = inp[1]	
@@ -143,7 +142,7 @@ def input_configurations(error_logger, logger):
 	(pool_start, pool_stop) = cal_ip_pool(name, cidr,logger)
 	configurations['networks']['sgi-pool-start'] = pool_start
 	configurations['networks']['sgi-pool-end'] = pool_stop
-	ip_file_read = open(PATH_IP_FILES + name + '_available_ips.txt', 'r')
+	ip_file_read = open(path_ip_files + name + '_available_ips.txt', 'r')
 	available_ip = ip_file_read.readline()
 	available_ip = available_ip.rstrip("\n")
 	configurations['networks']['allowed-ip-sgi'] = available_ip
@@ -154,27 +153,6 @@ def input_configurations(error_logger, logger):
 		json.dump(configurations, outfile, indent=4)
 	file_read.close()
 
-	
-'''
-	#vcm_cfg_file_read = open('range_nexthop.txt', 'r').readlines()
-	try:
-		param_file_write = open('source/vEPC_deploy/ip_files/range_nexthop.txt', 'w')
-	except:
-		print "source/vEPC_deploy/ip_files/range_nexthop.txt: file not found"
-		error_logger.exception("source/vEPC_deploy/ip_files/range_nexthop.txt: file not found")
-		#sys.exit()
-	inp = file_read.readline()
-	param_file_write.write(inp)
-	
-	inp = file_read.readline()
-	param_file_write.write(inp)
-	
-	logger.info("writing to configuration file")
-	json_file.close()
-	param_file_write.close()
-'''
-
-	
 #--------------------------------------------------------#
 
 #===========calculate IP pool============#
@@ -218,8 +196,8 @@ def get_available_IP(net_addr, mask, logger):
 #===========================================#
 #=============write available IP list to file=========#
 def write_ip_file(list_ips, netname):
-	global PATH_IP_FILES
-	filename = PATH_IP_FILES + netname + '_available_ips.txt'
+	global path_ip_files
+	filename = path_ip_files + netname + '_available_ips.txt'
 	target = open(filename, 'w')
 	target.write(list_ips)
 	target.close()
