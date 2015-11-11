@@ -20,10 +20,10 @@ from file_defs import *
 # ======================= PROMPT INPUT AND CREDENTIALS FUNCTIONS =====================#
 def count_down(time_sleep):
 	for i in range(0, time_sleep):
-		sys.stdout.write('Starting deployment in '+str(time_sleep-i)+'... \r')
+		sys.stdout.write('Starting deployment in ' + str(time_sleep-i) + '... \r')
 		sys.stdout.flush()
 		time.sleep(1)
-def check_input(predicate, msg, error_string="Illegal Input"):
+def check_input(predicate, msg, error_string = "Invalid Input"):
 	while True:
 		result = raw_input(msg)
 		if predicate(result):
@@ -31,7 +31,7 @@ def check_input(predicate, msg, error_string="Illegal Input"):
 		print(error_string)
 # Prompt user to input value or use default value
 def take_input(prompt, def_val):
-	inp = raw_input(prompt +' <default: '+def_val+'>: ')
+	inp = raw_input(prompt + ' <default: ' + def_val + '>: ')
 	if(inp == ''):
 		return def_val
 	else:

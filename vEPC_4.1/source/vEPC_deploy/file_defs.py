@@ -46,15 +46,20 @@ def input_configurations(error_logger, logger):
 	
 	inp = file_read.readline()
 	inp = inp.split("\"")
-	configurations['os-creds']['os-user-name'] = inp[1]
+	configurations['os-creds']['os-user'] = inp[1]
 	
 	inp = file_read.readline()
 	inp = inp.split("\"")
 	configurations['os-creds']['os-tenant-name'] = inp[1]
+	configurations['os-creds']['os-project-id'] = inp[1]
 	
 	inp = file_read.readline()
 	inp = inp.split("\"")
 	configurations['os-creds']['os-pass'] = inp[1]
+	
+	inp = file_read.readline()
+	inp = inp.split("\"")
+	configurations['os-creds']['os-region-name'] = inp[1]
 	
 	inp = file_read.readline()
 	inp = inp.split("\"")
@@ -104,7 +109,7 @@ def input_configurations(error_logger, logger):
 	logger.info("writing to configuration file")
 	json_file.close()
 	with open('configurations.json', 'w') as outfile:
-		json.dump(configurations, outfile, indent=7)
+		json.dump(configurations, outfile, indent = 7)
 	param_file_write.close()
 	
 	file_read.close()
@@ -379,7 +384,7 @@ def mme_file_edit(configurations, neutron, logger):
 	
 	for line in file_str:
 		if line.startswith("ifconfig eth1:1"):
-			new_line = "ifconfig eth1:1 " + mme_ip + "/" + s1c_cidr[1] # + " -arp\n"
+			new_line = "ifconfig eth1:1 " + mme_ip + "/" + s1c_cidr[1] + " -arp\n"
 			file_write.write(new_line)
 		else:
 			file_write.write(line)

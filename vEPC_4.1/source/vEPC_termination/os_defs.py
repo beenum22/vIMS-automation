@@ -119,94 +119,131 @@ def clear_network(network_name, neutron, configurations,
 		s1c_to_rif2 = get_port_id('s1c_to_rif2', neutron)
 		if(s1c_to_rif1 != 'port-not-found'):
 			neutron.delete_port(s1c_to_rif1)
-			#print("[" + time.strftime("%H:%M:%S") + "] Port s1c_to_rif1 deleted.")
 		if(s1c_to_rif2 != 'port-not-found'):
 			neutron.delete_port(s1c_to_rif2)
-			#print("[" + time.strftime("%H:%M:%S") + "] Port s1c_to_rif2 deleted.")
 	
 	elif(network_name == configurations['networks']['s1u-name']):
 		s1u_to_dpe1 = get_port_id('s1u_to_dpe1', neutron)
 		s1u_to_dpe2 = get_port_id('s1u_to_dpe2', neutron)
 		if(s1u_to_dpe1 != 'port-not-found'):
 			neutron.delete_port(s1u_to_dpe1)
-			#print("[" + time.strftime("%H:%M:%S") + "] Port s1u_to_dpe1 deleted.")
 		if(s1u_to_dpe2 != 'port-not-found'):
 			neutron.delete_port(s1u_to_dpe2)
-			#print("[" + time.strftime("%H:%M:%S") + "] Port s1u_to_dpe2 deleted.")
 	
 	elif(network_name == configurations['networks']['s6a-name']):
 		s6a_to_udb1 = get_port_id('s6a_to_udb1', neutron)
 		s6a_to_udb2 = get_port_id('s6a_to_udb2', neutron)
 		if(s6a_to_udb1 != 'port-not-found'):
 			neutron.delete_port(s6a_to_udb1)
-			#print("[" + time.strftime("%H:%M:%S") + "] Port s6a_to_udb1 deleted.")
 		if(s6a_to_udb2 != 'port-not-found'):
 			neutron.delete_port(s6a_to_udb2)
-			#print("[" + time.strftime("%H:%M:%S") + "] Port s6a_to_udb2 deleted.")
 	
 	elif(network_name == configurations['networks']['radius-name']):
 		radius_to_cdf1 = get_port_id('radius_to_cdf1', neutron)
 		radius_to_cdf2 = get_port_id('radius_to_cdf2', neutron)
 		if(radius_to_cdf1 != 'port-not-found'):
 			neutron.delete_port(radius_to_cdf1)
-			#print("[" + time.strftime("%H:%M:%S") + "] Port radius_to_cdf1 deleted.")
 		if(radius_to_cdf2 != 'port-not-found'):
 			neutron.delete_port(radius_to_cdf2)
-			#print("[" + time.strftime("%H:%M:%S") + "] Port radius_to_cdf2 deleted.")
 	
 	elif(network_name == configurations['networks']['sgs-name']):
 		sgs_to_rif1 = get_port_id('sgs_to_rif1', neutron)
 		sgs_to_rif2 = get_port_id('sgs_to_rif2', neutron)
 		if(sgs_to_rif1 != 'port-not-found'):
 			neutron.delete_port(sgs_to_rif1)
-			#print("[" + time.strftime("%H:%M:%S")+ "] Port sgs_to_rif1 deleted.")
 		if(sgs_to_rif2 != 'port-not-found'):
 			neutron.delete_port(sgs_to_rif2)
-			#print("[" + time.strftime("%H:%M:%S")+ "] Port sgs_to_rif2 deleted.")
 	
 	elif(network_name == configurations['networks']['sgi-name']):
 		sgi_to_dpe1 = get_port_id('sgi_to_dpe1', neutron)
 		sgi_to_dpe2 = get_port_id('sgi_to_dpe2', neutron)
 		if(sgi_to_dpe1 != 'port-not-found'):
 			neutron.delete_port(sgi_to_dpe1)
-			#print("[" + time.strftime("%H:%M:%S") + "] Port sgi_to_dpe1 deleted.")
 		if(sgi_to_dpe2 != 'port-not-found'):
 			neutron.delete_port(sgi_to_dpe2)
-			#print("[" + time.strftime("%H:%M:%S") + "] Port sgi_to_dpe2 deleted.")
 	
 	neutron.delete_network(get_network_id(network_name, neutron))
-	print("[" + time.strftime("%H:%M:%S")+ "] Network "+network_name+' deleted.')
+	print("[" + time.strftime("%H:%M:%S")+ "] Network " + network_name + " deleted.")
 #===========================================================================================#
 #==============delete all networks and router==================#
 def del_networks(neutron, configurations, error_logger, logger_neutron):
-	
 	router_id = get_router_id(configurations['router']['name'], neutron)
 	
-	remove_interface(neutron, get_subnet_id(neutron, configurations['networks']['s1c-name']), router_id)
-	clear_network(configurations['networks']['s1c-name'], neutron,
-					configurations, error_logger, logger_neutron)
+	if (router_id == 'router-not-found'):
+		return
 	
-	remove_interface(neutron, get_subnet_id(neutron, configurations['networks']['s1u-name']), router_id)
-	clear_network(configurations['networks']['s1u-name'], neutron, 
-					configurations, error_logger, logger_neutron)
+	s1c = get_subnet_id(neutron, configurations['networks']['s1c-name'])
+	if (s1c != 'subnet-not-found'):
+		try:
+			remove_interface(neutron, s1c, router_id)
+		except:
+			error_logger.exception(configurations['networks']['s1c-name'] + " has no interface on VCM Router ...")
+		try:
+			clear_network(configurations['networks']['s1c-name'], neutron,
+						configurations, error_logger, logger_neutron)
+		except:
+			error_logger.exception(configurations['networks']['s1c-name'] + " doesn't exist ...")
 	
-	remove_interface(neutron, get_subnet_id(neutron, configurations['networks']['sgs-name']), router_id)
-	clear_network(configurations['networks']['sgs-name'], neutron, 
-					configurations, error_logger, logger_neutron)
+	s1u = get_subnet_id(neutron, configurations['networks']['s1u-name'])
+	if (s1u != 'subnet-not-found'):
+		try:
+			remove_interface(neutron, s1u, router_id)
+		except:
+			error_logger.exception(configurations['networks']['s1u-name'] + " has no interface on VCM Router ...")
+		try:	
+			clear_network(configurations['networks']['s1u-name'], neutron, 
+						configurations, error_logger, logger_neutron)
+		except:
+			error_logger.exception(configurations['networks']['s1u-name'] + " doesn't exist ...")
 	
-	remove_interface(neutron, get_subnet_id(neutron, configurations['networks']['sgi-name']), router_id)
-	clear_network(configurations['networks']['sgi-name'], neutron, 
-					configurations, error_logger, logger_neutron)
+	sgs = get_subnet_id(neutron, configurations['networks']['sgs-name'])
+	if (sgs != 'subnet-not-found'):
+		try:
+			remove_interface(neutron, sgs, router_id)
+		except:
+			error_logger.exception(configurations['networks']['sgs-name'] + " has no interface on VCM Router ...")
+		try:
+			clear_network(configurations['networks']['sgs-name'], neutron, 
+						configurations, error_logger, logger_neutron)
+		except:
+			error_logger.exception(configurations['networks']['s1u-name'] + " doesn't exist ...")
 	
-	remove_interface(neutron, get_subnet_id(neutron, configurations['networks']['radius-name']), router_id)
-	clear_network(configurations['networks']['radius-name'], neutron, 
-					configurations, error_logger, logger_neutron)
+	sgi = get_subnet_id(neutron, configurations['networks']['sgi-name'])
+	if (sgi != 'subnet-not-found'):
+		try:
+			remove_interface(neutron, sgi, router_id)
+		except:
+			error_logger.exception(configurations['networks']['sgi-name'] + " has no interface on VCM Router ...")
+		try:
+			clear_network(configurations['networks']['sgi-name'], neutron, 
+						configurations, error_logger, logger_neutron)
+		except:
+			error_logger.exception(configurations['networks']['sgi-name'] + " doesn't exist ...")
 	
-	remove_interface(neutron, get_subnet_id(neutron, configurations['networks']['s6a-name']), router_id)
-	clear_network(configurations['networks']['s6a-name'], neutron, 
-					configurations, error_logger, logger_neutron)
+	s6a = get_subnet_id(neutron, configurations['networks']['s6a-name'])
+	if (s6a != 'subnet-not-found'):
+		try:
+			remove_interface(neutron, s6a, router_id)
+		except:
+			error_logger.exception(configurations['networks']['s6a-name'] + " has no interface on VCM Router ...")
+		try:
+			clear_network(configurations['networks']['s6a-name'], neutron, 
+						configurations, error_logger, logger_neutron)
+		except:
+			error_logger.exception(configurations['networks']['s6a-name'] + " doesn't exist ...")
 	
-#==========================================================================================================================#
+	radius = get_subnet_id(neutron, configurations['networks']['radius-name'])
+	if (radius != 'subnet-not-found'):
+		try:
+			remove_interface(neutron, radius, router_id)
+		except:
+			error_logger.exception(configurations['networks']['radius-name'] + " has no interface on VCM Router ...")
+		try:
+			clear_network(configurations['networks']['radius-name'], neutron, 
+						configurations, error_logger, logger_neutron)
+		except:
+			error_logger.exception(configurations['networks']['radius-name'] + " doesn't exist ...")
+#===========================================================================================================#
 #==============get subnet of network==========#
 def get_subnet_id(neutron, net_name):
 	net_list = neutron.list_networks()
@@ -225,6 +262,7 @@ def get_router_id(router_name, neutron):
 	for i in range (0, len(routers_list['routers'])):
 		if (routers_list['routers'][i]['name'] == router_name):
 			return routers_list['routers'][i]['id']
+	return 'router-not-found'
 #===========================================#
 #=============Delete Router============================#
 def delete_router(neutron, router_name):
@@ -250,6 +288,27 @@ def get_configurations(logger, error_logger):
 	file.close()
 	return configurations
 #========================================#
+#=========check openstack environment=============#
+def check_env(logger, error_logger):
+	try:
+		logger.info("opening file to detect the environment")
+		p = os.popen("cat /etc/*-release","r")
+	except:
+		error_logger.exception("unable to open file to detect the environment, returning default as CentOS ...")
+		return 'CentOS'
+	line = p.readline()
+	while not line:    
+		if 'CentOS' in line:
+			return 'CentOS'
+		elif 'Wind River' in line:
+			return 'Wind River'
+		elif 'Ubuntu' in line:
+			return 'Ubuntu'
+		elif 'Red Hat' in line:
+			return 'Red Hat'
+		line = p.readline()
+	return 'unknown-environment'
+#==================================================#
 #======================================================#
 def get_aggnameA():   
    return 'GroupA'

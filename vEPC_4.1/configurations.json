@@ -6,18 +6,19 @@
               "vcm-img-name": "VCM_IMG", 
               "ems-img-name": "EMS_IMG"
        }, 
+       "sec-group-name": "VCM-vEPC", 
+       "deploy-ems": "yes", 
        "router": {
               "name": "VCM_Router"
        }, 
-       "deploy-ems": "yes", 
        "os-creds": {
               "os-authurl": "http://10.204.111.42:5000/v2.0/", 
               "os-tenant-name": "admin", 
               "os-project-id": "admin", 
               "os-api-key": "admin", 
               "os-pass": "admin", 
-              "os-user": "admin ", 
-              "os-user-name": "admin"
+              "os-user": "admin", 
+              "os-region-name": "RegionOne"
        }, 
        "networks": {
               "s1u-cidr": "172.16.2.0/24", 

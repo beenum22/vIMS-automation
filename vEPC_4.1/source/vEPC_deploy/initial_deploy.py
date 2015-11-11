@@ -17,7 +17,6 @@ from file_defs import *
 from funcs import *
 #==========================================#
 #=====openstack client API imports=========#
-import novaclient.v1_1.client as nvclient
 import neutronclient.v2_0.client as ntrnclient
 import glanceclient
 import keystoneclient.v2_0.client as ksClient
@@ -78,55 +77,28 @@ input_configurations(error_logger, logger)
 # get configurations from json file
 configurations = get_configurations(logger, error_logger)
 
-# get credentials for keystone
-logger.info("Getting keystone credentials for authorization ...")
-credsks = get_keystone_creds(configurations)
+#check OS environment
+name = check_env(logger, error_logger)
+#authenticating client APIs
+if name != 'unknown-environment':
+	
+	keystone = keytsone_auth(name, configurations, logger, error_logger)
 
-# get credentials for nova
-logger_nova.info("Getting nova credentials ...")
-nova_creds = get_nova_creds(configurations)
+	nova = nova_auth(name, configurations, logger_nova, error_logger)
 
-# get authorized instance of keystone
-logger.info("Getting authorized instance of keystone client")
-try:
-	keystone = ksClient.Client(**credsks)
-except:
-	error_logger.exception("Unable to create keystone client instance")
-	print("[" + time.strftime("%H:%M:%S")+ "] Error creating keystone client, please check logs ...")
-	sys.exit()
+	neutron = neutron_auth(name, configurations, logger_neutron, error_logger)
 
-# get authorized instance of nova client
-logger_nova.info("Getting authorized instance to use Nova client API ...")
-try:
-	auth = v2.Password(auth_url = nova_creds['auth_url'],
-						username = nova_creds['username'],
-						password = nova_creds['password'],
-						tenant_name = nova_creds['project_id'])
-	sess = session.Session(auth = auth)
-	nova = client.Client(nova_creds['version'], session = sess)
-except:
-	error_logger.exception("Unable to create nova client instance")
-	print("[" + time.strftime("%H:%M:%S")+ "] Error authorizing nova client API, please check logs ...")
-	sys.exit()
+	glance = glance_auth(name, configurations, keystone, logger_glance, error_logger)
+else:
+	name = 'CentOS'
+	keystone = keytsone_auth(name, configurations, logger, error_logger)
 
-# get authorized instance of neutron client
-logger_neutron.info("Getting authorized instance of neutron client")
-try:
-	neutron = ntrnclient.Client(**credsks)
-except:
-	error_logger.exception("Unable to create neutron client instance")
-	print("[" + time.strftime("%H:%M:%S")+ "] Error authorizing neutron client API, please check logs ...")
-	sys.exit()
-'''
-try:
-	create_IP_file('s1', configurations, logger)
-except:
-	error_logger.exception("Unable to create s1 IP file")
-try:
-	create_IP_file('sgi', configurations, logger)
-except:
-	error_logger.exception("Unable to create sgi IP file")
-'''
+	nova = nova_auth(name, configurations, logger_nova, error_logger)
+
+	neutron = neutron_auth(name, configurations, logger_neutron, error_logger)
+
+	glance = glance_auth(name, configurations, keystone, logger_glance, error_logger)
+##
 
 # ========= resource check function to check available resources on compute node ========== #
 logger_nova.info("Checking if resources available on compute nodes ...")
@@ -142,7 +114,7 @@ val2 = check_resource(nova, node, temp_list, logger)
 if val1 and val2:
 	logger.info("Successfully checked resources. All required resources on compute nodes are availabile ...")
 elif not val1:
-	print("[" + time.strftime("%H:%M:%S")+ "] Warning! Not enough resources available on Compute 1. Please see activity logs for details.")
+	print("[" + time.strftime("%H:%M:%S")+ "] Warning! Not enough resources available on Compute 1. Please see logs directory for details.")
 	inp = check_input(lambda x: x in ['yes', 'no'],
 					"[" + time.strftime("%H:%M:%S")+ "] Do you still want to deploy vEPC? <yes/no> ")
 	if inp == 'no':
@@ -156,15 +128,6 @@ elif not val2:
 #============================================#
 
 #======= creating VCM and EMS image using glance =========#
-#authorizing glance client
-logger_glance.info("Getting authorized instance of glance client")
-try:
-	glance_endpoint = keystone.service_catalog.url_for(service_type='image', endpoint_type='publicURL')
-	glance = glanceclient.Client('2', glance_endpoint, token=keystone.auth_token)
-except:
-	error_logger.exception("Unable to create glance client instance")
-	print ("[" + time.strftime("%H:%M:%S")+ "] Error creating glance client")
-	sys.exit()
 #creating VCM Image
 img_name = 'VCM_IMG'
 if not image_exists(glance, img_name, error_logger, logger_glance):
@@ -175,16 +138,25 @@ if not image_exists(glance, img_name, error_logger, logger_glance):
 #creating EMS Image
 img_name = 'EMS_IMG'
 if not image_exists(glance, img_name, error_logger, logger_glance):
-	print ("[" + time.strftime("%H:%M:%S")+ "] Creating EMS image...")
+	print("[" + time.strftime("%H:%M:%S") + "] Creating EMS image...")
 	check_image_directory(img_name, logger_glance, error_logger)
 	create_image(glance, img_name, logger_glance, error_logger)
-	print("[" + time.strftime("%H:%M:%S")+ "] Successfully created EMS image")
+	print("[" + time.strftime("%H:%M:%S") + "] Successfully created EMS image")
 
 #=========================================#
 
+sec_group_name = configurations['sec-group-name']
+logger_nova.info("Checking if security group " + configurations['sec-group-name'] + " already exist and creating if not ...")
+try:
+	group = nova.security_groups.find(name = sec_group_name)
+except:
+	error_logger.exception(sec_group_name + " doesn't exist.")
+	logger_nova.info("Creating security group VCM-vEPC ...")
+	nova.security_groups.create(name = sec_group_name, description = 'Security Group for VCM vEPC traffic')
+	
 # Allow PING, SSH and all TCP ingress and egress traffic on default security group of Openstack
 logger_nova.info("Allowing Ping, SSH and All TCP ingress and egress traffic on default security group")
-group = nova.security_groups.find(name = "default")
+group = nova.security_groups.find(name = sec_group_name)
 try:
 	nova.security_group_rules.create(group.id, ip_protocol = "icmp",
 									from_port = -1, to_port = -1)
@@ -209,25 +181,24 @@ try:
 except:
 	error_logger.exception("Port 5000 for VEM already allowed")
 
-logger_nova.info("Successfully allowed Ping, SSH, EMS and VEM ports")
+logger_nova.info("Successfully allowed Ping, SSH, EMS and VEM ports for security group " + sec_group_name + " ...")
 #check if instances already exist
 logger.info("Checking if VCM-1 components already exist ...")
 for i in range(0, 7):
 	instance_name = name_list[i] + "-1"
 	if is_server_exists(instance_name, nova, logger_nova):
 		print("[" + time.strftime("%H:%M:%S")+ "] vEPC components exist. Please run vEPC Termination script first and then re-try...")
-		error_logger.error("vEPC components already exist")
+		error_logger.error("vEPC components already exist. Exiting ...")
 		sys.exit()
 
 logger.info("Done checking, no instance of VCM-1 exists")
-
 logger.info("Now Checking if VCM-2 already exists")
 #check if instances 2 already exist
 for i in range(0, 7):
 	instance_name = name_list[i]+"-2"
 	if is_server_exists(instance_name, nova, logger_nova):
 		print("[" + time.strftime("%H:%M:%S")+ "] vEPC components exist. Please run vEPC Termination script first and then re-try...")
-		error_logger.error("vEPC components already exist")
+		error_logger.error("vEPC components already exist. Exiting ...")
 		sys.exit()
 
 logger.info("Done checking, no instance of VCM-2 exists")
@@ -237,31 +208,14 @@ create_agg(nova, error_logger, logger_nova)
 avl_zoneA = get_avlzoneA()
 avl_zoneB = get_avlzoneB()
 
+#===update quota values=====#
+quota_update(nova, configurations, logger_nova, error_logger)
+#===========================#
 logger.info("Starting vEPC deployment ...")
 print("[" + time.strftime("%H:%M:%S") + "] Starting vEPC deployment ...")
-# create networks S1C, S1U, S6a, RADIUS, SGs and SGi
-create_network(network_name = configurations['networks']['net-int-name'], cfg_name = 'net-int',
-				neutron = neutron, configurations = configurations, logger_neutron = logger_neutron)
+# create networks S1C, S1U, S6a, RADIUS, SGs and SGi and router
 
-create_network(network_name = configurations['networks']['s1c-name'], cfg_name = 's1c',
-				neutron = neutron, configurations = configurations, logger_neutron=logger_neutron)
-
-create_network(network_name = configurations['networks']['s1u-name'], cfg_name = 's1u',
-				neutron = neutron, configurations = configurations, logger_neutron=logger_neutron)
-
-create_network(network_name = configurations['networks']['s6a-name'], cfg_name = 's6a',
-				neutron = neutron, configurations = configurations, logger_neutron=logger_neutron)
-
-create_network(network_name = configurations['networks']['radius-name'], cfg_name = 'radius',
-				neutron = neutron, configurations = configurations, logger_neutron=logger_neutron)
-
-create_network(network_name = configurations['networks']['sgs-name'], cfg_name = 'sgs',
-				neutron = neutron, configurations = configurations, logger_neutron = logger_neutron)
-
-create_network(network_name = configurations['networks']['sgi-name'], cfg_name='sgi',
-				neutron = neutron, configurations = configurations, logger_neutron = logger_neutron)
-
-create_router(neutron, configurations)
+net_create(neutron, configurations, error_logger, logger_neutron)
 
 os.system("chmod +x source/vEPC_deploy/at/cloud-config/*")
 
@@ -287,51 +241,50 @@ try:
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 except:
 	error_logger.exception("Unable to create paramiko client instance")
-	print("[" + time.strftime("%H:%M:%S") + "] Error creating paramiko client")
+	print("[" + time.strftime("%H:%M:%S") + "] Error creating paramiko client for SSH ...")
 	sys.exit()
-print("[" + time.strftime("%H:%M:%S") + "] VCM-1 and VCM-2 instances deployment complete! Please wait for configurations..")
+print("[" + time.strftime("%H:%M:%S") + "] VCM-1 and VCM-2 instances deployment complete!")
 #===============================================================================================#
 #============================EMS Deploy=================================================#
 ems_name = configurations['vcm-cfg']['ems-vm-name']
 logger.info("Starting " + ems_name + " deployement")
 if not (is_server_exists(ems_name, nova, logger_nova)):
-	if configurations['deploy-ems'] == 'yes':
-		# Deploy EMS so that it's ready by the time vEPC is setup
-		ems_ip = deploy_EMS(configurations['vcm-cfg']['ems-vm-name'], nova, neutron,
-								configurations, avl_zoneA, error_logger, logger_neutron, logger_nova)
-		# deploy EMS
-		print("[" + time.strftime("%H:%M:%S") + "] Setting up " + ems_name + "...")
-		time.sleep(10)
-		check_ping_status(ems_ip, configurations['vcm-cfg']['ems-vm-name'], logger)
-		
-		create_EMS_hostsfile(configurations, nova)
-		hostname_config(ssh, ems_name, ems_ip, ems_name, 'ems.txt', remote_path_hostname, error_logger, logger_ssh)
-		time.sleep(40)
-		while(True):
-			try:
-				logger_ssh.info("Connecting to " + configurations['vcm-cfg']['ems-vm-name'])
-				ssh.connect(ems_ip, username='root', password='root123')
-				logger_ssh.info("Connected to VCM-EMS")
-				break
-			except:
-				print("[" + time.strftime("%H:%M:%S") + "] " + ems_name + " not ready for SSH waiting...")
-				error_logger.exception(ems_name + " not ready for SSH")
-				time.sleep(3)
-		logger_ssh.info("Starting " + ems_name + " service")
-		stdin, stdout, stderr = ssh.exec_command("vcmems start")
-		while not stdout.channel.exit_status_ready():
-			# Only print data if there is data to read in the channel 
-			if stdout.channel.recv_ready():
-				rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-				if len(rl) > 0:
-					# Print data from stdout
-					print stdout.channel.recv(1024)
-		ssh.close()
-		logger_ssh.info("Started " + ems_name + " service")
+	# Deploy EMS so that it's ready by the time vEPC is setup
+	ems_ip = deploy_EMS(configurations['vcm-cfg']['ems-vm-name'], nova, neutron,
+							configurations, avl_zoneA, error_logger, logger_neutron, logger_nova)
+	# deploy EMS
+	print("[" + time.strftime("%H:%M:%S") + "] Setting up " + ems_name + "...")
+	time.sleep(10)
+	check_ping_status(ems_ip, configurations['vcm-cfg']['ems-vm-name'], logger)
+	
+	create_EMS_hostsfile(configurations, nova)
+	hostname_config(ssh, ems_name, ems_ip, ems_name, 'ems.txt', remote_path_hostname, error_logger, logger_ssh)
+	time.sleep(50)
+	while(True):
+		try:
+			logger_ssh.info("Connecting to " + configurations['vcm-cfg']['ems-vm-name'])
+			ssh.connect(ems_ip, username = 'root', password = 'root123')
+			logger_ssh.info("Connected to VCM-EMS")
+			break
+		except:
+			print("[" + time.strftime("%H:%M:%S") + "] " + ems_name + " not ready for SSH waiting...")
+			error_logger.exception(ems_name + " not ready for SSH")
+			time.sleep(3)
+	logger_ssh.info("Starting " + ems_name + " service")
+	stdin, stdout, stderr = ssh.exec_command("vcmems start")
+	while not stdout.channel.exit_status_ready():
+		# Only print data if there is data to read in the channel 
+		if stdout.channel.recv_ready():
+			rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+			if len(rl) > 0:
+				# Print data from stdout
+				print stdout.channel.recv(1024)
+	ssh.close()
+	logger_ssh.info("Started " + ems_name + " service")
 time.sleep(2)
 
 net_name = configurations['networks']['net-int-name']
-server = nova.servers.find(name=ems_name).addresses
+server = nova.servers.find(name = ems_name).addresses
 ems_ip = server[net_name][1]['addr']
 logger_ssh.info("Successfully deployed " + ems_name)
 #=================================EMS deploy end====================================#
@@ -344,6 +297,7 @@ time.sleep(10)
 for i in range(0, 7):
 	check_ping_status(instance_list[i].ip, instance_list[i].name, logger)
 	check_ping_status(instance_list2[i].ip, instance_list2[i].name, logger)
+
 print("[" + time.strftime("%H:%M:%S")+ "] Assigning new host-names please wait..")
 
 # copy files for new hostnames
@@ -353,10 +307,10 @@ for i in range(0, 7):
 	hostname_config(ssh, name_list[i], instance_list2[i].ip, instance_list2[i].name, 
 					file_list2[i], remote_path_hostname, error_logger, logger_ssh)
 
-#-------update vcm-mme-start file-----#
+#================update vcm-mme-start file=============#
 write_cfg_file(local_path_dell_cfg, configurations, nova, neutron)
 mme_file_edit(configurations, neutron, logger)
-#=======================================#
+#======================================================#
 # start running scripts on VCM-1
 for i in range(0, 7):
 	print("[" + time.strftime("%H:%M:%S") + "] Configuring " + instance_list[i].name)
@@ -364,7 +318,7 @@ for i in range(0, 7):
 		try:
 			info_msg = "Connecting to " + instance_list[i].name
 			logger_ssh.info(info_msg)
-			ssh.connect(instance_list[i].ip, username='root', password='root123')
+			ssh.connect(instance_list[i].ip, username = 'root', password = 'root123')
 			break
 		except:
 			print("[" + time.strftime("%H:%M:%S")+ "] " + instance_list[i].name + " not ready for SSH waiting...")
@@ -386,8 +340,6 @@ for i in range(0, 7):
 		ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("./deploy_script --vnfc " + name_list[i] + " --instance_id 1 --internal_if eth2")
 	
 	output = ssh_stdout.readlines()
-	print("[" + time.strftime("%H:%M:%S") + "]\n")
-	print output
 	
 	if i == 0 or i == 6:
 		print("[" + time.strftime("%H:%M:%S") + "] \t Copying config file...")
@@ -400,27 +352,9 @@ for i in range(0, 7):
 			sftp.put(local_path_mme_cfg, remote_path_mme_cfg)
 		logger_ssh.info("Successfully copied")
 		sftp.close()
-	info_msg = "executing command: ./validate_deploy.sh"
-	logger_ssh.info(info_msg)
-	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('./validate_deploy.sh')
-	ssh_stdout.readlines()
-	
-	output = ssh_stdout.readlines()
-	print("[" + time.strftime("%H:%M:%S") + "]\n")
-	print output
 	
 	ssh.close()
 #===========================================================================================#
-'''
-# updating neutron ports to allow traffic
-
-(s1_mme1, s1_u1) = get_assigned_IP_from_file('s1', error_logger)
-sgi1 = get_assigned_IP_from_file('sgi', error_logger)
-# Update ports to allow addresses < portsS1 => 0 == s1_mme(1.4)[1.20], 1 == s1_u(1.5)[1.21] >
-update_neutron_port(neutron, get_port_id('s1_u', neutron), s1_u1, 'S1-u', logger_neutron, error_logger)
-update_neutron_port(neutron, get_port_id('s1_mme', neutron), s1_mme1, 'S1-mme', logger_neutron, error_logger)
-update_neutron_port(neutron, get_port_id('sgi', neutron), sgi1, 'SGi', logger_neutron, error_logger)
-'''
 
 # start VCM services on VEM and SDB
 vcm_start(ssh, instance_list[0].ip, instance_list[0].name, logger_ssh)
@@ -433,30 +367,10 @@ print("[" + time.strftime("%H:%M:%S")+ "] Configuring VEM-1...")
 time.sleep(5)
 info_msg = "Connecting to " + instance_list[0].name
 logger_ssh.info(info_msg)
-ssh.connect(instance_list[0].ip, username='root', password='root123')
+ssh.connect(instance_list[0].ip, username = 'root', password = 'root123')
 info_msg = "Connected to " + instance_list[0].name
 logger_ssh.info(info_msg)
-'''
-time_out = 0
-for time_out in range (0, 120):
-	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('./validate_deploy.sh')
-	opt = ssh_stdout.readlines()
-	# print(opt)
-	err = False
-	for temp in opt:
-		if(("Fail" in temp) or("Not Ready" in temp)):
-			logger_ssh.warning("VCM service is not ready on VEM-1")
-			print("[" + time.strftime("%H:%M:%S") + "] VCM service not ready on VEM-1")
-			print ("[" + time.strftime("%H:%M:%S") + "] SDB Connection check failed")
-			err = True
-			break
-	if not err:
-		print("[" + time.strftime("%H:%M:%S") + "] VCM service up and running on VEM-1...")
-		break
-	print("[" + time.strftime("%H:%M:%S") + "] VEM-1 not ready, waiting...")
-	time.sleep(30)
-	time_out = time_out + 30
-'''
+
 # Source the configuration file Dell-VCM.cfg for VEM-1
 source_config(ssh, logger_ssh)
 
@@ -464,7 +378,8 @@ source_config(ssh, logger_ssh)
 # Start VCM services on rest of components
 for i in range(2, 7):
 	vcm_start(ssh, instance_list[i].ip, instance_list[i].name, logger_ssh)
-
+for i in range (0, 7):
+	validate_deploy(ssh, instance_list[i].ip, instance_list[i].name, logger_ssh)
 #=======================configuring VCM 2 =======================#
 for i in range(0, 7):
 	print("[" + time.strftime("%H:%M:%S") + "] Configuring " + instance_list2[i].name)
@@ -472,7 +387,7 @@ for i in range(0, 7):
 		try:
 			info_msg = "Connecting to " + instance_list2[i].name
 			logger_ssh.info(info_msg)
-			ssh.connect(instance_list2[i].ip, username='root', password='root123')
+			ssh.connect(instance_list2[i].ip, username = 'root', password = 'root123')
 			break
 		except:
 			print("[" + time.strftime("%H:%M:%S") + "] " + instance_list2[i].name + " not ready for SSH waiting...")
@@ -493,31 +408,8 @@ for i in range(0, 7):
 	elif i==5 or i==6:
 		ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("./deploy_script --vnfc " + name_list[i] + " --instance_id 2 --internal_if eth2")
 	
-	output = ssh_stdout.readlines()
-	print("[" + time.strftime("%H:%M:%S") + "]\n")
-	print output
-	print '\n'
-	logger_ssh.info("executing command: ./validate_deploy.sh")
-	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('./validate_deploy.sh')
-	ssh_stdout.readlines()
-	
-	output = ssh_stdout.readlines()
-	print("[" + time.strftime("%H:%M:%S") + "]\n")
-	print output
-	print '\n'
-	
 	ssh.close()
-#---------------------#
-'''
-# updating neutron ports to allow traffic
-(s1_mme1, s1_u1) = get_assigned_IP_from_file('s1', error_logger)
-sgi1 = get_assigned_IP_from_file('sgi', error_logger)
-# Update ports to allow addresses configurations['allowed-ip2']
-update_neutron_port(neutron, get_port_id('s1_u2', neutron), s1_u1, 'S1-u2', logger_neutron, error_logger)
-update_neutron_port(neutron, get_port_id('s1_mme2', neutron), s1_mme1, 'S1-mme2', logger_neutron, error_logger)
-update_neutron_port(neutron, get_port_id('sgi2', neutron), sgi1, 'SGi2', logger_neutron, error_logger)
-#------------------------------#
-'''
+#=========================================#
 # start VCM services on VEM and SDB
 vcm_start(ssh, instance_list2[0].ip, instance_list2[0].name, logger_ssh)
 vcm_start(ssh, instance_list2[1].ip, instance_list2[1].name, logger_ssh)
@@ -527,36 +419,19 @@ print("[" + time.strftime("%H:%M:%S") + "] Configuring VEM-2...")
 time.sleep(30)
 info_msg = "Connecting to " + instance_list2[0].name
 logger_ssh.info(info_msg)
-ssh.connect(instance_list2[0].ip, username='root', password='root123')
+ssh.connect(instance_list2[0].ip, username = 'root', password = 'root123')
 info_msg = "Connected to " + instance_list2[0].name
 logger_ssh.info(info_msg)
-time_out = 0
-for time_out in range (0, 120):
-	logger_ssh.info("executing command: ./validate_deploy.sh ")
-	ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('./validate_deploy.sh')
-	opt = ssh_stdout.readlines()
-	# print(opt)
-	err = False
-	for temp in opt:
-		if(("Fail" in temp) or("Not Ready" in temp)):
-			logger_ssh.warning("VCM service is not ready on VEM-2")
-			print("[" + time.strftime("%H:%M:%S") + "] VCM service not ready on VEM-2")
-			print ("[" + time.strftime("%H:%M:%S") + "] SDB Connection check failed")
-			err = True
-			break
-	if not err:
-		print("[" + time.strftime("%H:%M:%S") + "] VCM service up and running on VEM-2...")
-		break
-	print("[" + time.strftime("%H:%M:%S") + "] VEM-2 not ready, waiting...")
-	time.sleep(30)
-	time_out = time_out + 30
 
 logger.info("VCM service up and running on VEM-2")
 
 # Start VCM services on rest of components
 for i in range(2, 7):
 	vcm_start(ssh, instance_list2[i].ip, instance_list2[i].name, logger_ssh)
-
+for i in range (0, 7):
+	validate_deploy(ssh, instance_list2[i].ip, instance_list2[i].name, logger_ssh)
+print("[" + time.strftime("%H:%M:%S") + "] VCM-vEPC Deployment Complete ....")
 #======================================== vEPC Deploy END ==================================================#
-
+#===========EMS GUI IP ===============#
+logger.info(ems_name + " GUI can be started from the browser with url http://"+ems_ip+":8980/vcmems/")
 print("[" + time.strftime("%H:%M:%S")+ "] " + ems_name + " GUI can be started from the browser with url http://"+ems_ip+":8980/vcmems/")

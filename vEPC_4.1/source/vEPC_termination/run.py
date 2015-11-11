@@ -55,35 +55,38 @@ while True:
 #logger.info("vEPC termination started")
 name_list = ['VEM', 'SDB', 'CPE', 'CDF', 'UDB', 'DPE', 'RIF']
 scale_up_list = ['SDB', 'CPE', 'DPE']
+
 configurations = get_configurations(logger, error_logger)
-logger.info("Getting keystone credentials for authorization")
-credsks = get_keystone_creds(configurations)
-logger_nova.info("Getting nova credentials")
-nova_creds = get_nova_creds(configurations)
-# Get authorized instance of nova client
-logger_nova.info("Getting authorized instance of nova client")
-try:
-	auth = v2.Password(auth_url = nova_creds['auth_url'],
-						   username = nova_creds['username'],
-						   password = nova_creds['password'],
-						   tenant_name = nova_creds['project_id'])
-	sess = session.Session(auth = auth)
-	nova = client.Client(nova_creds['version'], session = sess)
-except:
-	error_logger.exception("Unable to create nova client instance")
-# Get authorized instance of neutron client
-logger_neutron.info("Getting authorized instance of neutron client")
-try:
-	neutron = ntrnclient.Client(**credsks)
-except:
-	error_logger.exception("Unable to create neutron client instance")
+
+#check OS environment
+name = check_env(logger, error_logger)
+#authenticating client APIs
+if name != 'unknown-environment':
+	
+	keystone = keytsone_auth(name, configurations, logger, error_logger)
+
+	nova = nova_auth(name, configurations, logger_nova, error_logger)
+
+	neutron = neutron_auth(name, configurations, logger_neutron, error_logger)
+
+	glance = glance_auth(name, configurations, keystone, logger_glance, error_logger)
+else:
+	name = 'CentOS'
+	keystone = keytsone_auth(name, configurations, logger, error_logger)
+
+	nova = nova_auth(name, configurations, logger_nova, error_logger)
+
+	neutron = neutron_auth(name, configurations, logger_neutron, error_logger)
+
+	glance = glance_auth(name, configurations, keystone, logger_glance, error_logger)
+##
 
 configurations['auto-del'] = 'yes'
 configurations['deploy-ems'] = 'yes'
 #try:
 for i in range(0, 7):
-	instance_name = name_list[i]+"-1"
-	instance_name2 = name_list[i]+"-2"
+	instance_name = name_list[i] + "-1"
+	instance_name2 = name_list[i] + "-2"
 	clear_instance(instance_name, nova, configurations['auto-del'], configurations,
 					neutron, logger, error_logger, logger_nova, logger_neutron)
 	clear_instance(instance_name2, nova, configurations['auto-del'], configurations,
@@ -96,19 +99,33 @@ while True:
 	if chk == 'no' or chk == 'yes':
 		break
 	else:
-		print("Illegal input")
+		print("Invalid input")
 	
 if chk == 'yes':
 	clear_instance(configurations['vcm-cfg']['ems-vm-name'], nova, configurations['auto-del'], 
 					configurations, neutron, logger, error_logger, logger_nova, logger_neutron)
 	router_id = get_router_id(configurations['router']['name'], neutron)
-	remove_interface(neutron, get_subnet_id(neutron, configurations['networks']['net-int-name']), router_id)
-	clear_network(configurations['networks']['net-int-name'], neutron, configurations, error_logger, logger_neutron)
-
-	delete_router(neutron, configurations['router']['name'])
-#------clearing IP files-----#
+	if (router_id != 'router-not-found'):
+		int_net = get_subnet_id(neutron, configurations['networks']['net-int-name'])
+		if (int_net != 'subnet-not-found'):
+			try:
+				remove_interface(neutron, int_net, router_id)
+			except:
+				error_logger.exception(configurations['networks']['net-int-name'] + " has no interface with VCM Router ...")
+			try:
+				clear_network(configurations['networks']['net-int-name'], neutron,
+								configurations, error_logger, logger_neutron)
+			except:
+				error_logger.exception(configurations['networks']['net-int-name'] + " doesn't exist ...")
+		delete_router(neutron, configurations['router']['name'])
+	try:
+		group = nova.security_groups.find(name = configurations['sec-group-name'])
+		nova.security_groups.delete(group.id)
+	except:
+		logger.exception("Security group " + configurations['sec-group-name'] + " doesn't exist")
+#=====clearing IP files=====#
 clear_IP_files(logger)
-#-----------------------------#
+#============================#
 print("[" + time.strftime("%H:%M:%S") + "] vEPC Termination complete ...")
 
 while True:
@@ -116,7 +133,7 @@ while True:
 	if chk == 'no' or chk == 'yes':
 	    break
 	else:
-	    print("Illegal input")
+	    print("Invalid input")
 if chk == 'yes':
 	print("[" + time.strftime("%H:%M:%S") + "] Deleting Aggregates : ")
 	del_agg(nova, error_logger, logger_nova)
@@ -129,7 +146,7 @@ while True:
 	elif chk == 'yes':
 	    break
 	else:
-	    print("Illegal input")
+	    print("Invalid input")
 logger.info("Getting authorized instance of keystone client")
 keystone = ksClient.Client(**credsks)
 logger_glance.info("Getting authorized instance of glance client")
@@ -150,4 +167,4 @@ if chk == 'yes':
 print("[" + time.strftime("%H:%M:%S") + "] All vEPC components have been terminated...")
 
 logger.info("Successfully terminated vEPC")	
-	
+#================================================================#
