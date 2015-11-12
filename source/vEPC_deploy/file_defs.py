@@ -38,15 +38,20 @@ def input_configurations(error_logger, logger):
 	
 	inp = file_read.readline()
 	inp = inp.split("\"")
-	configurations['os-creds']['os-user-name'] = inp[1]
+	configurations['os-creds']['os-user'] = inp[1]
 	
 	inp = file_read.readline()
 	inp = inp.split("\"")
 	configurations['os-creds']['os-tenant-name'] = inp[1]
+	configurations['os-creds']['os-project-id'] = inp[1]
 	
 	inp = file_read.readline()
 	inp = inp.split("\"")
 	configurations['os-creds']['os-pass'] = inp[1]
+	
+	inp = file_read.readline()
+	inp = inp.split("\"")
+	configurations['os-creds']['os-region-name'] = inp[1]
 	
 	inp = file_read.readline()
 	inp = inp.split("\"")
