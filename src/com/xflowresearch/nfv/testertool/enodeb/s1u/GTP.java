@@ -29,7 +29,7 @@ public class GTP {
 		byte[] byteGTPacket = gtpacket.getPacket();
 		//////////////GTP Echo Packet Creation Here////////////////////
 
-		
+
 		DatagramPacket packet = new DatagramPacket(byteGTPacket, byteGTPacket.length, transportLayerAddress, 2152);
 		try 
 		{
@@ -39,33 +39,31 @@ public class GTP {
 			e.printStackTrace();
 		}
 
-	
-		byte[] receiveData = new byte[1024];
-		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-		try {
-			socket.receive(receivePacket);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		
-		String receivedMessage = bytesToHex(receiveData);
-		System.out.println("GTP Received:"+receivedMessage);
+		/** Receive the Response from the GTP Request Asynchronously **/
+		new Thread(){
+			public void run(){
+				byte[] receiveData = new byte[1024];
+				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+				try {
+					socket.receive(receivePacket);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				String receivedMessage = bytesToHex(receiveData);
+				System.out.println("GTP Received:"+receivedMessage);
+			}
+		}.start();
+
 	}
 
-	
+
 	public void sendGTPacket(){
 
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
 	/**
 	 * Convert byte array to hex String
 	 */
