@@ -46,11 +46,7 @@ public class AttachSimulator {
 	private SctpClient sctpClient;
 
 	public AttachSimulator(XMLParser xmlparser){
-		sctpClient = new SctpClient();
-		if( !sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort())) )
-		{
-			System.exit(1);
-		}	
+			
 	}
 
 
@@ -74,7 +70,13 @@ public class AttachSimulator {
 	 * @param xmlparser
 	 */
 	public Boolean establishS1Signalling(XMLParser xmlparser)
-	{		
+	{
+		sctpClient = new SctpClient();
+		if( !sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort())) )
+		{
+			System.exit(1);
+		}	
+		
 		ArrayList<Value> values = new ArrayList<Value>();
 		values.add(new Value("GlobalENBID", "reject", xmlparser.getS1signallingParams().GlobalENBID));
 		values.add(new Value("eNBname", "ignore", xmlparser.getS1signallingParams().eNBname));

@@ -70,6 +70,22 @@ public class eNodeB implements Runnable
 				simulateUserTraffic.simulateGTPEchoRequest(as.getTransportLayerAddress(), 
 						as.getPDNIpv4(), 
 						as.getTEID());
+				simulateUserTraffic.simulateGTPEchoRequest(as.getTransportLayerAddress(), 
+						as.getPDNIpv4(), 
+						as.getTEID());
+				simulateUserTraffic.simulateGTPEchoRequest(as.getTransportLayerAddress(), 
+						as.getPDNIpv4(), 
+						as.getTEID());
+				simulateUserTraffic.simulateGTPEchoRequest(as.getTransportLayerAddress(), 
+						as.getPDNIpv4(), 
+						as.getTEID());
+				
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 		else{
