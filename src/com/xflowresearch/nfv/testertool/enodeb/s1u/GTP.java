@@ -59,11 +59,6 @@ public class GTP {
 	}
 
 
-	public void sendGTPacket(){
-
-	}
-
-
 	/**
 	 * Convert byte array to hex String
 	 */

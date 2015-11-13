@@ -69,9 +69,9 @@ public class AttachSimulator {
 	 * Establish S1Signalling with MME..
 	 * @param xmlparser
 	 */
-	public Boolean establishS1Signalling(XMLParser xmlparser)
+	public Boolean establishS1Signalling(XMLParser xmlparser, SctpClient sctpClient)
 	{
-		sctpClient = new SctpClient();
+		this.sctpClient = sctpClient;
 		if( !sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort())) )
 		{
 			System.exit(1);

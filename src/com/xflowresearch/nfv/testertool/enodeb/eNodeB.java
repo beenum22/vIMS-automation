@@ -4,7 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xflowresearch.nfv.testertool.common.XMLParser;
+import com.xflowresearch.nfv.testertool.enodeb.s1mme.SctpClient;
+import com.xflowresearch.nfv.testertool.enodeb.s1mme.UserControlInterface;
 import com.xflowresearch.nfv.testertool.enodeb.s1u.GTP;
+import com.xflowresearch.nfv.testertool.enodeb.s1u.UserDataInterface;
 
 /**
  * eNodeB
@@ -18,39 +21,51 @@ import com.xflowresearch.nfv.testertool.enodeb.s1u.GTP;
 public class eNodeB implements Runnable
 {
 	private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
-
 	private XMLParser xmlparser;
+	
+	private SctpClient sctpClient;
+	private UserDataInterface userDataInterface;
+	private UserControlInterface userControlInterface;
+
+	public eNodeB(){
+		sctpClient = new SctpClient();
+		userDataInterface = new UserDataInterface();
+		userControlInterface = new UserControlInterface();
+	}
 
 	public void setXMLParser(XMLParser xmlparser){
 		this.xmlparser = xmlparser;
 	}
-
-	public eNodeB(){
-
-	}
-
-
 	public Logger getLogger(){
 		return eNodeB.logger;
 	}
 
 
 	@Override
-	public void run() {
-
+	public void run() 
+	{
 		logger.info("eNodeB started");
 
 		/** Test Attach Sequence initiation **/
 		AttachSimulator as = new AttachSimulator(xmlparser);
-		GTP simulateUserTraffic = new GTP();
-
+		GTP gtpEcho = new GTP();
+		
+		
+		
 		/**
 		 * establish s1 signalling with the MME
 		 */
-		if(as.establishS1Signalling(xmlparser))
-		{		
-
+		if(as.establishS1Signalling(xmlparser, sctpClient))
+		{
 			logger.info("S1 Signaling Successfully Established");
+			
+			/** Listen for UE Commands for Control Plane Signaling **/
+			userControlInterface.listenForUserControlCommands();
+			
+			/** Listen for UE Data for User Plane **/
+			userDataInterface.listenForUserDataTraffic();
+			
+			
 			/**
 			 * Start the attach sequence with the MME for a UE
 			 */
@@ -67,25 +82,9 @@ public class eNodeB implements Runnable
 				/**
 				 * Simulate HTTP Traffic towards S-GW
 				 */
-				simulateUserTraffic.simulateGTPEchoRequest(as.getTransportLayerAddress(), 
+				gtpEcho.simulateGTPEchoRequest(as.getTransportLayerAddress(), 
 						as.getPDNIpv4(), 
 						as.getTEID());
-				simulateUserTraffic.simulateGTPEchoRequest(as.getTransportLayerAddress(), 
-						as.getPDNIpv4(), 
-						as.getTEID());
-				simulateUserTraffic.simulateGTPEchoRequest(as.getTransportLayerAddress(), 
-						as.getPDNIpv4(), 
-						as.getTEID());
-				simulateUserTraffic.simulateGTPEchoRequest(as.getTransportLayerAddress(), 
-						as.getPDNIpv4(), 
-						as.getTEID());
-				
-				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 			}
 		}
 		else{
