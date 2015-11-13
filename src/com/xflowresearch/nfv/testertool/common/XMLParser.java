@@ -21,7 +21,7 @@ import com.xflowresearch.nfv.testertool.simulationcontrol.SimulationControl;
  * @author ahmadarslan
  */
 public class XMLParser {
-	
+
 	public class S1SignallingParams{
 		public String GlobalENBID;
 		public String eNBname;
@@ -29,20 +29,24 @@ public class XMLParser {
 		public String DefaultPagingDRX;
 	}
 	private S1SignallingParams s1signallingParams = new S1SignallingParams();
-	
+
 	public class AuthenticationResponseParams{
 		public String EUTRANCGI;
 		public String TAI;
 	}
 	private AuthenticationResponseParams authenticationResponseParams = new AuthenticationResponseParams(); 
-	
+
 	private String eNBUES1APID;
 	private String TAI;
 	private String EUTRANCGI;
 	private String RRCEstablishmentCause;
+
 	private String MMEIP;
 	private String MMEPort;
-	
+
+	private int UECount;
+	private int eNBCount;
+
 	public String geteNBUES1APID() {
 		return eNBUES1APID;
 	}
@@ -58,7 +62,7 @@ public class XMLParser {
 	public String getRRCEstablishmentCause() {
 		return RRCEstablishmentCause;
 	}
-	
+
 	public String getMMEIP() {
 		return MMEIP;
 	}
@@ -66,12 +70,19 @@ public class XMLParser {
 	public String getMMEPort() {
 		return MMEPort;
 	}
-	
+
 	public S1SignallingParams getS1signallingParams() {
 		return s1signallingParams;
 	}
 	public AuthenticationResponseParams getAuthenticationResponseParams() {
 		return authenticationResponseParams;
+	}
+	
+	public int getUECount() {
+		return UECount;
+	}
+	public int geteNBCount() {
+		return eNBCount;
 	}
 
 	public void readSimulationParameters()
@@ -91,11 +102,11 @@ public class XMLParser {
 			for (int temp = 0; temp < itemList.size(); temp++) 
 			{    
 				Element item = itemList.get(temp);
-				
+
 				if(item.getName().equals("SimulationParams"))
 				{
-				//	System.out.println("UECount: " + item.getChild("UECount").getText());
-				//	System.out.println("eNBCount: "+ item.getChild("eNBCount").getText());
+					UECount = Integer.parseInt(item.getChild("UECount").getText());
+					eNBCount = Integer.parseInt(item.getChild("eNBCount").getText());
 					MMEIP = item.getChild("MMEIP").getText();
 					MMEPort = item.getChild("MMEPort").getText();
 				}
@@ -126,7 +137,7 @@ public class XMLParser {
 					authenticationResponseParams.EUTRANCGI = item.getChild("EUTRANCGI").getText();
 					authenticationResponseParams.TAI = item.getChild("TAI").getText();
 				}
-			//	System.out.println();        		
+				//	System.out.println();        		
 			}
 		}
 		catch(JDOMException e)

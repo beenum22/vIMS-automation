@@ -21,11 +21,6 @@ public class main {
 				currentFile.delete();
 			}
 		}
-		
 		SimulationControl.getInstance().startSimulation();
-		
-
-
 	}
-
 }

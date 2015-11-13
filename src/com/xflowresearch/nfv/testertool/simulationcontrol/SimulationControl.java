@@ -23,13 +23,13 @@ public class SimulationControl
 
 	private eNodeB enodeb;
 	private UE ue;
-	
+
 	private XMLParser xmlparser;
 
 	/** Logger to log the messages and Errors **/
 	private static final Logger logger = LoggerFactory.getLogger("SimulationControlLogger");
 
-	
+
 	private SimulationControl(){
 		enodeb = new eNodeB();
 		ue = new UE();
@@ -37,12 +37,12 @@ public class SimulationControl
 		xmlparser = new XMLParser();
 	}
 
-	
+
 	public static SimulationControl getInstance( ) {
 		return instance;
 	}
-	
-	
+
+
 	public Logger getLogger(){
 		return SimulationControl.logger;
 	}
@@ -51,21 +51,26 @@ public class SimulationControl
 	public void startSimulation(){
 		logger.info("Simulation started");
 
-		/*TODO: Parse/Read the input parameters from 'XML' files here!! */
+		/* Parse/Read the input parameters from 'XML' files here!! */
 		xmlparser.readSimulationParameters();
 
 		/** Initialize UE and eNodeB instances' data and start their threads**/
-		enodeb.setXMLParser(xmlparser);
-		Thread eNBThread = new Thread(enodeb);
-		eNBThread.setName("eNBThread1");
-		eNBThread.start();
-		logger.info("eNodeB Thread Spawned");
+		if(xmlparser.geteNBCount() != 0)
+		{
+			enodeb.setXMLParser(xmlparser);
+			Thread eNBThread = new Thread(enodeb);
+			eNBThread.setName("eNBThread1");
+			eNBThread.start();
+			logger.info("eNodeB Thread Spawned");
+		}
 
-		Thread UEThread = new Thread(ue);
-		UEThread.setName("UEThread1");
-		UEThread.start();
-		logger.info("UE Thread Spawned");
-
+		if(xmlparser.getUECount() != 0)
+		{
+			Thread UEThread = new Thread(ue);
+			UEThread.setName("UEThread1");
+			UEThread.start();
+			logger.info("UE Thread Spawned");
+		}
+		
 	}
-
 }
