@@ -78,7 +78,7 @@ public class HTTPClient
 		 */
 		//Socket clientSocket = new Socket(host, port, InetAddress.getByName("192.168.100.10"), 0);
 		
-		address = InetAddress.getByName(srcIP);
+		address = InetAddress.getByName("10.20.30.4");
 		
 		Socket clientSocket = new java.net.Socket();
 		clientSocket.bind(new InetSocketAddress(address, 0));
