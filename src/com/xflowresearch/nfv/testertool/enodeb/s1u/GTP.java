@@ -58,7 +58,7 @@ public class GTP {
 				
 				String stringData = bytesToHex(data);
 		        System.out.println("Data Recieved:"+ stringData);
-		        packet.setLength(receiveData.length);
+		        receivePacket.setLength(receiveData.length);
 			}
 		}.start();
 
