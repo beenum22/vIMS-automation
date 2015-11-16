@@ -5,7 +5,7 @@
 
 	<SimulationParams>
 		<UECount>1</UECount>
-		<eNBCount>1</eNBCount>
+		<eNBCount>0</eNBCount>
 		
 		<MMEIP>127.0.0.1</MMEIP>
 		<MMEPort>36412</MMEPort>

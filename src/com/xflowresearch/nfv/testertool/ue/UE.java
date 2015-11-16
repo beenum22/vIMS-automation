@@ -16,9 +16,11 @@ public class UE implements Runnable
 {
 	private static final Logger logger = LoggerFactory.getLogger("UELogger");
 
+	
+	private UEControlInterface ueControlInterface;
 
 	public UE(){
-
+		ueControlInterface = new UEControlInterface();
 	}
 
 
@@ -30,9 +32,8 @@ public class UE implements Runnable
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-
 		logger.info("UE started");
-
+		ueControlInterface.sendControlCommand("Attach;UEParams");
 	}
 
 }
