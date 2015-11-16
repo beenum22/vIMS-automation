@@ -52,7 +52,7 @@ public class UserControlInterface {
 					executeUECommand(stringData);
 			        
 			        // Reset the length of the packet before reusing it.
-			        packet.setLength(buffer.length); 
+			        packet.setLength(buffer.length);
 			      }
 				
 			}//public void run..

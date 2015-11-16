@@ -41,8 +41,10 @@ public class GTP {
 
 		
 		/** Receive the Response from the GTP Request Asynchronously **/
-		new Thread(){
-			public void run(){
+		new Thread()
+		{
+			public void run()
+			{
 				byte[] receiveData = new byte[1024];
 				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 				try {
@@ -51,8 +53,12 @@ public class GTP {
 					e.printStackTrace();
 				}
 
-				String receivedMessage = bytesToHex(receiveData);
-				System.out.println("GTP Received:"+receivedMessage);
+				byte[] data = new byte[receivePacket.getLength()];
+				System.arraycopy(receivePacket.getData(), receivePacket.getOffset(), data, 0, receivePacket.getLength());
+				
+				String stringData = bytesToHex(data);
+		        System.out.println("Data Recieved:"+ stringData);
+		        packet.setLength(receiveData.length);
 			}
 		}.start();
 
