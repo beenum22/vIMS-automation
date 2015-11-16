@@ -59,10 +59,10 @@ public class UserControlInterface {
 
 					String stringData = new String(data);
 					
-					Object reply = executeUECommand(stringData, xmlparser, as);
+					Object reply = executeUECommand(stringData, xmlparser, as, enodeb);
 					
 					String pdnipv4 = null;
-					if(reply.getClass().equals("com.xflowresearch.nfv.testertool.enodeb.s1u.User")){
+					if(reply.getClass().equals(com.xflowresearch.nfv.testertool.enodeb.s1u.User.class)){
 						user = (User) reply;
 						pdnipv4 = user.getIP();
 						enodeb.addNewUser(user);
@@ -91,21 +91,20 @@ public class UserControlInterface {
 
 	}
 
-	public Object executeUECommand(String command, XMLParser xmlparser, AttachSimulator as){
-		return executeAttachSequence(xmlparser, as);
+	public Object executeUECommand(String command, XMLParser xmlparser, AttachSimulator as, eNodeB enodeb){
+		return executeAttachSequence(xmlparser, as, enodeb);
 	}
 
 
-	public Object executeAttachSequence(XMLParser xmlparser, AttachSimulator as)
+	public Object executeAttachSequence(XMLParser xmlparser, AttachSimulator as, eNodeB enodeb)
 	{
 		/** Test Attach Sequence initiation **/
-		GTP gtpEcho = new GTP();
-
 		if(as.initiateAttachSequence(xmlparser))
-		{
+		{	
 			User user = new User();
 			user.setTEID(as.getTEID());
 			user.setIP(as.getPDNIpv4().toString().substring(1, as.getPDNIpv4().toString().length()));
+			enodeb.setTransportLayerAddressInUserControlInterface(as.getTransportLayerAddress());
 			return user;
 		}
 		return null;

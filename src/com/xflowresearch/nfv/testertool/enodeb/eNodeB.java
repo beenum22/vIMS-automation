@@ -1,5 +1,6 @@
 package com.xflowresearch.nfv.testertool.enodeb;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
@@ -54,6 +55,7 @@ public class eNodeB implements Runnable
 		logger.info("eNodeB started");
 
 		AttachSimulator as  = new AttachSimulator(xmlparser);
+		
 		/**
 		 * establish s1 signalling with the MME
 		 */
@@ -65,22 +67,26 @@ public class eNodeB implements Runnable
 			userControlInterface.listenForUserControlCommands(xmlparser, as, this);
 			
 			/** Listen for UE Data for User Plane **/
-			userDataInterface.listenForUserDataTraffic();
-			
-			
-			/**
-			 * Start the attach sequence with the MME for a UE
-			 */
-			
+			System.out.println("Value in eNB:"+as.getTransportLayerAddress());
+			userDataInterface.listenForUserDataTraffic(this);		
 		}
-		else{
+		else
+		{
 			logger.error("Unable to establish S1Signalling with MME");
 		}
 	}
 	
 	
+	public synchronized void setTransportLayerAddressInUserControlInterface(InetAddress transportLayerAddress){
+		userDataInterface.setTransportLayerAddress(transportLayerAddress);
+	}
+	
 	public synchronized void addNewUser(User user){
 		users.add(user);
 		System.out.println("New User Added - TEID:"+user.getTEID());
+	}
+	
+	public synchronized User getUser(int index){
+		return users.get(index);
 	}
 }

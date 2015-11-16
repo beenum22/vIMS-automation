@@ -359,7 +359,7 @@ public class AttachSimulator {
 		String ip1 = value.substring(0, 8);
 		TEID = value.substring(8, 16);
 		String ip2 = value.substring(146, 154);
-
+		
 		try {
 			transportLayerAddress = InetAddress.getByAddress(DatatypeConverter.parseHexBinary(ip1));
 			PDNIpv4 = InetAddress.getByAddress(DatatypeConverter.parseHexBinary(ip2));
@@ -368,14 +368,7 @@ public class AttachSimulator {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println(transportLayerAddress.toString());
-		System.out.println(PDNIpv4.toString());
-
-
-		System.out.println(TEID);
+		
 		logger.info("Data Extracted From ESM InformationResponse - TransportLayerAddress:"+transportLayerAddress+" PDNIPv4:"+PDNIpv4+" TEID:"+TEID);
-
-		//		/System.out.println(value);
-
 	}
 }

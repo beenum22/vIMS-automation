@@ -71,12 +71,17 @@ public class GTPacket {
 			len = "000" + len;
 		this.length = len;
 	}
+	
 	public void setTEID(String tEID) {
 		TEID = tEID;
 	}
 	
+	public void setTPDU(String TPDU){
+		this.TPDU = TPDU;
+	}
+	
 	public byte[] getPacket(){
-		String pac = header + messageType + length + TEID;
+		String pac = header + messageType + length + TEID + TPDU;
 		return hexStringToByteArray(pac); 
 	}
 	

@@ -45,6 +45,7 @@ public class UE implements Runnable
 		pdnipv4 = pdnipv4.substring(1, pdnipv4.length());
 		
 		try {
+			Thread.sleep(3000);
 			httpClient.sendRequest(pdnipv4);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -53,6 +54,9 @@ public class UE implements Runnable
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
