@@ -21,7 +21,7 @@ public class UEControlInterface {
 
 		InetAddress IPAddress = null;
 		try {
-			IPAddress = InetAddress.getByName("192.168.169.2");
+			IPAddress = InetAddress.getByName("10.20.30.3");
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
 		}
@@ -35,7 +35,6 @@ public class UEControlInterface {
 			clientSocket.send(sendPacket);
 			System.out.println("Message Sent");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -49,7 +48,5 @@ public class UEControlInterface {
 
 		clientSocket.close();
 	}
-
-
 
 }
