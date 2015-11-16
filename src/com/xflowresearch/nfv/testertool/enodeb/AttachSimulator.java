@@ -29,6 +29,7 @@ public class AttachSimulator {
 	InetAddress PDNIpv4;
 	String TEID;
 
+	
 
 	private class Value{
 		public String typeOfValue;

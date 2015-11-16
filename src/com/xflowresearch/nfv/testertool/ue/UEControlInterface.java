@@ -38,13 +38,18 @@ public class UEControlInterface {
 			e.printStackTrace();
 		}
 
-		/*
+		
 		byte[] receiveData = new byte[1024];
 		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-		clientSocket.receive(receivePacket);
+		try {
+			clientSocket.receive(receivePacket);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		String modifiedSentence = new String(receivePacket.getData());
 		System.out.println("FROM SERVER:" + modifiedSentence);
-		 */
+		 
 
 		clientSocket.close();
 	}

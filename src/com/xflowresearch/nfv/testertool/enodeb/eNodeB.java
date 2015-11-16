@@ -46,12 +46,7 @@ public class eNodeB implements Runnable
 	{
 		logger.info("eNodeB started");
 
-		/** Test Attach Sequence initiation **/
-		AttachSimulator as = new AttachSimulator(xmlparser);
-		GTP gtpEcho = new GTP();
-		
-		
-		
+		AttachSimulator as  = new AttachSimulator(xmlparser);
 		/**
 		 * establish s1 signalling with the MME
 		 */
@@ -60,7 +55,7 @@ public class eNodeB implements Runnable
 			logger.info("S1 Signaling Successfully Established");
 			
 			/** Listen for UE Commands for Control Plane Signaling **/
-			userControlInterface.listenForUserControlCommands();
+			userControlInterface.listenForUserControlCommands(xmlparser, as);
 			
 			/** Listen for UE Data for User Plane **/
 			userDataInterface.listenForUserDataTraffic();
@@ -69,23 +64,7 @@ public class eNodeB implements Runnable
 			/**
 			 * Start the attach sequence with the MME for a UE
 			 */
-			if(as.initiateAttachSequence(xmlparser))
-			{
-				try 
-				{
-					Thread.sleep(2000);
-				} 
-				catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-
-				/**
-				 * Simulate HTTP Traffic towards S-GW
-				 */
-				gtpEcho.simulateGTPEchoRequest(as.getTransportLayerAddress(), 
-						as.getPDNIpv4(), 
-						as.getTEID());
-			}
+			
 		}
 		else{
 			logger.error("Unable to establish S1Signalling with MME");
