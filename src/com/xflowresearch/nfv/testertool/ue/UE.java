@@ -1,5 +1,9 @@
 package com.xflowresearch.nfv.testertool.ue;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,9 +22,11 @@ public class UE implements Runnable
 
 	
 	private UEControlInterface ueControlInterface;
+	private HTTPClient httpClient;
 
 	public UE(){
 		ueControlInterface = new UEControlInterface();
+		httpClient = new HTTPClient();
 	}
 
 
@@ -33,7 +39,24 @@ public class UE implements Runnable
 	public void run() {
 		// TODO Auto-generated method stub
 		logger.info("UE started");
-		ueControlInterface.sendControlCommand("Attach;UEParams");
+		
+		/** Send Attach command to eNB for attaching to the MME!! to the MME **/
+		String pdnipv4 = ueControlInterface.sendControlCommand("Attach;UEParams");
+		pdnipv4 = pdnipv4.substring(1, pdnipv4.length());
+		
+		try {
+			httpClient.sendRequest(pdnipv4);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 }

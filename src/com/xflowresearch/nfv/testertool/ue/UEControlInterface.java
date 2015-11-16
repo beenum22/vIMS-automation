@@ -9,7 +9,7 @@ import java.net.UnknownHostException;
 
 public class UEControlInterface {
 
-	public void sendControlCommand(String command)
+	public String sendControlCommand(String command)
 	{
 		DatagramSocket clientSocket = null;
 		try {
@@ -33,7 +33,6 @@ public class UEControlInterface {
 		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9877);
 		try {
 			clientSocket.send(sendPacket);
-			System.out.println("Message Sent");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -47,11 +46,10 @@ public class UEControlInterface {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		String modifiedSentence = new String(receivePacket.getData());
-		System.out.println("FROM SERVER:" + modifiedSentence);
-		 
-
+		String pdnipv4 = new String(receivePacket.getData());
 		clientSocket.close();
+		
+		return pdnipv4;
 	}
 
 }
