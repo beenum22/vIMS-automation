@@ -9,16 +9,20 @@ import java.net.UnknownHostException;
 
 import com.xflowresearch.nfv.testertool.common.XMLParser;
 import com.xflowresearch.nfv.testertool.enodeb.AttachSimulator;
+import com.xflowresearch.nfv.testertool.enodeb.eNodeB;
 import com.xflowresearch.nfv.testertool.enodeb.s1u.GTP;
+import com.xflowresearch.nfv.testertool.enodeb.s1u.User;
 
 public class UserControlInterface {
 
-	public void listenForUserControlCommands(XMLParser xmlparser, AttachSimulator as)
-	{
+	public void listenForUserControlCommands(XMLParser xmlparser, AttachSimulator as, eNodeB enodeb)
+	{	
 		new Thread()
 		{
 			public void run()
 			{
+				User user;
+				
 				DatagramSocket serverSocket = null;
 
 				try 
@@ -54,12 +58,20 @@ public class UserControlInterface {
 					System.arraycopy(packet.getData(), packet.getOffset(), data, 0, packet.getLength());
 
 					String stringData = new String(data);
-					String reply = executeUECommand(stringData, xmlparser, as);
-
+					
+					Object reply = executeUECommand(stringData, xmlparser, as);
+					
+					String pdnipv4 = null;
+					if(reply.getClass().equals("com.xflowresearch.nfv.testertool.enodeb.s1u.User")){
+						user = (User) reply;
+						pdnipv4 = user.getIP();
+						enodeb.addNewUser(user);
+					}
+					
 					InetAddress IPAddress = packet.getAddress();
 					int port = packet.getPort();
 					
-					sendData = reply.getBytes();
+					sendData = pdnipv4.getBytes();
 					DatagramPacket sendPacket =
 							new DatagramPacket(sendData, sendData.length, IPAddress, port);
 					try {
@@ -79,26 +91,22 @@ public class UserControlInterface {
 
 	}
 
-	public String executeUECommand(String command, XMLParser xmlparser, AttachSimulator as){
+	public Object executeUECommand(String command, XMLParser xmlparser, AttachSimulator as){
 		return executeAttachSequence(xmlparser, as);
 	}
 
 
-	public String executeAttachSequence(XMLParser xmlparser, AttachSimulator as)
+	public Object executeAttachSequence(XMLParser xmlparser, AttachSimulator as)
 	{
 		/** Test Attach Sequence initiation **/
 		GTP gtpEcho = new GTP();
 
 		if(as.initiateAttachSequence(xmlparser))
 		{
-			return as.getPDNIpv4().toString();
-			/**
-			 * Simulate HTTP Traffic towards S-GW
-			 
-			gtpEcho.simulateGTPEchoRequest(as.getTransportLayerAddress(), 
-					as.getPDNIpv4(), 
-					as.getTEID());
-					*/
+			User user = new User();
+			user.setTEID(as.getTEID());
+			user.setIP(as.getPDNIpv4().toString().substring(1, as.getPDNIpv4().toString().length()));
+			return user;
 		}
 		return null;
 	}

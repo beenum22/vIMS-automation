@@ -1,12 +1,14 @@
 package com.xflowresearch.nfv.testertool.enodeb;
 
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xflowresearch.nfv.testertool.common.XMLParser;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.SctpClient;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.UserControlInterface;
-import com.xflowresearch.nfv.testertool.enodeb.s1u.GTP;
+import com.xflowresearch.nfv.testertool.enodeb.s1u.User;
 import com.xflowresearch.nfv.testertool.enodeb.s1u.UserDataInterface;
 
 /**
@@ -23,11 +25,16 @@ public class eNodeB implements Runnable
 	private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
 	private XMLParser xmlparser;
 	
+	private ArrayList<User> users;
+	
 	private SctpClient sctpClient;
 	private UserDataInterface userDataInterface;
 	private UserControlInterface userControlInterface;
 
-	public eNodeB(){
+	public eNodeB()
+	{
+		users = new ArrayList<User>();
+		
 		sctpClient = new SctpClient();
 		userDataInterface = new UserDataInterface();
 		userControlInterface = new UserControlInterface();
@@ -55,7 +62,7 @@ public class eNodeB implements Runnable
 			logger.info("S1 Signaling Successfully Established");
 			
 			/** Listen for UE Commands for Control Plane Signaling **/
-			userControlInterface.listenForUserControlCommands(xmlparser, as);
+			userControlInterface.listenForUserControlCommands(xmlparser, as, this);
 			
 			/** Listen for UE Data for User Plane **/
 			userDataInterface.listenForUserDataTraffic();
@@ -69,5 +76,11 @@ public class eNodeB implements Runnable
 		else{
 			logger.error("Unable to establish S1Signalling with MME");
 		}
+	}
+	
+	
+	public synchronized void addNewUser(User user){
+		users.add(user);
+		System.out.println("New User Added - TEID:"+user.getTEID());
 	}
 }

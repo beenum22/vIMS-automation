@@ -47,6 +47,7 @@ public class UserDataInterface
 					String stringData = bytesToHex(data);
 			        
 			        System.out.println("Data Recieved:"+ stringData);
+			        handleUserData(stringData);
 			        
 			        // Reset the length of the packet before reusing it.
 			        packet.setLength(buffer.length); 
@@ -56,6 +57,12 @@ public class UserDataInterface
 			
 		}.start();   //new Thread..
 
+	}
+	
+	
+	public void handleUserData(String ipPdu){
+		
+		
 	}
 
 
