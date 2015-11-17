@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 
 public class UEControlInterface {
 
@@ -46,7 +47,10 @@ public class UEControlInterface {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		String pdnipv4 = new String(receivePacket.getData());
+		byte[] data = new byte[receivePacket.getLength()];
+		System.arraycopy(receivePacket.getData(), receivePacket.getOffset(), data, 0, receivePacket.getLength());
+		String pdnipv4 = new String(data);
+		
 		clientSocket.close();
 		
 		return pdnipv4;

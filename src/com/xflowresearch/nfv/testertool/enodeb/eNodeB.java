@@ -67,7 +67,6 @@ public class eNodeB implements Runnable
 			userControlInterface.listenForUserControlCommands(xmlparser, as, this);
 			
 			/** Listen for UE Data for User Plane **/
-			System.out.println("Value in eNB:"+as.getTransportLayerAddress());
 			userDataInterface.listenForUserDataTraffic(this);		
 		}
 		else

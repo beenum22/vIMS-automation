@@ -119,11 +119,7 @@ public class XMLParser {
 				}
 				if(item.getName().equals("eNBParams"))
 				{
-					//System.out.println("eNBID: " + item.getChild("eNBID").getText());
-					//System.out.println("TAC: "+ item.getChild("TAC").getText());
-					//System.out.println("MNC: " + item.getChild("MNC").getText());
-					//System.out.println("MCC: "+ item.getChild("MCC").getText());
-					//System.out.println("MMEI: "+ item.getChild("MMEI").getText());
+					
 				}
 				if(item.getName().equals("S1SignallingParams"))
 				{
@@ -136,8 +132,7 @@ public class XMLParser {
 				{
 					authenticationResponseParams.EUTRANCGI = item.getChild("EUTRANCGI").getText();
 					authenticationResponseParams.TAI = item.getChild("TAI").getText();
-				}
-				//	System.out.println();        		
+				}      		
 			}
 		}
 		catch(JDOMException e)

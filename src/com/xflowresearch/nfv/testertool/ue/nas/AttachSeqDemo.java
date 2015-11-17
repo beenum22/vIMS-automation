@@ -38,7 +38,6 @@ public class AttachSeqDemo {
 				+ "," + "EPSMobilityManagementMsg: " + Array[2] +  "," 
 				+ "AuthParameterRandValue:" + Array[3];
 		String RAND= Array[3];
-		System.out.println (AuthResponse);
 		return RAND;
 		
 	}
@@ -69,13 +68,10 @@ public class AttachSeqDemo {
 		
 		
 		AuthResponse = Integer.toHexString(AuthResponse.length()/2) + AuthResponse;
-		//System.out.println(length);
 	    if (length.length()==1)
 	    {
 	    	AuthResponse= '0' + AuthResponse;
 	    }
-	    
-		System.out.println(AuthResponse);
 		return AuthResponse;
 		
 	}
@@ -92,7 +88,7 @@ public class AttachSeqDemo {
 		AttachSeqDemo obj =new AttachSeqDemo();
 		
 		
-		System.out.println(obj.SendAuthResp ( r, k, op ));
+		obj.SendAuthResp ( r, k, op );
 
 	}
 	

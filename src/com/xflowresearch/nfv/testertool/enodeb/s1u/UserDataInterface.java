@@ -107,8 +107,6 @@ public class UserDataInterface
 				DatagramPacket packet = new DatagramPacket(byteGTPacket, byteGTPacket.length, transportLayerAddress, 2152);
 				try 
 				{
-					System.out.println("transportLayerAddress.toString():"+transportLayerAddress.toString());
-					System.out.println("transportLayerAddress:"+transportLayerAddress);
 					socket.send(packet);
 				}
 				catch (IOException e) {

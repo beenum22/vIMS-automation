@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
  *	UE class that executes on the eNodeB thread
  *	and initiates the UE functionality.
  *
- * 
  * @author ahmadarslan
  */
 public class UE implements Runnable
@@ -42,7 +41,6 @@ public class UE implements Runnable
 		
 		/** Send Attach command to eNB for attaching to the MME!! to the MME **/
 		String pdnipv4 = ueControlInterface.sendControlCommand("Attach;UEParams");
-		pdnipv4 = pdnipv4.substring(1, pdnipv4.length());
 		
 		try {
 			Thread.sleep(3000);

@@ -16,9 +16,10 @@ import java.util.Enumeration;
 
 public class HTTPClient 
 {
-	
+
 	public void sendRequest(String srcIP) throws URISyntaxException, UnknownHostException, IOException
-    {
+	{
+		addALiasIP(srcIP);
 		/*
 		 * To begin, you need to parse the given URL request to extract
 		 *  the host, path, port, and protocol (i.e., HTTP, HTTPS, and 
@@ -55,20 +56,20 @@ public class HTTPClient
 			}
 		}
 
-		
+
 		NetworkInterface nif = NetworkInterface.getByName("eth0");
 		Enumeration<InetAddress> nifAddresses = nif.getInetAddresses();
-		
-		
+
+
 		InetAddress address = null;	
-//		while(nifAddresses.hasMoreElements()){
-//			address = nifAddresses.nextElement();
-//			String stringAddr = address.getHostAddress();
-//			System.out.println(stringAddr);
-//		}
-//		address = nifAddresses.nextElement();
-//		address = nifAddresses.nextElement();
-//		System.out.println(address);
+		//		while(nifAddresses.hasMoreElements()){
+		//			address = nifAddresses.nextElement();
+		//			String stringAddr = address.getHostAddress();
+		//			System.out.println(stringAddr);
+		//		}
+		//		address = nifAddresses.nextElement();
+		//		address = nifAddresses.nextElement();
+		//		System.out.println(address);
 
 		/*
 		 *Now that the required information has been extracted, we need to do three
@@ -77,9 +78,9 @@ public class HTTPClient
 		 *Connecting is simple; just create a new Java Socket with the host and port: 
 		 */
 		//Socket clientSocket = new Socket(host, port, InetAddress.getByName("192.168.100.10"), 0);
-		
-		address = InetAddress.getByName("10.20.30.4");
-		
+
+		address = InetAddress.getByName(srcIP);
+
 		Socket clientSocket = new java.net.Socket();
 		clientSocket.bind(new InetSocketAddress(address, 0));
 		clientSocket.connect(new InetSocketAddress("212.71.234.61", port));
@@ -104,4 +105,30 @@ public class HTTPClient
 		clientSocket.close();
 	}
 
+	public void addALiasIP(String IP)
+	{
+		String command = "ifconfig eth1:0 " + IP + " up";
+		StringBuffer output = new StringBuffer();
+
+		Process p;
+		try {
+			p = Runtime.getRuntime().exec(command);
+			p.waitFor();
+
+			BufferedReader reader = 
+					new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+			String line = "";			
+			while ((line = reader.readLine())!= null) {
+				output.append(line + "\n");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+//		/System.out.println(output.toString());
+
+	}
+	
 }
