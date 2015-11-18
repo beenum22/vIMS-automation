@@ -398,6 +398,15 @@ def create_cluster(heat,cluster_name):
   print ("Creating stack "+ cluster_full_name )
   logger.info("Creating Heat Stack")
   
+############################ Delete Heat Stack ###########################################
+
+def delete_cluster(heat,cluster_name):
+   cluster_full_name=cluster_name
+   try:
+    heat.stacks.delete(cluster_full_name)
+    print('Removing heat stack')
+   except:
+    print ("Cannot find the Cluster to be deleted. Exiting ...") 
 
 ########################### Create Heat Stack from credentials of keystone #####################
 logger.info("Getting keystone credentials to create heat client")
@@ -420,8 +429,23 @@ while(cluster_details.status!= 'COMPLETE'):
    time.sleep(30)
    if cluster_details.status == 'IN_PROGRESS':
      print('Stack Creation in progress..')
-   cluster_details=heatclient.stacks.get(STACK_NAME)          
-                        
+   if (cluster_details.status == 'FAILED'):
+     print('Stack Creation failed, redeploying stack')
+     delete_cluster(heatclient, STACK_NAME)
+     time.sleep(5)
+     while(cluster_details.status == 'IN_PROGRESS' or cluster_details.status == 'FAILED' or cluster_details.status == 'DELETE_IN_PROGRESS'):
+      try:
+        cluster_details=heatclient.stacks.get(STACK_NAME)
+        print('Deleting cluster')
+        time.sleep(10)
+      except:
+        print('Deleted cluster')
+        time.sleep(10)
+        break
+     print('Creating Heat stack')
+     time.sleep(10)
+     create_cluster(heatclient,STACK_NAME)   
+   cluster_details=heatclient.stacks.get(STACK_NAME)                    
 ##################################### Get DNS IP ################################################
 
 def get_dns_ip(heat, cluster_name):
@@ -715,24 +739,24 @@ while True:
   else:
     break	
 
-# print('Installing SNMP...')
-# logger.info("Installing SNMP.")
-# stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
-# while not stdout.channel.exit_status_ready():
-# 	# Only print data if there is data to read in the channel 
-# 	if stdout.channel.recv_ready():
-# 		rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-# 		if len(rl) > 0:
-# 			# Print data from stdout
-# 			# Print data from stdout
-# 			print stdout.channel.recv(1024),
-# while True:	
-#   if(not stdout.read()):
-#     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
-#     print('Retrying Installation...')
-#     time.sleep(5)	
-#   else:
-#     break    
+print('Installing SNMP...')
+logger.info("Installing SNMP.")
+stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
+while not stdout.channel.exit_status_ready():
+	# Only print data if there is data to read in the channel 
+	if stdout.channel.recv_ready():
+		rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+		if len(rl) > 0:
+			# Print data from stdout
+			# Print data from stdout
+			print stdout.channel.recv(1024),
+while True:	
+  if(not stdout.read()):
+    stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
+    print('Retrying Installation...')
+    time.sleep(5)	
+  else:
+    break    
 
 print('Installing SNMPD...')
 logger.info("Installing SNMPD.")
@@ -1430,45 +1454,45 @@ while True:
     time.sleep(5)	
   else:
     break
-print('Installing SNMP...')
-logger.info("Installing SNMP in Homer")
-stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
-while not stdout.channel.exit_status_ready():
-	# Only print data if there is data to read in the channel 
-	if stdout.channel.recv_ready():
-		rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-		if len(rl) > 0:
-			# Print data from stdout
-			# Print data from stdout
-			print stdout.channel.recv(1024),
-while True:	
-  if(not stdout.read()):
-    stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
-    print('Retrying Installation...')
-    time.sleep(5)	
-  else:
-    break    
+# print('Installing SNMP...')
+# logger.info("Installing SNMP in Homer")
+# stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
+# while not stdout.channel.exit_status_ready():
+# 	# Only print data if there is data to read in the channel 
+# 	if stdout.channel.recv_ready():
+# 		rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+# 		if len(rl) > 0:
+# 			# Print data from stdout
+# 			# Print data from stdout
+# 			print stdout.channel.recv(1024),
+# while True:	
+#   if(not stdout.read()):
+#     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
+#     print('Retrying Installation...')
+#     time.sleep(5)	
+#   else:
+#     break    
 
-print('Installing SNMPD...')
-logger.info("Installing SNMPD in Homer")
-stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
-while not stdout.channel.exit_status_ready():
-	# Only print data if there is data to read in the channel 
-	if stdout.channel.recv_ready():
-		rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-		if len(rl) > 0:
-			# Print data from stdout
-			# Print data from stdout
-			print stdout.channel.recv(1024),
-while True:	
-  if(not stdout.read()):
-    stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
-    print('Retrying Installation...')
-    time.sleep(5)	
-  else:
-    break    
-print('Finished Installation..')
-logger.info("Finished Installation in Homer")
+# print('Installing SNMPD...')
+# logger.info("Installing SNMPD in Homer")
+# stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
+# while not stdout.channel.exit_status_ready():
+# 	# Only print data if there is data to read in the channel 
+# 	if stdout.channel.recv_ready():
+# 		rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+# 		if len(rl) > 0:
+# 			# Print data from stdout
+# 			# Print data from stdout
+# 			print stdout.channel.recv(1024),
+# while True:	
+#   if(not stdout.read()):
+#     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
+#     print('Retrying Installation...')
+#     time.sleep(5)	
+#   else:
+#     break    
+# print('Finished Installation..')
+# logger.info("Finished Installation in Homer")
 		    
 print('Installed Homer packages')
 	
@@ -2363,7 +2387,7 @@ while True:
     time.sleep(5)	
   else:
     break     
-print('Installing SNMP...')
+# print('Installing SNMP...')
 # logger.info("Installing SNMP in Ralf")
 # stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
 # while not stdout.channel.exit_status_ready():
@@ -2382,24 +2406,24 @@ print('Installing SNMP...')
 #   else:
 #     break    
 
-print('Installing SNMPD...')
-logger.info("Installing SNMPD in Ralf")
-stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
-while not stdout.channel.exit_status_ready():
-	# Only print data if there is data to read in the channel 
-	if stdout.channel.recv_ready():
-		rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-		if len(rl) > 0:
-			# Print data from stdout
-			# Print data from stdout
-			print stdout.channel.recv(1024),
-while True:	
-  if(not stdout.read()):
-    stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
-    print('Retrying Installation...')
-    time.sleep(5)	
-  else:
-    break    
+# print('Installing SNMPD...')
+# logger.info("Installing SNMPD in Ralf")
+# stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
+# while not stdout.channel.exit_status_ready():
+# 	# Only print data if there is data to read in the channel 
+# 	if stdout.channel.recv_ready():
+# 		rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+# 		if len(rl) > 0:
+# 			# Print data from stdout
+# 			# Print data from stdout
+# 			print stdout.channel.recv(1024),
+# while True:	
+#   if(not stdout.read()):
+#     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
+#     print('Retrying Installation...')
+#     time.sleep(5)	
+#   else:
+#     break    
 print('Finished Installation..')
 logger.info("Finished Installation in Ralf")
 		 
@@ -2521,6 +2545,7 @@ create_cluster(heatclient,STACK_HA_NAME)
 print('Please wait while stack is deployed.......')
 #time.sleep(180)
 ########################## Create Heat Stack from credentials of keystone #####################
+
 cluster_details=heatclient.stacks.get(STACK_HA_NAME)
 while(cluster_details.status!= 'COMPLETE'):
    time.sleep(30)
@@ -2704,23 +2729,23 @@ while True:
   else:
     break 
 
-# print('Installing SNMP...')
-# stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
-# while not stdout.channel.exit_status_ready():
-#   # Only print data if there is data to read in the channel 
-#   if stdout.channel.recv_ready():
-#     rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-#     if len(rl) > 0:
-#       # Print data from stdout
-#       # Print data from stdout
-#       print stdout.channel.recv(1024),
-# while True: 
-#   if(not stdout.read()):
-#     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
-#     print('Retrying Installation...')
-#     time.sleep(5) 
-#   else:
-#     break    
+print('Installing SNMP...')
+stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
+while not stdout.channel.exit_status_ready():
+  # Only print data if there is data to read in the channel 
+  if stdout.channel.recv_ready():
+    rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+    if len(rl) > 0:
+      # Print data from stdout
+      # Print data from stdout
+      print stdout.channel.recv(1024),
+while True: 
+  if(not stdout.read()):
+    stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmp snmp-mibs-downloader --yes --force-yes -o DPkg::options::=--force-confnew")
+    print('Retrying Installation...')
+    time.sleep(5) 
+  else:
+    break    
 
 print('Installing SNMPD...')
 stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
@@ -3061,43 +3086,43 @@ while True:
 #   else:
 #     break    
 
-print('Installing SNMPD...')
-stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install -f snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
-while not stdout.channel.exit_status_ready():
-  # Only print data if there is data to read in the channel 
-  if stdout.channel.recv_ready():
-    rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-    if len(rl) > 0:
-      # Print data from stdout
-      # Print data from stdout
-      print stdout.channel.recv(1024),
-while True: 
-  if(not stdout.read()):
-    stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install -f snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
-    print('Retrying Installation...')
-    time.sleep(5) 
-  else:
-    break    
+# print('Installing SNMPD...')
+# stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install -f snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
+# while not stdout.channel.exit_status_ready():
+#   # Only print data if there is data to read in the channel 
+#   if stdout.channel.recv_ready():
+#     rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+#     if len(rl) > 0:
+#       # Print data from stdout
+#       # Print data from stdout
+#       print stdout.channel.recv(1024),
+# while True: 
+#   if(not stdout.read()):
+#     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install -f snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
+#     print('Retrying Installation...')
+#     time.sleep(5) 
+#   else:
+#     break    
 print('Finished Installation..')
         
 print('Installed Homestead packages') 
 
-#Configure MIB's
-print('Configuring SNMP')
-sftp = ssh.open_sftp()
-sftp.put( MIB_FILE_PATH, MIB_PATH )
-sftp.put( MIB_FILE_PATH, '/usr/share/snmp/mibs/PROJECT-CLEARWATER-MIB.txt')
-sftp.put( SNMP_FILE_PATH, SNMP_CONFIG_PATH )
-stdin, stdout, stderr = ssh.exec_command("service snmpd restart")
-while not stdout.channel.exit_status_ready():
-  # Only print data if there is data to read in the channel 
-  if stdout.channel.recv_ready():
-    rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-    if len(rl) > 0:
-      # Print data from stdout
-      print stdout.channel.recv(1024),
-time.sleep(30)
-stdin, stdout, stderr = ssh.exec_command("snmpwalk -v 2c -c clearwater localhost UCD-SNMP-MIB::memory")
+# #Configure MIB's
+# print('Configuring SNMP')
+# sftp = ssh.open_sftp()
+# sftp.put( MIB_FILE_PATH, MIB_PATH )
+# sftp.put( MIB_FILE_PATH, '/usr/share/snmp/mibs/PROJECT-CLEARWATER-MIB.txt')
+# sftp.put( SNMP_FILE_PATH, SNMP_CONFIG_PATH )
+# stdin, stdout, stderr = ssh.exec_command("service snmpd restart")
+# while not stdout.channel.exit_status_ready():
+#   # Only print data if there is data to read in the channel 
+#   if stdout.channel.recv_ready():
+#     rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+#     if len(rl) > 0:
+#       # Print data from stdout
+#       print stdout.channel.recv(1024),
+# time.sleep(30)
+# stdin, stdout, stderr = ssh.exec_command("snmpwalk -v 2c -c clearwater localhost UCD-SNMP-MIB::memory")
 
   
 print('Uploading shared configuration')
@@ -3391,24 +3416,24 @@ while True:
 #   else:
 #     break    
 
-print('Installing SNMPD...')
-stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
-while not stdout.channel.exit_status_ready():
-  # Only print data if there is data to read in the channel 
-  if stdout.channel.recv_ready():
-    rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-    if len(rl) > 0:
-      # Print data from stdout
-      # Print data from stdout
-      print stdout.channel.recv(1024),
-while True: 
-  if(not stdout.read()):
-    stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
-    print('Retrying Installation...')
-    time.sleep(5) 
-  else:
-    break    
-print('Finished Installation..')
+# print('Installing SNMPD...')
+# stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
+# while not stdout.channel.exit_status_ready():
+#   # Only print data if there is data to read in the channel 
+#   if stdout.channel.recv_ready():
+#     rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+#     if len(rl) > 0:
+#       # Print data from stdout
+#       # Print data from stdout
+#       print stdout.channel.recv(1024),
+# while True: 
+#   if(not stdout.read()):
+#     stdin, stdout, stderr = ssh.exec_command("DEBIAN_FRONTEND=noninteractive apt-get install snmpd --yes --force-yes -o DPkg::options::=--force-confnew")
+#     print('Retrying Installation...')
+#     time.sleep(5) 
+#   else:
+#     break    
+# print('Finished Installation..')
      
 print('Installed Ralf packages') 
 #Update DNS Server
@@ -3806,6 +3831,7 @@ while not stdout.channel.exit_status_ready():
     if len(rl) > 0:
       # Print data from stdout
       print stdout.channel.recv(1024),
+
 
 #Update DNS Server
 print('Updating DNS server')
@@ -4239,6 +4265,8 @@ ssh.close()
 
 #Get Homestead IP
 homestead_ip = get_homestead_ip(heatclient , STACK_NAME)
+file1 = open(PATH+ "/Private_net_ip.txt", "w+")
+file1.close()
 write_private_ip=get_stack_private_ip(heatclient, STACK_NAME, PATH)
 write_private_ip=get_stack_private_ip(heatclient, STACK_HA_NAME, PATH)
 print("*************************")

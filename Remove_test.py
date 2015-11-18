@@ -92,8 +92,30 @@ cred = get_keystone_creds(config)
 ks_client = Keystone_Client(**cred)
 heat_endpoint = ks_client.service_catalog.url_for(service_type='orchestration', endpoint_type='publicURL')
 heatclient = Heat_Client('1', heat_endpoint, token=ks_client.auth_token)
+print('Please enter the number of stress test nodes to delete:')
+number = raw_input()
+number=int(number)
 
-delete_cluster(heatclient, STACK_NAME)
+############################ getting scale index ###########################################
+file1 = open(PATH+ "/test_index.txt", "r")
+test_index= file1.read()
+test_index=int(test_index)
+file1.close()
+new_index=test_index - number
+index = str(test_index)
+
+file1 = open(PATH+ "/test_index.txt", "w")
+file1.write(str(new_index))
+file1.close()
+
+while (int(new_index) != int(index)):
+    try:
+      index = str(index)
+      delete_cluster(heatclient, STACK_NAME + index)
+      index = int(index)
+      index = index - 1
+    except:
+      print('Cannot find cluster to delete...')
 
 ########################## Delete Nova Key Pair ##########################################
 try:

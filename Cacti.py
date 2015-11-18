@@ -2,6 +2,7 @@ import novaclient.v1_1.client as nvclient
 import neutronclient.v2_0.client as ntrnclient
 import sys
 import os
+from os_fun import *
 from heatclient.client import Client as Heat_Client
 from keystoneclient.v2_0 import Client as Keystone_Client
 import glanceclient 
@@ -106,9 +107,9 @@ creden = get_keystone_creds(config)
 keystone = ksClient.Client(**creden)
 glance_endpoint = keystone.service_catalog.url_for(service_type='image', endpoint_type='publicURL')
 glance = glanceclient.Client('2',glance_endpoint, token=keystone.auth_token)
-
-image = glance.images.create(name="Cacti-image",disk_format = 'ami',container_format = 'ami')
-image = glance.images.upload(image.id, open(IMAGE_PATH, 'rb'))
+if not image_exists(glance, 'Cacti-image'):
+  image = glance.images.create(name="Cacti-image",disk_format = 'ami',container_format = 'ami')
+  image = glance.images.upload(image.id, open(IMAGE_PATH, 'rb'))
 print ('Successfully added image')
 
 ############################# Create Availability Zones #################################
@@ -167,19 +168,21 @@ print ('Network ID of external network =' + net_id)
 ############################## Create Keypair #############################################
 
 # Creating a keypair
-print('Creating Keypair')
-keypair = nova.keypairs.create(name = 'cacti')
-# Open a file for storing the private key
-f_private = open('/root/.ssh/cacti.pem', "w")
-# Store the private key
-f_private.write(keypair.private_key)
-f_private.close()
-# Open a file for storing the public key
-f_public = open('/root/.ssh/cacti.pub', "w")
-# Store the public key
-f_public.write(keypair.public_key)
-f_public.close()
-print('Finished Creating Keypairs')
+if not keypair_exists(nova ,'cacti'):
+	# Creating a keypair
+  print('Creating Keypair')
+  keypair = nova.keypairs.create(name = 'cacti')
+  # Open a file for storing the private key
+  f_private = open('/root/.ssh/cacti.pem', "w")
+  # Store the private key
+  f_private.write(keypair.private_key)
+  f_private.close()
+  # Open a file for storing the public key
+  f_public = open('/root/.ssh/cacti.pub', "w")
+  # Store the public key
+  f_public.write(keypair.public_key)
+  f_public.close()
+  print('Finished Creating Keypairs')
 ########################### Fetch network ID of private network ###########################
 
 def get_private_id(netname, neutron):

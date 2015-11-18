@@ -56,6 +56,7 @@ os.environ['IMAGE_PATH'] = PATH+'/IMG'
 CONFIG_PATH = PATH+'/configurations.json'
 USER_CONFIG_PATH = PATH+'/user_config.json'
 STACK_NAME = 'IMS'
+STACK_HA_NAME = 'IMS-HA'
 REPO_URL = 'http://repo.cw-ngv.com/stable'
 ETCD_IP = ''
 ELLIS_INDEX = '0'
@@ -66,7 +67,7 @@ HOMER_INDEX = '0'
 DN_RANGE_START = '6505550000'
 DN_RANGE_LENGTH = '1000'
 CALL_THRESHOLD = '20000'
-CALL_LOWER_THRESHOLD = '10'
+CALL_LOWER_THRESHOLD = '30'
 Index = 2
 #LOCAL_IP = '10.204.110.42'
 ############################## User Configuration Functions ##############################
@@ -126,6 +127,7 @@ ks_client = Keystone_Client(**cred)
 heat_endpoint = ks_client.service_catalog.url_for(service_type='orchestration', endpoint_type='publicURL')
 heatclient = Heat_Client('1', heat_endpoint, token=ks_client.auth_token, username='admin', passwork='admin')
 
+
 #################################### Get Homestead IP ###########################################
 
 def get_homestead_ip(heat, cluster_name):
@@ -139,17 +141,30 @@ def get_homestead_ip(heat, cluster_name):
    return homestead_ip[0]
 homestead_ip = get_homestead_ip(heatclient , STACK_NAME)
 
+#################################### Get Sprout IP ############################################
+def get_sprout_ip(heat, cluster_name):
+   temp_list=[]
+   cluster_full_name=cluster_name
+   cluster_details=heat.stacks.get(cluster_full_name)
+   
+   for i in cluster_details.outputs:
+     if i['output_key']=='sprout_ip':
+        sprout_ip= i['output_value']
+   return sprout_ip[0]      
+
+sprout_ip = get_sprout_ip(heatclient , STACK_NAME)
+sprout_ha_ip = get_sprout_ip(heatclient , STACK_HA_NAME)
 SCALE_UP = False
-################################## Get Homestead information ###################################
+################################## Get Sprout information ###################################
 while True:
   
-  #Connect to Homestead
+  #Connect to Sprout
   #k = paramiko.RSAKey.from_private_key_file("/root/.ssh/secure.pem")
   ssh = paramiko.SSHClient()
   ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-  print ("Connecting To Homestead Node with IP " + homestead_ip)
-  ssh.connect( hostname = homestead_ip , username = "root", password = "root123" )
-  print ("Connected")
+#  print ("Connecting To Sprout Node with IP " + sprout_ip)
+  ssh.connect( hostname = sprout_ip , username = "root", password = "root123" )
+#  print ("Connected")
   stdin, stdout, stderr = ssh.exec_command("sudo -s")  
   
   
@@ -165,35 +180,131 @@ while True:
       
   os.system('clear')
       
+  # stdin, stdout, stderr = ssh.exec_command("snmpwalk -v2c -c clearwater localhost PROJECT-CLEARWATER-MIB::homesteadIncomingRequestsCount.scopeCurrent5MinutePeriod ")
+  # mib_data = stdout.read()
+  # mib_data = str(mib_data)
+  # data = mib_data.split()
+  # no_of_incomming_requests =  data[3]
+  
+  stdin, stdout, stderr = ssh.exec_command("snmpwalk -v2c -c clearwater localhost PROJECT-CLEARWATER-MIB::sproutRejectedOverloadCount.scopeCurrent5MinutePeriod")
+  mib_data = stdout.read()
+  mib_data = str(mib_data)
+  data = mib_data.split()
+  no_of_rejected_requests_1 =  data[3]
+  
+  stdin, stdout, stderr = ssh.exec_command("snmpwalk -v2c -c clearwater localhost .1.3.6.1.4.1.2021.11.9.0")
+  mib_data = stdout.read()
+  mib_data = str(mib_data)
+  data = mib_data.split()
+  CPU_load_sprout_1 =  data[3]
+
+  #Connect to Sprout
+  #k = paramiko.RSAKey.from_private_key_file("/root/.ssh/secure.pem")
+  ssh = paramiko.SSHClient()
+  ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+#  print ("Connecting To Sprout Node with IP " + sprout_ha_ip)
+  ssh.connect( hostname = sprout_ha_ip , username = "root", password = "root123" )
+#  print ("Connected")
+  stdin, stdout, stderr = ssh.exec_command("sudo -s")  
+  
+  
+  #print('Checking MIB libraries')
+  #stdin, stdout, stderr = ssh.exec_command("snmpwalk -v2c -c clearwater localhost PROJECT-CLEARWATER-MIB::dataConnection")
+  #while not stdout.channel.exit_status_ready():
+  # # Only print data if there is data to read in the channel 
+  # if stdout.channel.recv_ready():
+  #   rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+  #   if len(rl) > 0:
+  #     # Print data from stdout
+  #     print stdout.channel.recv(1024),
+      
+  os.system('clear')
+      
+  # stdin, stdout, stderr = ssh.exec_command("snmpwalk -v2c -c clearwater localhost PROJECT-CLEARWATER-MIB::homesteadIncomingRequestsCount.scopeCurrent5MinutePeriod ")
+  # mib_data = stdout.read()
+  # mib_data = str(mib_data)
+  # data = mib_data.split()
+  # no_of_incomming_requests =  data[3]
+  
+  stdin, stdout, stderr = ssh.exec_command("snmpwalk -v2c -c clearwater localhost PROJECT-CLEARWATER-MIB::sproutRejectedOverloadCount.scopeCurrent5MinutePeriod ")
+  mib_data = stdout.read()
+  data = mib_data.split()
+  no_of_rejected_requests_2 =  data[3]
+  
+  stdin, stdout, stderr = ssh.exec_command("snmpwalk -v2c -c clearwater localhost .1.3.6.1.4.1.2021.11.9.0")
+  mib_data = stdout.read()
+  mib_data = str(mib_data)
+  data = mib_data.split()
+  CPU_load_sprout_2 =  data[3]
+  #Connect to Homestead
+  #k = paramiko.RSAKey.from_private_key_file("/root/.ssh/secure.pem")
+  ssh = paramiko.SSHClient()
+  ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+#  print ("Connecting To Homestead Node with IP " + homestead_ip)
+  ssh.connect( hostname = homestead_ip , username = "root", password = "root123" )
+#  print ("Connected")
+  stdin, stdout, stderr = ssh.exec_command("sudo -s")  
+  
+  
+  #print('Checking MIB libraries')
+  #stdin, stdout, stderr = ssh.exec_command("snmpwalk -v2c -c clearwater localhost PROJECT-CLEARWATER-MIB::dataConnection")
+  #while not stdout.channel.exit_status_ready():
+  # # Only print data if there is data to read in the channel 
+  # if stdout.channel.recv_ready():
+  #   rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+  #   if len(rl) > 0:
+  #     # Print data from stdout
+  #     print stdout.channel.recv(1024),
+      
+  os.system('clear')
+      
   stdin, stdout, stderr = ssh.exec_command("snmpwalk -v2c -c clearwater localhost PROJECT-CLEARWATER-MIB::homesteadIncomingRequestsCount.scopeCurrent5MinutePeriod ")
   mib_data = stdout.read()
   mib_data = str(mib_data)
   data = mib_data.split()
   no_of_incomming_requests =  data[3]
   
-  stdin, stdout, stderr = ssh.exec_command("snmpwalk -v2c -c clearwater localhost PROJECT-CLEARWATER-MIB::homesteadRejectedOverloadCount.scopeCurrent5MinutePeriod ")
-  mib_data = stdout.read()
-  mib_data = str(mib_data)
-  data = mib_data.split()
-  no_of_rejected_requests =  data[3]
 
-  print ('**************************************************************')
-  print ('Number of incomming requests in the current 5 minute period= '+ no_of_incomming_requests )
-  print ('Number of incomming rejected requests in the current 5 minute period due to overload= '+ no_of_rejected_requests )
-  print ('**************************************************************')
+  try:
+    num1 = int(no_of_rejected_requests_1)
+  except:
+    print num1
+  try: 
+    num2 = int(no_of_rejected_requests_2)
+  except:
+    print num2
+
+  try:  
+    threshold = num1 + num2
+  except:
+    threshold = '0'
+
+
+  print ('************************************************************************')
+  print ('Number of incomming total rejected requests in the current 5 minute period due to overload= '+ str(threshold) )
+  print ('CPU load Sprout 1 = '+CPU_load_sprout_1)
+  print ('CPU load Sprout 2 = '+CPU_load_sprout_2)
+  print ('************************************************************************')
   
-  if (int(no_of_rejected_requests) > 5 and SCALE_UP == False):
+  if (int(threshold) > 10):
     SCALE_UP = True    
     Stack_index = str(Index)
     Scale.scale_up(Stack_index)
     Index=Index + 1  
-  
-  if(int(no_of_incomming_requests) < int(CALL_LOWER_THRESHOLD) and SCALE_UP == True):
 
+  elif (int(CPU_load_sprout_2) > 30 and int(CPU_load_sprout_1) > 30):
+    SCALE_UP = True    
+    Stack_index = str(Index)
+    Scale.scale_up(Stack_index)
+    Index=Index + 1    
+
+  if(int(no_of_incomming_requests) < int(CALL_LOWER_THRESHOLD) and int(Index) > 2):
+
+    Index=Index - 1
     SCALE_UP = False
     Stack_index = str(Index)
     Scale_down.scale_down(Stack_index)
-    Index=Index - 1
+
     
   time.sleep(30)
 

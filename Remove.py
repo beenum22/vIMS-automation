@@ -8,6 +8,7 @@ import glanceclient
 import keystoneclient.v2_0.client as ksClient
 import json
 import time
+from Scale_down import *
 
 ################################### File path function ###################################
 import subprocess
@@ -76,6 +77,11 @@ creds = get_nova_creds(config)
 nova = nvclient.Client(**creds)   
 # Get authorized instance of neutron client
 neutron = ntrnclient.Client(**credsks)
+############################ getting scale index ###########################################
+file1 = open(PATH+ "/Scale_index.txt", "r")
+scale_index= file1.read()
+file1.close()
+
 
 ############################ Delete Heat Stack ###########################################
 
@@ -95,6 +101,26 @@ heatclient = Heat_Client('1', heat_endpoint, token=ks_client.auth_token)
 
 delete_cluster(heatclient, STACK_NAME)
 delete_cluster(heatclient, STACK_HA_NAME)
+while (scale_index >= 2 ):
+  try:
+      scale_index= str(scale_index)
+      delete_cluster(heatclient, 'Scale'+ scale_index)
+      scale_index= int(scale_index)-1
+  except:
+      print('Cannot find cluster to be deleted')
+      scale_index= int(scale_index)-1
+
+
+cluster_details=heatclient.stacks.get(STACK_NAME)
+#print cluster_details.status
+while(cluster_details.status == 'IN_PROGRESS'):
+    try:
+      cluster_details=heatclient.stacks.get(STACK_NAME)
+      print('Deleting cluster')
+      time.sleep(10)
+    except:
+      print('Cluster Deleted')
+      break
 
 ########################## Delete Nova Key Pair ##########################################
 try:
