@@ -81,7 +81,9 @@ public class GTPacket {
 	}
 	
 	public byte[] getPacket(){
-		String pac = header + messageType + length + TEID + TPDU;
+		String pac = header + messageType + length + TEID;
+		if(TPDU != null)
+			pac += TPDU;
 		return hexStringToByteArray(pac); 
 	}
 	

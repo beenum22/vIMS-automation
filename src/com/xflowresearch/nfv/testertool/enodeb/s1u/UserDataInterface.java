@@ -10,6 +10,8 @@ import com.xflowresearch.nfv.testertool.enodeb.eNodeB;
 
 public class UserDataInterface 
 {
+	
+	int i=0;
 
 	private InetAddress transportLayerAddress;
 	
@@ -42,6 +44,10 @@ public class UserDataInterface
 
 				while (true) 
 				{
+					/////////Remove/////////
+					if(i==0){
+					//////////////////
+					
 					// Wait to receive a datagram
 					try 
 					{
@@ -58,10 +64,18 @@ public class UserDataInterface
 					String stringData = bytesToHex(data);
 
 					System.out.println("Data Recieved:"+ stringData);
+					
+					//simulateGTPEchoRequest(enodeb);
 					handleUserData(stringData, enodeb);
 
 					// Reset the length of the packet before reusing it.
 					packet.setLength(buffer.length); 
+					
+					////////Remove////////////
+					i++;
+					}
+					///////////////
+					
 				}
 
 			}//public void run..
@@ -70,7 +84,27 @@ public class UserDataInterface
 
 	}
 
+	///GTP Echo////////////////////////////////////////////////////////////////////////
+	
+	public void simulateGTPEchoRequest(eNodeB enodeb)
+	{
+		System.out.println("Sending GTP Echo");
+		User user = enodeb.getUser(0);
+		
+		//////////////GTP Echo Packet Creation Here////////////////////
+		GTPacket gtpacket = new GTPacket("001", 1, 0, 0, 0, 0);
+		gtpacket.setMessageType("01");
+		gtpacket.setLength(0);
+		gtpacket.setTEID(user.getTEID());
 
+		byte[] byteGTPacket = gtpacket.getPacket();
+		
+		sendGTPacketToSGW(byteGTPacket);
+		//////////////GTP Echo Packet Creation Here////////////////////
+	}
+	///GTP Echo////////////////////////////////////////////////////////////////////////
+	
+	
 	/** Received User Data, Apply GTP Tunnel and send to S-GW **/
 	public void handleUserData(String ipPdu, eNodeB enodeb)
 	{
@@ -130,9 +164,6 @@ public class UserDataInterface
 			}
 		}.start();
 	}
-
-
-
 
 	/**
 	 * Convert byte array to hex String

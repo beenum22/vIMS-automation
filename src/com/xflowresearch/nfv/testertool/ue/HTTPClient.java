@@ -25,7 +25,7 @@ public class HTTPClient
 		 *  the host, path, port, and protocol (i.e., HTTP, HTTPS, and 
 		 *  so on). For example, let's parse the host and path first:
 		 */
-		String urlStr = "http://www.drdobbs.com/jvm/making-http-requests-from-java/240160966"; // some URL
+		String urlStr = "http://172.17.2.8/ResponseServlet/HttpResponse"; // some URL
 		URI uri = new URI( urlStr); 
 		String host = uri.getHost( ); 
 		String path = uri.getRawPath( ); 
@@ -37,7 +37,6 @@ public class HTTPClient
 		if (query != null && query.length( ) > 0) {
 			path += "?" + query;
 		} 
-
 
 		/*
 		 * Next, let's extract the protocol and port, and make sure they match
@@ -56,34 +55,11 @@ public class HTTPClient
 			}
 		}
 
-
-		NetworkInterface nif = NetworkInterface.getByName("eth0");
-		Enumeration<InetAddress> nifAddresses = nif.getInetAddresses();
-
-
-		InetAddress address = null;	
-		//		while(nifAddresses.hasMoreElements()){
-		//			address = nifAddresses.nextElement();
-		//			String stringAddr = address.getHostAddress();
-		//			System.out.println(stringAddr);
-		//		}
-		//		address = nifAddresses.nextElement();
-		//		address = nifAddresses.nextElement();
-		//		System.out.println(address);
-
-		/*
-		 *Now that the required information has been extracted, we need to do three
-		 *main things. First, make a socket connection to the server; second, send
-		 *a correctly formatted HTTP request; third, listen for the response. 
-		 *Connecting is simple; just create a new Java Socket with the host and port: 
-		 */
-		//Socket clientSocket = new Socket(host, port, InetAddress.getByName("192.168.100.10"), 0);
-
-		address = InetAddress.getByName(srcIP);
+		InetAddress address = InetAddress.getByName(srcIP);
 
 		Socket clientSocket = new java.net.Socket();
 		clientSocket.bind(new InetSocketAddress(address, 0));
-		clientSocket.connect(new InetSocketAddress("212.71.234.61", port));
+		clientSocket.connect(new InetSocketAddress(host, port));
 
 
 		PrintWriter request = new PrintWriter( clientSocket.getOutputStream() );
