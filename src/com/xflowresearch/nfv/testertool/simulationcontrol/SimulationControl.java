@@ -24,9 +24,10 @@ public class SimulationControl
 {	
 	private static SimulationControl instance = new SimulationControl();
 
-	private eNodeB enodeb;
-	private UE ue;
+	//private eNodeB enodeb;
+	//private UE ue;
 	private ArrayList <Thread> UEs;
+	private ArrayList <Thread> eNBs;
 
 	private XMLParser xmlparser;
 
@@ -35,10 +36,12 @@ public class SimulationControl
 
 	private SimulationControl()
 	{
-		enodeb = new eNodeB();
+		//enodeb = new eNodeB();
 		//ue = new UE();
+		
 		UEs = new ArrayList<Thread>();
-
+		eNBs = new ArrayList<Thread>();
+		
 		xmlparser = new XMLParser();
 	}
 	
@@ -66,11 +69,23 @@ public class SimulationControl
 		/* Initialize UE and eNodeB instances' data and start their threads */
 		if(xmlparser.geteNBCount() != 0)
 		{
-			enodeb.setXMLParser(xmlparser);
+			int eNBCount = xmlparser.geteNBCount();
+			for(int i = 0; i <eNBCount; i++)
+			{
+				eNodeB temp = new eNodeB();
+				temp.setXMLParser(xmlparser);
+				
+				eNBs.add(new Thread(temp));
+				eNBs.get(i).setName("eNodeB" + i);
+				eNBs.get(i).start();
+				logger.info("eNodeB" + i + " Thread Spawned");
+			}
+			
+			/*enodeb.setXMLParser(xmlparser);
 			Thread eNBThread = new Thread(enodeb);
 			eNBThread.setName("eNBThread1");
 			eNBThread.start();
-			logger.info("eNodeB Thread Spawned");
+			logger.info("eNodeB Thread Spawned");*/
 		}
 
 		if(xmlparser.getUECount() != 0)
@@ -83,6 +98,16 @@ public class SimulationControl
 				UEs.get(i).setName("UEThread"+i);
 				logger.info("UE Thread " + i + " Spawned");
 				UEs.get(i).start();
+				
+				try
+				{
+					Thread.sleep(250);
+				}
+				
+				catch(Exception exc)
+				{
+					exc.printStackTrace();
+				}
 			}
 			
 			/*Thread UEThread = new Thread(ue);

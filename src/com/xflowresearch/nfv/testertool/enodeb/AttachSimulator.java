@@ -29,26 +29,14 @@ public class AttachSimulator
 	InetAddress PDNIpv4;
 	String TEID;
 
-	private class Value
-	{
-		public String typeOfValue;
-		public String criticality;
-		public String value;
-
-		public Value(String typeOfValue, String criticality, String value)
-		{
-			super();
-			this.typeOfValue = typeOfValue;
-			this.criticality = criticality;
-			this.value = value;
-		}
-	}
-
 	private SctpClient sctpClient;
-
-	public AttachSimulator(XMLParser xmlparser)
+	private XMLParser xmlparser;
+	
+	
+	public AttachSimulator(XMLParser xmlparser, SctpClient sctpClient)
 	{
-
+		this.xmlparser = xmlparser;
+		this.sctpClient = sctpClient;
 	}
 
 	/**
@@ -70,34 +58,6 @@ public class AttachSimulator
 	}
 
 	/**
-	 * Establish S1Signalling with MME..
-	 * 
-	 * @param xmlparser
-	 */
-	public Boolean establishS1Signalling(XMLParser xmlparser, SctpClient sctpClient)
-	{
-		this.sctpClient = sctpClient;
-		if( !sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort())))
-		{
-			System.exit(1);
-		}
-
-		ArrayList <Value> values = new ArrayList <Value>();
-		values.add(new Value("GlobalENBID", "reject", xmlparser.getS1signallingParams().GlobalENBID));
-		values.add(new Value("eNBname", "ignore", xmlparser.getS1signallingParams().eNBname));
-		values.add(new Value("SupportedTAs", "reject", xmlparser.getS1signallingParams().SupportedTAs));
-		values.add(new Value("DefaultPagingDRX", "ignore", xmlparser.getS1signallingParams().DefaultPagingDRX));
-
-		S1APPacket recievedPacket = sendS1APacket("InitiatingMessage", "S1Setup", "reject", values, true);
-
-		if(recievedPacket.getType().equals("SuccessfulOutcome"))
-		{
-			return true;
-		}
-		else return false;
-	}
-
-	/**
 	 * The Attach Sequence is initiated in this function..
 	 * 
 	 * @param xmlparser
@@ -106,20 +66,20 @@ public class AttachSimulator
 	{
 		logger.info("Initiating Attach Sequence");
 
-		S1APPacket reply1 = sendAttachRequest(xmlparser, ueparams, eNBUES1APID);
+		S1APPacket reply1 = sendAttachRequest(ueparams, eNBUES1APID);
 		if(reply1.getProcCode().equals("downlinkNASTransport"))
 		{
-			S1APPacket reply2 = sendAuthenticationResponse(xmlparser, reply1, eNBUES1APID);
+			S1APPacket reply2 = sendAuthenticationResponse(reply1, eNBUES1APID);
 			if(reply2!=null && reply2.getProcCode().equals("downlinkNASTransport"))
 			{
-				S1APPacket reply3 = sendSecurityModeComplete(xmlparser, reply2);
+				S1APPacket reply3 = sendSecurityModeComplete(reply2);
 				if(reply3.getProcCode().equals("downlinkNASTransport"))
 				{
-					S1APPacket reply4 = sendESMInformationResponse(xmlparser, reply3);
+					S1APPacket reply4 = sendESMInformationResponse(reply3);
 					if(reply4.getProcCode().equals("InitialContextSetup"))
 					{
-						sendInitialContextSetupResponse(xmlparser, reply4);
-						sendAttachComplete(xmlparser, reply4);
+						sendInitialContextSetupResponse(reply4);
+						sendAttachComplete(reply4);
 						return true;
 					}
 					else System.out.println("Attach(4) failure");
@@ -143,7 +103,7 @@ public class AttachSimulator
 	 */
 	//0911325476982143
 	//String AttachArguments = "08" + ueparams.split(";")[0] + "05e0e000000000050202d011d1";
-	public S1APPacket sendAttachRequest(XMLParser xmlparser, String ueparams, String eNBUES1APID)
+	public S1APPacket sendAttachRequest(String ueparams, String eNBUES1APID)
 	{
 		////// NAS packet Generation////////////////////////////
 		//String AttachArguments = "08091132547698214305e0e000000000050202d011d1";
@@ -170,7 +130,7 @@ public class AttachSimulator
 	 * 
 	 * @param xmlparser
 	 */
-	public S1APPacket sendAuthenticationResponse(XMLParser xmlparser, S1APPacket authenticationRequest, 
+	public S1APPacket sendAuthenticationResponse(S1APPacket authenticationRequest, 
 			String eNBUES1APID)
 	{
 
@@ -195,7 +155,7 @@ public class AttachSimulator
 			return null;
 		
 		//
-		System.out.println("R Value:"+r);
+		//System.out.println("R Value:"+r);
 		//
 		// get the NAS response from the NAS classes!!
 		String NASPDU = obj.SendAuthResp(r, k, op);
@@ -222,7 +182,7 @@ public class AttachSimulator
 	 * 
 	 * @param xmlparser
 	 */
-	public S1APPacket sendSecurityModeComplete(XMLParser xmlparser, S1APPacket securityModeCommand)
+	public S1APPacket sendSecurityModeComplete(S1APPacket securityModeCommand)
 	{
 
 		// NAS PDU GENERATION
@@ -254,7 +214,7 @@ public class AttachSimulator
 	 * 
 	 * @param xmlparser
 	 */
-	public S1APPacket sendESMInformationResponse(XMLParser xmlparser, S1APPacket esmInformationRequest)
+	public S1APPacket sendESMInformationResponse(S1APPacket esmInformationRequest)
 	{
 		// NAS PDU GENERATION
 		String NASPDUInESMInformationRequest = esmInformationRequest.getValue("NASPDU");
@@ -286,7 +246,7 @@ public class AttachSimulator
 	 * 
 	 * @param xmlparser
 	 */
-	public void sendInitialContextSetupResponse(XMLParser xmlparser, S1APPacket initialContextSetupRequest)
+	public void sendInitialContextSetupResponse(S1APPacket initialContextSetupRequest)
 	{
 
 		ArrayList <Value> values = new ArrayList <Value>();
@@ -305,7 +265,7 @@ public class AttachSimulator
 	 * 
 	 * @param xmlparser
 	 */
-	public void sendAttachComplete(XMLParser xmlparser, S1APPacket initialContextSetupRequest)
+	public void sendAttachComplete(S1APPacket initialContextSetupRequest)
 	{
 		// NAS PDU GENERATION
 		// String NASPDUInInitialContextSetupRequest =

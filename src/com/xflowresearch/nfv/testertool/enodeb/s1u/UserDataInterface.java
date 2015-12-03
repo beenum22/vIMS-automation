@@ -5,17 +5,22 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 
 import com.xflowresearch.nfv.testertool.enodeb.eNodeB;
 
 public class UserDataInterface 
 {
-	
+
 	int i=0;
 
 	private InetAddress transportLayerAddress;
-	
-	
+
+	private DatagramSocket serverSocket = null;
+
+	private DatagramSocket socket = null;
+
+
 	public void setTransportLayerAddress(InetAddress transportLayerAddress) {
 		this.transportLayerAddress = transportLayerAddress;
 	}
@@ -27,8 +32,6 @@ public class UserDataInterface
 		{
 			public void run()
 			{
-				DatagramSocket serverSocket = null;
-
 				try 
 				{
 					serverSocket = new DatagramSocket(9876);
@@ -44,38 +47,31 @@ public class UserDataInterface
 
 				while (true) 
 				{
-					/////////Remove/////////
-					if(i==0){
-					//////////////////
-					
 					// Wait to receive a datagram
-					try 
-					{
-						serverSocket.receive(packet);
-					}
-					catch (IOException e) {
-						e.printStackTrace();
-					}
 
-					// Convert the contents to a string, and display them
-					byte[] data = new byte[packet.getLength()];
-					System.arraycopy(packet.getData(), packet.getOffset(), data, 0, packet.getLength());
 
-					String stringData = bytesToHex(data);
+						try 
+						{
+							serverSocket.receive(packet);
+						}
+						catch (IOException e) {
+							e.printStackTrace();
+						}
 
-					System.out.println("Data Recieved:"+ stringData);
-					
-					//simulateGTPEchoRequest(enodeb);
-					handleUserData(stringData, enodeb);
+						// Convert the contents to a string, and display them
+						byte[] data = new byte[packet.getLength()];
+						System.arraycopy(packet.getData(), packet.getOffset(), data, 0, packet.getLength());
 
-					// Reset the length of the packet before reusing it.
-					packet.setLength(buffer.length); 
-					
-					////////Remove////////////
-					i++;
-					}
-					///////////////
-					
+						String stringData = bytesToHex(data);
+
+						System.out.println("Data Recieved:"+ stringData);
+
+						//simulateGTPEchoRequest(enodeb);
+						handleUserData(stringData, enodeb);
+
+						// Reset the length of the packet before reusing it.
+						packet.setLength(buffer.length); 
+			
 				}
 
 			}//public void run..
@@ -85,12 +81,12 @@ public class UserDataInterface
 	}
 
 	///GTP Echo////////////////////////////////////////////////////////////////////////
-	
+
 	public void simulateGTPEchoRequest(eNodeB enodeb)
 	{
 		System.out.println("Sending GTP Echo");
 		User user = enodeb.getUser(0);
-		
+
 		//////////////GTP Echo Packet Creation Here////////////////////
 		GTPacket gtpacket = new GTPacket("001", 1, 0, 0, 0, 0);
 		gtpacket.setMessageType("01");
@@ -98,13 +94,13 @@ public class UserDataInterface
 		gtpacket.setTEID(user.getTEID());
 
 		byte[] byteGTPacket = gtpacket.getPacket();
-		
+
 		sendGTPacketToSGW(byteGTPacket);
 		//////////////GTP Echo Packet Creation Here////////////////////
 	}
 	///GTP Echo////////////////////////////////////////////////////////////////////////
-	
-	
+
+
 	/** Received User Data, Apply GTP Tunnel and send to S-GW **/
 	public void handleUserData(String ipPdu, eNodeB enodeb)
 	{
@@ -117,7 +113,7 @@ public class UserDataInterface
 		gtpacket.setTPDU(ipPdu);
 
 		byte[] byteGTPacket = gtpacket.getPacket();
-		
+
 		sendGTPacketToSGW(byteGTPacket);
 	}
 
@@ -129,13 +125,16 @@ public class UserDataInterface
 		{
 			public void run()
 			{
-				DatagramSocket socket = null;
-				try 
+
+				if(socket == null)
 				{
-					socket = new DatagramSocket();
-				} 
-				catch (SocketException e) {
-					e.printStackTrace();
+					try 
+					{
+						socket = new DatagramSocket(2152);
+					} 
+					catch (SocketException e) {
+						e.printStackTrace();
+					}
 				}
 
 				DatagramPacket packet = new DatagramPacket(byteGTPacket, byteGTPacket.length, transportLayerAddress, 2152);
@@ -146,10 +145,11 @@ public class UserDataInterface
 				catch (IOException e) {
 					e.printStackTrace();
 				}
-				
+
 				byte[] receiveData = new byte[1024];
 				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-				try {
+				try 
+				{
 					socket.receive(receivePacket);
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -160,6 +160,24 @@ public class UserDataInterface
 
 				String stringData = bytesToHex(data);
 				System.out.println("Data Recieved From S-GW:"+ stringData);
+				
+				///////////////////Remove the GTP Tunnel Here///////////////////////////
+				String untunneled = stringData.substring(16, stringData.length());
+				System.out.println("Untunneled From S-GW:"+ untunneled);
+				data = hexStringToByteArray(untunneled);
+				///////////////////Remove the GTP Tunnel Here///////////////////////////
+
+				//send data to the sniffer
+				try {
+					DatagramPacket packet1 = new DatagramPacket(data, data.length, InetAddress.getByName("127.0.0.1"), 9798);
+					serverSocket.send(packet1);
+
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				//send data to the sniffer
+
 				receivePacket.setLength(receiveData.length);
 			}
 		}.start();
@@ -177,5 +195,17 @@ public class UserDataInterface
 			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
 		}
 		return new String(hexChars);
+	}
+	
+	public static byte[] hexStringToByteArray(String s)
+	{
+		byte[] b = new byte[s.length() / 2];
+		for (int i = 0; i < b.length; i++)
+		{
+			int index = i * 2;
+			int v = Integer.parseInt(s.substring(index, index + 2), 16);
+			b[i] = (byte) v;
+		}
+		return b;
 	}
 }

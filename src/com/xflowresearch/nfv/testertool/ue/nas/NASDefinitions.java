@@ -1,8 +1,8 @@
 //NAC PROTOCOL DEFINITIONS
-
 package com.xflowresearch.nfv.testertool.ue.nas;
-public class NASDefinitions {
 
+public class NASDefinitions 
+{
 		public enum MobilityManagementMessageType
 		//for the case when Protocol Discriminator = EPS Mobility Management Message
 		{
@@ -40,31 +40,34 @@ public class NASDefinitions {
 			private String hexValue;
 			
 	
-			private MobilityManagementMessageType(final String hexValue) {
+			private MobilityManagementMessageType(final String hexValue) 
+			{
 				this.hexValue = hexValue;
 			}
 			
-			public String getHexCode(){
+			public String getHexCode()
+			{
 				return hexValue;
 			}
 			
-			public static String hexToType(String hexVal){
-				if (hexVal != null) {
+			public static String hexToType(String hexVal)
+			{
+				if (hexVal != null) 
+				{
 					for (MobilityManagementMessageType b : MobilityManagementMessageType.values()) {
-						if (hexVal.equalsIgnoreCase(b.getHexCode())) {
+						if (hexVal.equalsIgnoreCase(b.getHexCode())) 
+						{
 							return b.toString();
 						}
 					}
 				}
+				
 				return null;
-			}
-			
-			
+			}	
 		}
 		
-		
-		public enum EPSSessionManagementMessageType{  ////for the case when Protocol Discriminator = EPS Session Management Message Type
-			
+		public enum EPSSessionManagementMessageType
+		{  ////for the case when Protocol Discriminator = EPS Session Management Message Type	
 			ActivateDefaultEPSBearerContextRequest(""),
 			ActivateDefaultEPSBearerContextAccept(""),
 			ActivateDefaultEPSbearerContextReject(""),
@@ -93,30 +96,32 @@ public class NASDefinitions {
 			private String hexValue;
 			
 			
-			private EPSSessionManagementMessageType(final String hexValue) {
+			private EPSSessionManagementMessageType(final String hexValue) 
+			{
 				this.hexValue = hexValue;
 			}
 			
-			public String getHexCode(){
+			public String getHexCode()
+			{
 				return hexValue;
 			}
 			
-			public static String hexToType(String hexVal){
-				if (hexVal != null) {
-					for (EPSSessionManagementMessageType b : EPSSessionManagementMessageType.values()) {
-						if (hexVal.equalsIgnoreCase(b.getHexCode())) {
+			public static String hexToType(String hexVal)
+			{
+				if (hexVal != null) 
+				{
+					for (EPSSessionManagementMessageType b : EPSSessionManagementMessageType.values()) 
+					{	
+						if (hexVal.equalsIgnoreCase(b.getHexCode())) 
+						{
 							return b.toString();
 						}
 					}
 				}
+				
 				return null;
-			}
-			
-			
+			}			
 		}
-	
-		
-		
 		
 		public enum SecurityHeaderType
 		{
@@ -134,32 +139,34 @@ public class NASDefinitions {
 			private String hexValue;
 			
 			
-			private SecurityHeaderType(final String hexValue) {
+			private SecurityHeaderType(final String hexValue) 
+			{
 				this.hexValue = hexValue;
 			}
 			
-			public String getHexCode(){
+			public String getHexCode()
+			{
 				return hexValue;
 			}
 			
-			public static String hexToType(String hexVal){
-				if (hexVal != null) {
-					for (SecurityHeaderType b : SecurityHeaderType.values()) {
+			public static String hexToType(String hexVal)
+			{
+				if (hexVal != null) 
+				{
+					for (SecurityHeaderType b : SecurityHeaderType.values()) 
+					{
 						if (hexVal.equalsIgnoreCase(b.getHexCode())) {
 							return b.toString();
 						}
 					}
 				}
+				
 				return null;
 			}
-			
 		}
 		
-		
-	
-		
-		public enum ProtocolDiscriminatorValue{
-			
+		public enum ProtocolDiscriminatorValue
+		{	
 			GroupCallControl("0000"),
 			BroadcastCallControl("0001"),
 			EPSSessionManagementMessage("0010"),
@@ -381,26 +388,27 @@ public class NASDefinitions {
 			
 		}
 		
-		public enum TMSIStatusBit{
-			
+		public enum TMSIStatusBit
+		{			
 			NoValidTMSIavailable("0"),
 			ValidTMSIavailable("1");
 			
 			private String hexValue;
 			
-			private TMSIStatusBit(final String hexValue) {
+			private TMSIStatusBit(final String hexValue) 
+			{
 				this.hexValue = hexValue;
 			}
 			
-			public String getHexCode(){
+			public String getHexCode()
+			{
 				return hexValue;
 			}
-			
 		}
 		
 		
-		public enum EPSBearerIdentity{
-			
+		public enum EPSBearerIdentity
+		{	
 			NoEPSBearerIdentityAssigned("0000");
 			
             private String hexValue;
@@ -413,8 +421,5 @@ public class NASDefinitions {
 				return hexValue;
 			}
 		}
-		
-	
-		
 }
 	

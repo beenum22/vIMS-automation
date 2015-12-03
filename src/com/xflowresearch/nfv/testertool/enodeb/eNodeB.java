@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xflowresearch.nfv.testertool.common.XMLParser;
+import com.xflowresearch.nfv.testertool.enodeb.s1mme.S1APPacket;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.SctpClient;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.UserControlInterface;
 import com.xflowresearch.nfv.testertool.enodeb.s1u.User;
@@ -31,6 +32,8 @@ public class eNodeB implements Runnable
 	private SctpClient sctpClient;
 	private UserDataInterface userDataInterface;
 	private UserControlInterface userControlInterface;
+	
+	private AttachSimulator S1AS;
 
 	public eNodeB()
 	{
@@ -51,22 +54,50 @@ public class eNodeB implements Runnable
 		return eNodeB.logger;
 	}
 
+	/**
+	 * Establish S1Signalling with MME..
+	 * 
+	 * @param xmlparser
+	 */
+	public Boolean establishS1Signalling()
+	{
+		if(sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort())))
+		{
+			//System.exit(1);
+			logger.error("Failed to connect with MME");
+		}
+		
+		S1AS = new AttachSimulator(xmlparser, sctpClient);
+
+		ArrayList <Value> values = new ArrayList <Value>();
+		values.add(new Value("GlobalENBID", "reject", xmlparser.getS1signallingParams().GlobalENBID));
+		values.add(new Value("eNBname", "ignore", xmlparser.getS1signallingParams().eNBname));
+		values.add(new Value("SupportedTAs", "reject", xmlparser.getS1signallingParams().SupportedTAs));
+		values.add(new Value("DefaultPagingDRX", "ignore", xmlparser.getS1signallingParams().DefaultPagingDRX));
+
+		S1APPacket recievedPacket = S1AS.sendS1APacket("InitiatingMessage", "S1Setup", "reject", values, true);
+
+		if(recievedPacket.getType().equals("SuccessfulOutcome"))
+		{
+			return true;
+		}
+		else return false;
+	}
+	
 	@Override
 	public void run()
 	{
 		logger.info("eNodeB started");
 
-		AttachSimulator as = new AttachSimulator(xmlparser);
-
 		/*
 		 * establish s1 signalling with the MME
 		 */
-		if(as.establishS1Signalling(xmlparser, sctpClient))
+		if(establishS1Signalling())
 		{
 			logger.info("S1 Signaling Successfully Established");
 
 			/** Listen for UE Commands for Control Plane Signaling **/
-			userControlInterface.listenForUserControlCommands(xmlparser, as, this);
+			userControlInterface.listenForUserControlCommands(xmlparser, this, sctpClient);
 
 			/** Listen for UE Data for User Plane **/
 			userDataInterface.listenForUserDataTraffic(this);

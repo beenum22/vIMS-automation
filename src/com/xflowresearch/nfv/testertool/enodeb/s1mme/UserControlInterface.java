@@ -4,30 +4,27 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import com.xflowresearch.nfv.testertool.common.XMLParser;
 import com.xflowresearch.nfv.testertool.enodeb.AttachSimulator;
 import com.xflowresearch.nfv.testertool.enodeb.eNodeB;
-import com.xflowresearch.nfv.testertool.enodeb.s1u.GTP;
-import com.xflowresearch.nfv.testertool.enodeb.s1u.User;
-import com.xflowresearch.nfv.testertool.ue.UserCommandHandler;
 
 public class UserControlInterface
 {
-
-	public void listenForUserControlCommands(XMLParser xmlparser, AttachSimulator as, eNodeB enodeb)
+	public void listenForUserControlCommands(XMLParser xmlparser, eNodeB enodeb, SctpClient sctpClient)
 	{
 		new Thread()
 		{
 			public void run()
 			{
 				DatagramSocket serverSocket = null;
-
 				try
 				{
-					serverSocket = new DatagramSocket(9877, InetAddress.getByName("10.20.30.3"));
+					serverSocket = new DatagramSocket(9877, InetAddress.getByName("10.20.30.8"));
+					//serverSocket = new ServerSocket(9877, 20, InetAddress.);
 				}
 				catch(SocketException e)
 				{
@@ -68,11 +65,8 @@ public class UserControlInterface
 					int port = packet.getPort();
 					// make new thread UserCommandHandler
 					
-					UserCommandHandler uch = new UserCommandHandler(stringData, serverSocket, enodeb, xmlparser, as, IPAddress, port);
+					UserCommandHandler uch = new UserCommandHandler(stringData, serverSocket, enodeb, xmlparser, IPAddress, port, sctpClient);
 					new Thread(uch).start();
-					
-					
-
 					// Reset the length of the packet before reusing it.
 					
 				}

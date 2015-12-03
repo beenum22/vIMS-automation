@@ -29,7 +29,7 @@ public class UEControlInterface
 		
 		try
 		{
-			IPAddress = InetAddress.getByName("10.20.30.3");
+			IPAddress = InetAddress.getByName("10.20.30.8");
 		}
 		
 		catch(UnknownHostException e1)
