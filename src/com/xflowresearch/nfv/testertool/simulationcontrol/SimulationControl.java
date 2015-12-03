@@ -1,5 +1,7 @@
 package com.xflowresearch.nfv.testertool.simulationcontrol;
 
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,51 +12,58 @@ import com.xflowresearch.nfv.testertool.ue.UE;
 /**
  * SimulationControl
  * 
- *	Simulation Control class responsible for reading the input
- *	parameters of the simulation from a file and based on the 
- *	config parameters, it spawns the UE and eNodeB threads.
+ * Simulation Control class responsible for reading the input parameters of the
+ * simulation from a file and based on the config parameters, it spawns the UE
+ * and eNodeB threads.
  *
  * 
  * @author ahmadarslan
  */
-public class SimulationControl 
-{
+
+public class SimulationControl
+{	
 	private static SimulationControl instance = new SimulationControl();
 
 	private eNodeB enodeb;
 	private UE ue;
+	private ArrayList <Thread> UEs;
 
 	private XMLParser xmlparser;
 
 	/** Logger to log the messages and Errors **/
 	private static final Logger logger = LoggerFactory.getLogger("SimulationControlLogger");
 
-
-	private SimulationControl(){
+	private SimulationControl()
+	{
 		enodeb = new eNodeB();
-		ue = new UE();
+		//ue = new UE();
+		UEs = new ArrayList<Thread>();
 
 		xmlparser = new XMLParser();
 	}
-
-
-	public static SimulationControl getInstance( ) {
+	
+	/** Get the Simulation Controller instance */
+	public static SimulationControl getInstance()
+	{
 		return instance;
 	}
 
-
-	public Logger getLogger(){
+	/** Get the logger instance */
+	public Logger getLogger()
+	{
 		return SimulationControl.logger;
 	}
-
-
-	public void startSimulation(){
+	
+	/** Start the simulation */	
+	public void startSimulation()
+	{
 		logger.info("Simulation started");
 
 		/* Parse/Read the input parameters from 'XML' files here!! */
 		xmlparser.readSimulationParameters();
+		xmlparser.readIMSIParamters();
 
-		/** Initialize UE and eNodeB instances' data and start their threads**/
+		/* Initialize UE and eNodeB instances' data and start their threads */
 		if(xmlparser.geteNBCount() != 0)
 		{
 			enodeb.setXMLParser(xmlparser);
@@ -66,11 +75,20 @@ public class SimulationControl
 
 		if(xmlparser.getUECount() != 0)
 		{
-			Thread UEThread = new Thread(ue);
+			int UECount = xmlparser.getUECount();
+			
+			for(int i = 0; i < UECount; i++)
+			{
+				UEs.add(new Thread(new UE(xmlparser.getUEParameters(i))));
+				UEs.get(i).setName("UEThread"+i);
+				logger.info("UE Thread " + i + " Spawned");
+				UEs.get(i).start();
+			}
+			
+			/*Thread UEThread = new Thread(ue);
 			UEThread.setName("UEThread1");
 			UEThread.start();
-			logger.info("UE Thread Spawned");
+			logger.info("UE Thread Spawned");*/
 		}
-		
 	}
 }

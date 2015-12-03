@@ -8,52 +8,71 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 
-public class UEControlInterface {
+public class UEControlInterface
+{
 
 	public String sendControlCommand(String command)
 	{
 		DatagramSocket clientSocket = null;
-		try {
+		
+		try
+		{
 			clientSocket = new DatagramSocket();
-		} catch (SocketException e2) {
+		}
+		catch(SocketException e2)
+		{
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
 
 		InetAddress IPAddress = null;
-		try {
+		
+		try
+		{
 			IPAddress = InetAddress.getByName("10.20.30.3");
-		} catch (UnknownHostException e1) {
+		}
+		
+		catch(UnknownHostException e1)
+		{
 			e1.printStackTrace();
 		}
 
-		byte[] sendData = new byte[1024];
+		byte [] sendData = new byte[1024];
 
 		sendData = command.getBytes();
 
 		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9877);
-		try {
+		
+		try
+		{
 			clientSocket.send(sendPacket);
-		} catch (IOException e) {
+		}
+		
+		catch(IOException e)
+		{
 			e.printStackTrace();
 		}
 
+		byte [] receiveData = new byte[1024];
 		
-		byte[] receiveData = new byte[1024];
 		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-		try {
+		try
+		{
 			clientSocket.receive(receivePacket);
-		} catch (IOException e) {
+		}
+		
+		catch(IOException e)
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		byte[] data = new byte[receivePacket.getLength()];
+		
+		byte [] data = new byte[receivePacket.getLength()];
 		System.arraycopy(receivePacket.getData(), receivePacket.getOffset(), data, 0, receivePacket.getLength());
 		String pdnipv4 = new String(data);
-		
+
 		clientSocket.close();
-		
+
 		return pdnipv4;
 	}
-
 }
