@@ -208,7 +208,7 @@ else:
 ##
 
 heat_endpoint = keystone.service_catalog.url_for(service_type='orchestration', endpoint_type='publicURL')
-heatclient = Heat_Client('1', heat_endpoint, token=keystone.auth_token, username='admin', passwork='admin')
+heatclient = Heat_Client('1', heat_endpoint, token=keystone.auth_token, username='admin', password='admin')
 
 ##################################### Get Homestead IP #########################################
 
@@ -268,7 +268,8 @@ while not stdout.channel.exit_status_ready():
 		if len(rl) > 0:
 			# Print data from stdout
 			print stdout.channel.recv(1024),
-stdin, stdout, stderr = ssh.exec_command("/usr/share/clearwater/homestead/src/metaswitch/crest/tools/bulk_create.py users.csv")
+stdin, stdout, stderr = ssh.exec_command("chmod 777 /usr/share/clearwater/crest/env/lib/python2.7/site-packages/crest-0.1-py2.7.egg/metaswitch/crest/tools/bulk_create.py")
+stdin, stdout, stderr = ssh.exec_command("/usr/share/clearwater/crest/env/lib/python2.7/site-packages/crest-0.1-py2.7.egg/metaswitch/crest/tools/bulk_create.py users.csv")   
 while not stdout.channel.exit_status_ready():
 	# Only print data if there is data to read in the channel 
 	if stdout.channel.recv_ready():

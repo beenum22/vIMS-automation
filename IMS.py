@@ -110,7 +110,7 @@ SNMP_CONFIG_PATH = '/etc/snmp/snmpd.conf'
 SNMP_FILE_PATH = PATH+'/snmpd.conf'
 MIB_PATH = "/usr/share/mibs/PROJECT-CLEARWATER-MIB.txt"
 #MIB_FILE_PATH = "/root/vIMS/PROJECT-CLEARWATER-MIB.txt"
-MIB_FILE_PATH = "/vIMS/PROJECT-CLEARWATER-MIB.txt"
+MIB_FILE_PATH = PATH+"/PROJECT-CLEARWATER-MIB.txt"
 os.environ['IMAGE_PATH'] = PATH+'/IMG'
 CONFIG_PATH = PATH+'/configurations.json'
 USER_CONFIG_PATH = PATH+'/user_config.json'
@@ -2720,7 +2720,7 @@ def create_cluster(heat,cluster_name):
 # cred = get_keystone_creds(config)
 # ks_client = Keystone_Client(**cred)
 heat_endpoint = keystone.service_catalog.url_for(service_type='orchestration', endpoint_type='publicURL')
-heatclient = Heat_Client('1', heat_endpoint, token=keystone.auth_token, username='admin', passwork='admin')
+heatclient = Heat_Client('1', heat_endpoint, token=keystone.auth_token, username='admin', password='admin')
 create_cluster(heatclient,STACK_HA_NAME)
 #stack = heatclient.stacks.list()
 #print stack.next()
