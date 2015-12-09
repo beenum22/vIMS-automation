@@ -1,0 +1,643 @@
+2015-11-23 05:35:40,406 INFO     Scale_down              [-]  Getting initial user confiurations.
+2015-11-23 05:35:40,406 INFO     Scale_down              [-]  Getting initial user confiurations Successfull.
+2015-11-23 05:35:40,406 INFO     Scale_down              [-]  Getting client credentials
+2015-11-23 05:35:40,407 INFO     Scale_down              [-]  opening file to detect the environment
+2015-11-23 05:35:40,409 INFO     Scale_down              [-]  Environment returned CentOS
+2015-11-23 05:35:40,410 INFO     Scale_down              [-]  Creating authorized instance of keystone client
+2015-11-23 05:35:40,417 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-23 05:35:40,567 INFO     Scale_down              [-]  Authorized keystone instance ....
+2015-11-23 05:35:40,567 INFO     Scale_down              [-]  Environment is CentOS ...
+2015-11-23 05:35:40,568 INFO     nova                    [-]  Creating authorized instance of nova client instance ...
+2015-11-23 05:35:40,568 INFO     nova                    [-]  Authorized nova instance ....
+2015-11-23 05:35:40,568 INFO     nova                    [-]  Environment is CentOS ...
+2015-11-23 05:35:40,568 INFO     neutron                 [-]  Creating authorized instance of neutron client instance ...
+2015-11-23 05:35:40,568 INFO     neutron                 [-]  Authorized neutron instance ....
+2015-11-23 05:35:40,568 INFO     neutron                 [-]  Environment is CentOS ...
+2015-11-23 05:35:40,568 INFO     glance                  [-]  Creating authorized instance of glance client instance ...
+2015-11-23 05:35:40,595 INFO     glance                  [-]  Authorized glance instance ....
+2015-11-23 05:35:40,595 INFO     glance                  [-]  Environment is CentOS ...
+2015-11-23 05:35:40,601 INFO     Scale                   [-]  Getting initial user confiurations.
+2015-11-23 05:35:40,601 INFO     Scale                   [-]  Getting initial user confiurations Successfull.
+2015-11-23 05:35:40,601 INFO     Scale                   [-]  Getting client credentials
+2015-11-23 05:35:40,601 INFO     Scale                   [-]  opening file to detect the environment
+2015-11-23 05:35:40,604 INFO     Scale                   [-]  Environment returned CentOS
+2015-11-23 05:35:40,604 INFO     Scale                   [-]  Creating authorized instance of keystone client
+2015-11-23 05:35:40,606 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-23 05:35:41,023 INFO     Scale                   [-]  Authorized keystone instance ....
+2015-11-23 05:35:41,023 INFO     Scale                   [-]  Environment is CentOS ...
+2015-11-23 05:35:41,023 INFO     nova                    [-]  Creating authorized instance of nova client instance ...
+2015-11-23 05:35:41,024 INFO     nova                    [-]  Authorized nova instance ....
+2015-11-23 05:35:41,024 INFO     nova                    [-]  Environment is CentOS ...
+2015-11-23 05:35:41,024 INFO     neutron                 [-]  Creating authorized instance of neutron client instance ...
+2015-11-23 05:35:41,024 INFO     neutron                 [-]  Authorized neutron instance ....
+2015-11-23 05:35:41,024 INFO     neutron                 [-]  Environment is CentOS ...
+2015-11-23 05:35:41,024 INFO     glance                  [-]  Creating authorized instance of glance client instance ...
+2015-11-23 05:35:41,024 INFO     glance                  [-]  Authorized glance instance ....
+2015-11-23 05:35:41,025 INFO     glance                  [-]  Environment is CentOS ...
+2015-11-23 05:35:41,029 INFO     __main__                [-]  Getting initial user confiurations.
+2015-11-23 05:35:41,029 INFO     __main__                [-]  Getting initial user confiurations Successfull.
+2015-11-23 05:35:41,029 INFO     __main__                [-]  Getting client credentials
+2015-11-23 05:35:41,029 INFO     __main__                [-]  Credentials Loaded
+2015-11-23 05:35:41,030 INFO     __main__                [-]  Getting Keystone credentials
+2015-11-23 05:35:41,030 INFO     nova                    [-]  Getting of nova credentials
+2015-11-23 05:35:41,030 INFO     __main__                [-]  opening file to detect the environment
+2015-11-23 05:35:41,032 INFO     __main__                [-]  Environment returned CentOS
+2015-11-23 05:35:41,033 INFO     __main__                [-]  Creating authorized instance of keystone client
+2015-11-23 05:35:41,035 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-23 05:35:41,450 INFO     __main__                [-]  Authorized keystone instance ....
+2015-11-23 05:35:41,450 INFO     __main__                [-]  Environment is CentOS ...
+2015-11-23 05:35:41,450 INFO     nova                    [-]  Creating authorized instance of nova client instance ...
+2015-11-23 05:35:41,450 INFO     nova                    [-]  Authorized nova instance ....
+2015-11-23 05:35:41,450 INFO     nova                    [-]  Environment is CentOS ...
+2015-11-23 05:35:41,450 INFO     neutron                 [-]  Creating authorized instance of neutron client instance ...
+2015-11-23 05:35:41,451 INFO     neutron                 [-]  Authorized neutron instance ....
+2015-11-23 05:35:41,451 INFO     neutron                 [-]  Environment is CentOS ...
+2015-11-23 05:35:41,451 INFO     glance                  [-]  Creating authorized instance of glance client instance ...
+2015-11-23 05:35:41,452 INFO     glance                  [-]  Authorized glance instance ....
+2015-11-23 05:35:41,452 INFO     glance                  [-]  Environment is CentOS ...
+2015-11-23 05:35:41,453 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-23 05:35:41,766 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:35:41,944 INFO     nova                    [-]  Getting hypervisor list
+2015-11-23 05:35:41,945 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:35:41,971 INFO     nova                    [-]  Checking if aggregate group GroupA already exists
+2015-11-23 05:35:41,972 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:35:41,988 INFO     nova                    [-]  Aggregate group GroupA already exists
+2015-11-23 05:35:41,988 INFO     nova                    [-]  getting ID of aggregate group GroupA
+2015-11-23 05:35:41,988 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:35:42,020 INFO     nova                    [-]  Done getting ID of aggregate group GroupA
+2015-11-23 05:35:42,020 INFO     nova                    [-]  ID of aggregate group GroupA 427
+2015-11-23 05:35:42,020 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:35:42,039 INFO     nova                    [-]  Checking if node-6.10.204.64.10 exists in aggregate group GroupA
+2015-11-23 05:35:42,039 INFO     nova                    [-]  Getting hosts details [u'node-6.10.204.64.10'] (name from aggregate group)
+2015-11-23 05:35:42,039 INFO     nova                    [-]  Done checking [u'node-6.10.204.64.10'] is already added to aggregate group GroupA
+2015-11-23 05:35:42,039 INFO     nova                    [-]  Checking if aggregate group GroupB already exists
+2015-11-23 05:35:42,039 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:35:42,067 INFO     nova                    [-]  Aggregate group GroupB already exists
+2015-11-23 05:35:42,067 INFO     nova                    [-]  getting ID of aggregate group GroupB
+2015-11-23 05:35:42,068 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:35:42,084 INFO     nova                    [-]  Done getting ID of aggregate group GroupB
+2015-11-23 05:35:42,084 INFO     nova                    [-]  ID of aggregate group GroupB 428
+2015-11-23 05:35:42,085 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:35:42,114 INFO     nova                    [-]  Checking if node-7.10.204.64.10 exists in aggregate group GroupB
+2015-11-23 05:35:42,114 INFO     nova                    [-]  Getting hosts details [u'node-7.10.204.64.10'] (name from aggregate group)
+2015-11-23 05:35:42,114 INFO     nova                    [-]  Done checking [u'node-7.10.204.64.10'] is already added to aggregate group GroupB
+2015-11-23 05:35:42,114 INFO     __main__                [-]  Successfully added availaibility zones
+2015-11-23 05:35:42,115 INFO     __main__                [-]  getting keystone client credentials
+2015-11-23 05:35:42,116 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-23 05:35:42,270 INFO     glance                  [-]  Creating Glance endpoint
+2015-11-23 05:35:42,270 INFO     glance                  [-]  Creating Glance client
+2015-11-23 05:35:42,271 INFO     glance                  [-]  Creating Glance image
+2015-11-23 05:35:42,272 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:35:42,564 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-23 05:35:42,720 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:35:42,790 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:35:42,887 INFO     __main__                [-]  Successfully created a DNS security key
+2015-11-23 05:35:42,888 INFO     __main__                [-]  creating heat endpoint
+2015-11-23 05:35:42,888 INFO     __main__                [-]  creating heat client
+2015-11-23 05:35:42,888 INFO     __main__                [-]  creating heatstack Cluster
+2015-11-23 05:35:42,920 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:35:46,297 INFO     __main__                [-]  Creating Heat Stack
+2015-11-23 05:35:46,297 INFO     __main__                [-]  Deployong Heat Stack
+2015-11-23 05:35:46,298 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:35:46,460 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:36:16,559 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:36:16,649 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:36:46,730 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:36:46,813 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:37:16,890 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:37:16,981 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:37:47,060 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:37:47,148 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:38:17,229 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:38:17,320 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:38:47,404 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:38:47,490 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:39:17,569 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:39:17,653 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:39:47,732 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:39:47,820 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:40:17,903 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:40:17,990 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:40:48,070 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:40:48,197 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:41:18,289 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:41:18,379 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:41:48,456 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:41:48,542 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:42:18,624 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:42:18,720 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:42:20,590 INFO     __main__                [-]  Getting DNS ip to configure DNS Server
+2015-11-23 05:42:20,591 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:42:20,678 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:46:22,350 INFO     paramiko                [-]  Connecting To DNS Node
+2015-11-23 05:46:22,359 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-23 05:46:22,568 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-23 05:46:22,570 INFO     paramiko                [-]  Updating Ubuntu by apt-get update
+2015-11-23 05:46:22,764 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-23 05:48:24,879 INFO     paramiko                [-]  Installing Bind DNS Server
+2015-11-23 05:48:24,920 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-23 05:48:31,623 INFO     paramiko                [-]  Updating BIND configuration with the specified zone and key
+2015-11-23 05:48:31,664 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-23 05:48:31,728 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-23 05:48:31,769 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-23 05:48:31,812 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-23 05:48:31,840 INFO     __main__                [-]  Creating basic zone configuration
+2015-11-23 05:48:31,841 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-23 05:48:31,920 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-23 05:48:31,960 INFO     __main__                [-]  Finished creating configurations
+2015-11-23 05:48:31,960 INFO     __main__                [-]  Reloading Bind service
+2015-11-23 05:48:31,962 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-23 05:48:31,987 INFO     __main__                [-]  Configure Bono Node
+2015-11-23 05:48:31,988 INFO     __main__                [-]  Get Bono IP
+2015-11-23 05:48:31,989 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:48:32,129 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:48:37,035 INFO     paramiko                [-]  Connecting To Bono Node
+2015-11-23 05:48:37,043 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-23 05:48:37,250 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-23 05:48:37,253 INFO     __main__                [-]  Connected To Bono Node
+2015-11-23 05:48:37,434 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-23 05:48:37,455 INFO     __main__                [-]  Configuring APT software source
+2015-11-23 05:48:37,456 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-23 05:48:37,459 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-23 05:48:37,499 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-23 05:48:37,501 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-23 05:48:37,538 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-23 05:48:37,573 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-23 05:48:37,611 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-23 05:48:37,615 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-23 05:48:37,655 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-23 05:48:37,659 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-23 05:48:37,699 INFO     __main__                [-]  Configuring clearwater shared settings
+2015-11-23 05:48:37,738 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-23 05:48:37,780 INFO     __main__                [-]  Installing Bono packages.
+2015-11-23 05:48:37,818 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-23 05:48:39,702 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-23 05:48:44,748 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-23 05:49:09,081 INFO     paramiko.transport      [-]  Secsh channel 15 opened.
+2015-11-23 05:49:14,124 INFO     __main__                [-]  Installing Bono packages.
+2015-11-23 05:49:14,125 INFO     paramiko.transport      [-]  Secsh channel 16 opened.
+2015-11-23 05:49:30,469 INFO     paramiko.transport      [-]  Secsh channel 17 opened.
+2015-11-23 05:49:35,511 INFO     __main__                [-]  Installing SNMP.
+2015-11-23 05:49:35,512 INFO     paramiko.transport      [-]  Secsh channel 18 opened.
+2015-11-23 05:49:52,966 INFO     paramiko.transport      [-]  Secsh channel 19 opened.
+2015-11-23 05:49:58,011 INFO     __main__                [-]  Installing SNMPD.
+2015-11-23 05:49:58,012 INFO     paramiko.transport      [-]  Secsh channel 20 opened.
+2015-11-23 05:50:00,865 INFO     paramiko.transport      [-]  Secsh channel 21 opened.
+2015-11-23 05:50:05,908 INFO     __main__                [-]  Finished Installation in BONO
+2015-11-23 05:50:05,908 INFO     __main__                [-]  Uploading shared configuration
+2015-11-23 05:50:05,909 INFO     paramiko.transport      [-]  Secsh channel 22 opened.
+2015-11-23 05:50:11,968 INFO     __main__                [-]  Applying shared configuration
+2015-11-23 05:50:11,969 INFO     paramiko.transport      [-]  Secsh channel 23 opened.
+2015-11-23 05:50:12,128 INFO     __main__                [-]  Updating DNS server
+2015-11-23 05:50:12,129 INFO     paramiko.transport      [-]  Secsh channel 24 opened.
+2015-11-23 05:50:12,169 INFO     paramiko.transport      [-]  Secsh channel 25 opened.
+2015-11-23 05:50:12,207 INFO     paramiko.transport      [-]  Secsh channel 26 opened.
+2015-11-23 05:50:12,319 INFO     __main__                [-]  Configuring SNMP
+2015-11-23 05:50:12,320 INFO     paramiko.transport      [-]  Secsh channel 27 opened.
+2015-11-23 05:50:12,372 INFO     paramiko.transport.sftp [-]  [chan 27] Opened sftp connection (server version 3)
+2015-11-23 05:50:12,395 INFO     paramiko.transport      [-]  Secsh channel 28 opened.
+2015-11-23 05:50:44,444 INFO     paramiko.transport      [-]  Secsh channel 29 opened.
+2015-11-23 05:50:44,446 INFO     paramiko.transport      [-]  Secsh channel 30 opened.
+2015-11-23 05:50:44,452 INFO     paramiko.transport      [-]  Secsh channel 31 opened.
+2015-11-23 05:50:44,495 INFO     paramiko.transport      [-]  Secsh channel 32 opened.
+2015-11-23 05:50:46,573 INFO     __main__                [-]  configuring sprout
+2015-11-23 05:50:46,573 INFO     __main__                [-]  Get Sprout IP
+2015-11-23 05:50:46,574 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:50:46,657 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:50:48,969 INFO     paramiko                [-]  Connecting To Sprout Node
+2015-11-23 05:50:48,978 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-23 05:50:49,192 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-23 05:50:49,205 INFO     __main__                [-]  Connected to Sprout
+2015-11-23 05:50:49,380 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-23 05:50:49,407 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-23 05:50:49,410 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-23 05:50:49,416 INFO     __main__                [-]  Configuring APT software source
+2015-11-23 05:50:49,419 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-23 05:50:49,421 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-23 05:50:49,460 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-23 05:50:49,488 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-23 05:50:49,524 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-23 05:50:49,562 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-23 05:50:49,602 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-23 05:50:49,642 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-23 05:50:49,681 INFO     __main__                [-]  Configuring clearwater shared settings
+2015-11-23 05:50:49,720 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-23 05:50:49,762 INFO     __main__                [-]  Create /etc/chronos/chronos.conf.
+2015-11-23 05:50:49,800 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-23 05:50:49,841 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-23 05:50:49,844 INFO     __main__                [-]  Installing Sprout packages.
+2015-11-23 05:50:49,880 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-23 05:51:21,076 INFO     paramiko.transport      [-]  Secsh channel 15 opened.
+2015-11-23 05:51:51,109 INFO     __main__                [-]  Installing Sprout packages.
+2015-11-23 05:51:51,110 INFO     paramiko.transport      [-]  Secsh channel 16 opened.
+2015-11-23 05:52:21,146 INFO     paramiko.transport      [-]  Secsh channel 17 opened.
+2015-11-23 05:52:51,185 INFO     paramiko.transport      [-]  Secsh channel 18 opened.
+2015-11-23 05:52:51,190 INFO     __main__                [-]  Installing SNMP in Sprout
+2015-11-23 05:52:51,228 INFO     paramiko.transport      [-]  Secsh channel 19 opened.
+2015-11-23 05:52:51,259 INFO     paramiko.transport      [-]  Secsh channel 20 opened.
+2015-11-23 05:52:56,303 INFO     paramiko.transport      [-]  Secsh channel 21 opened.
+2015-11-23 05:53:08,799 INFO     __main__                [-]  Installing SNMPD in Sprout
+2015-11-23 05:53:08,836 INFO     paramiko.transport      [-]  Secsh channel 22 opened.
+2015-11-23 05:53:09,203 INFO     paramiko.transport      [-]  Secsh channel 23 opened.
+2015-11-23 05:53:14,246 INFO     __main__                [-]  Finished Installation
+2015-11-23 05:53:14,246 INFO     __main__                [-]  Installed Sprout packages
+2015-11-23 05:53:14,246 INFO     __main__                [-]  Uploading shared configuration
+2015-11-23 05:53:14,247 INFO     paramiko.transport      [-]  Secsh channel 24 opened.
+2015-11-23 05:53:14,258 INFO     __main__                [-]  Applying shared configuration
+2015-11-23 05:53:14,258 INFO     paramiko.transport      [-]  Secsh channel 25 opened.
+2015-11-23 05:53:14,423 INFO     paramiko                [-]  Updating DNS server
+2015-11-23 05:53:14,460 INFO     paramiko.transport      [-]  Secsh channel 26 opened.
+2015-11-23 05:53:14,491 INFO     paramiko.transport      [-]  Secsh channel 27 opened.
+2015-11-23 05:53:14,529 INFO     paramiko.transport      [-]  Secsh channel 28 opened.
+2015-11-23 05:53:14,631 INFO     __main__                [-]  Configuring SNMP in Sprout
+2015-11-23 05:53:14,632 INFO     paramiko.transport      [-]  Secsh channel 29 opened.
+2015-11-23 05:53:14,680 INFO     paramiko.transport.sftp [-]  [chan 29] Opened sftp connection (server version 3)
+2015-11-23 05:53:14,696 INFO     paramiko.transport      [-]  Secsh channel 30 opened.
+2015-11-23 05:53:46,742 INFO     paramiko.transport      [-]  Secsh channel 31 opened.
+2015-11-23 05:53:46,746 INFO     paramiko.transport      [-]  Secsh channel 32 opened.
+2015-11-23 05:53:46,751 INFO     paramiko.transport      [-]  Secsh channel 33 opened.
+2015-11-23 05:53:46,756 INFO     paramiko.transport      [-]  Secsh channel 34 opened.
+2015-11-23 05:53:48,832 INFO     __main__                [-]  Configure Homer Node
+2015-11-23 05:53:48,832 INFO     __main__                [-]  Get Homer IP
+2015-11-23 05:53:48,833 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:53:48,967 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:53:51,784 INFO     paramiko                [-]  Connecting To Homer Node
+2015-11-23 05:53:51,793 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-23 05:53:52,015 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-23 05:53:52,020 INFO     __main__                [-]  Connected To Homer Node
+2015-11-23 05:53:52,211 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-23 05:53:52,223 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-23 05:53:52,226 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-23 05:53:52,231 INFO     __main__                [-]  Configuring APT software source
+2015-11-23 05:53:52,232 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-23 05:53:52,251 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-23 05:53:52,291 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-23 05:53:52,317 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-23 05:53:52,359 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-23 05:53:52,387 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-23 05:53:52,427 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-23 05:53:52,431 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-23 05:53:52,471 INFO     __main__                [-]  Configuring clearwater shared settings
+2015-11-23 05:53:52,511 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-23 05:53:52,552 INFO     __main__                [-]  Installing Homer packages.
+2015-11-23 05:53:52,591 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-23 05:53:54,936 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-23 05:53:54,974 INFO     __main__                [-]  Retrying Installation.
+2015-11-23 05:54:38,038 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-23 05:55:08,125 INFO     paramiko.transport      [-]  Secsh channel 15 opened.
+2015-11-23 05:55:38,188 INFO     __main__                [-]  Installing Homer packages.
+2015-11-23 05:55:38,189 INFO     paramiko.transport      [-]  Secsh channel 16 opened.
+2015-11-23 05:55:38,611 INFO     paramiko.transport      [-]  Secsh channel 17 opened.
+2015-11-23 05:56:08,671 INFO     __main__                [-]  Uploading shared configuration
+2015-11-23 05:56:08,672 INFO     paramiko.transport      [-]  Secsh channel 18 opened.
+2015-11-23 05:56:08,681 INFO     __main__                [-]  Applying shared configuration
+2015-11-23 05:56:08,682 INFO     paramiko.transport      [-]  Secsh channel 19 opened.
+2015-11-23 05:56:08,834 INFO     __main__                [-]  Updating DNS server for homer
+2015-11-23 05:56:08,874 INFO     paramiko.transport      [-]  Secsh channel 20 opened.
+2015-11-23 05:56:08,938 INFO     paramiko.transport      [-]  Secsh channel 21 opened.
+2015-11-23 05:56:08,980 INFO     paramiko.transport      [-]  Secsh channel 22 opened.
+2015-11-23 05:56:09,082 INFO     paramiko.transport      [-]  Secsh channel 23 opened.
+2015-11-23 05:56:09,085 INFO     paramiko.transport      [-]  Secsh channel 24 opened.
+2015-11-23 05:56:09,128 INFO     paramiko.transport      [-]  Secsh channel 25 opened.
+2015-11-23 05:56:11,236 INFO     __main__                [-]  Configure Homestead Node
+2015-11-23 05:56:11,236 INFO     __main__                [-]  Get Homestead IP
+2015-11-23 05:56:11,237 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:56:11,321 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 05:56:14,267 INFO     paramiko                [-]  Connecting To Homestead Node
+2015-11-23 05:56:14,276 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-23 05:56:14,491 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-23 05:56:14,504 INFO     __main__                [-]  Connected To Homestead Node
+2015-11-23 05:56:14,695 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-23 05:56:14,706 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-23 05:56:14,710 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-23 05:56:14,715 INFO     __main__                [-]  Configuring APT software source
+2015-11-23 05:56:14,716 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-23 05:56:14,734 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-23 05:56:14,775 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-23 05:56:14,801 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-23 05:56:14,839 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-23 05:56:14,873 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-23 05:56:14,912 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-23 05:56:14,916 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-23 05:56:14,955 INFO     __main__                [-]  Configuring clearwater shared settings
+2015-11-23 05:56:14,995 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-23 05:56:15,036 INFO     __main__                [-]  Installing Homestead packages.
+2015-11-23 05:56:15,075 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-23 05:56:17,940 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-23 05:56:17,979 INFO     __main__                [-]  Retrying Installation.
+2015-11-23 05:58:08,299 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-23 05:58:08,713 INFO     paramiko.transport      [-]  Secsh channel 15 opened.
+2015-11-23 05:58:08,751 INFO     __main__                [-]  Retrying Installation.
+2015-11-23 05:58:50,757 INFO     paramiko.transport      [-]  Secsh channel 16 opened.
+2015-11-23 05:58:58,733 INFO     paramiko.transport      [-]  Secsh channel 17 opened.
+2015-11-23 05:58:58,771 INFO     __main__                [-]  Retrying Installation.
+2015-11-23 05:59:03,775 INFO     paramiko.transport      [-]  Secsh channel 18 opened.
+2015-11-23 05:59:04,144 INFO     paramiko.transport      [-]  Secsh channel 19 opened.
+2015-11-23 05:59:04,543 INFO     paramiko.transport      [-]  Secsh channel 20 opened.
+2015-11-23 06:01:05,087 INFO     paramiko.transport      [-]  Secsh channel 21 opened.
+2015-11-23 06:03:05,722 INFO     __main__                [-]  Installing SNMP in Homestead
+2015-11-23 06:03:05,760 INFO     paramiko.transport      [-]  Secsh channel 22 opened.
+2015-11-23 06:03:29,314 INFO     paramiko.transport      [-]  Secsh channel 23 opened.
+2015-11-23 06:03:34,354 INFO     __main__                [-]  Installing SNMPD in Homestead
+2015-11-23 06:03:34,355 INFO     paramiko.transport      [-]  Secsh channel 24 opened.
+2015-11-23 06:03:48,105 INFO     paramiko.transport      [-]  Secsh channel 25 opened.
+2015-11-23 06:03:53,149 INFO     __main__                [-]  Finished Installation in Homestead
+2015-11-23 06:03:53,149 INFO     __main__                [-]  Configure MIB's in Homer
+2015-11-23 06:03:53,150 INFO     paramiko.transport      [-]  Secsh channel 26 opened.
+2015-11-23 06:03:53,174 INFO     paramiko.transport.sftp [-]  [chan 26] Opened sftp connection (server version 3)
+2015-11-23 06:03:53,188 INFO     paramiko.transport      [-]  Secsh channel 27 opened.
+2015-11-23 06:04:25,638 INFO     paramiko.transport      [-]  Secsh channel 28 opened.
+2015-11-23 06:04:25,647 INFO     __main__                [-]  Uploading shared configuration
+2015-11-23 06:04:25,648 INFO     paramiko.transport      [-]  Secsh channel 29 opened.
+2015-11-23 06:04:26,014 INFO     __main__                [-]  Applying shared configuration
+2015-11-23 06:04:26,015 INFO     paramiko.transport      [-]  Secsh channel 30 opened.
+2015-11-23 06:04:26,307 INFO     __main__                [-]  Updating DNS server for homestead
+2015-11-23 06:04:26,308 INFO     paramiko.transport      [-]  Secsh channel 31 opened.
+2015-11-23 06:04:26,385 INFO     paramiko.transport      [-]  Secsh channel 32 opened.
+2015-11-23 06:04:26,426 INFO     paramiko.transport      [-]  Secsh channel 33 opened.
+2015-11-23 06:04:27,211 INFO     paramiko.transport      [-]  Secsh channel 34 opened.
+2015-11-23 06:04:32,256 INFO     paramiko.transport      [-]  Secsh channel 35 opened.
+2015-11-23 06:04:32,258 INFO     paramiko.transport      [-]  Secsh channel 36 opened.
+2015-11-23 06:04:32,261 INFO     paramiko.transport      [-]  Secsh channel 37 opened.
+2015-11-23 06:04:34,393 INFO     __main__                [-]  Configure Ellis Node
+2015-11-23 06:04:34,394 INFO     __main__                [-]  Get Ellis IP
+2015-11-23 06:04:34,395 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:04:34,638 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:04:37,915 INFO     paramiko                [-]  Connecting To Ellis Node
+2015-11-23 06:04:37,931 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-23 06:04:38,156 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-23 06:04:38,161 INFO     __main__                [-]  Connected To Ellis Node
+2015-11-23 06:04:38,372 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-23 06:04:38,379 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-23 06:04:38,380 INFO     __main__                [-]  Configuring APT software source
+2015-11-23 06:04:38,405 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-23 06:04:38,415 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-23 06:06:47,182 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-23 06:08:59,747 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-23 06:08:59,787 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-23 06:08:59,788 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-23 06:08:59,829 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-23 06:08:59,832 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-23 06:08:59,848 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-23 06:08:59,850 INFO     __main__                [-]  Installing Ellis software packages.
+2015-11-23 06:08:59,851 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-23 06:21:30,449 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-23 06:21:30,450 INFO     __main__                [-]  Installed Ellis software packages.
+2015-11-23 06:24:30,616 INFO     __main__                [-]  Configuring clearwater shared settings
+2015-11-23 06:24:30,617 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-23 06:24:30,619 INFO     __main__                [-]  Uploading shared configuration
+2015-11-23 06:24:30,659 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-23 06:24:31,955 INFO     __main__                [-]  Applying shared configuration
+2015-11-23 06:24:31,956 INFO     paramiko.transport      [-]  Secsh channel 15 opened.
+2015-11-23 06:24:32,131 INFO     __main__                [-]  Allocating a pool of numbers to assign users
+2015-11-23 06:24:32,132 INFO     paramiko.transport      [-]  Secsh channel 16 opened.
+2015-11-23 06:24:32,171 INFO     __main__                [-]  Updating DNS server for ellis
+2015-11-23 06:24:32,171 INFO     paramiko.transport      [-]  Secsh channel 17 opened.
+2015-11-23 06:24:32,210 INFO     paramiko.transport      [-]  Secsh channel 18 opened.
+2015-11-23 06:24:32,253 INFO     paramiko.transport      [-]  Secsh channel 19 opened.
+2015-11-23 06:24:53,411 INFO     paramiko.transport      [-]  Secsh channel 20 opened.
+2015-11-23 06:24:53,438 INFO     paramiko.transport      [-]  Secsh channel 21 opened.
+2015-11-23 06:24:53,443 INFO     paramiko.transport      [-]  Secsh channel 22 opened.
+2015-11-23 06:24:55,531 INFO     __main__                [-]  Configure Ralf Node
+2015-11-23 06:24:55,531 INFO     __main__                [-]  Get Ralf IP
+2015-11-23 06:24:55,532 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:24:55,728 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:24:58,806 INFO     paramiko                [-]  Connecting To Ralf Node
+2015-11-23 06:24:58,848 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-23 06:24:59,048 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-23 06:24:59,077 INFO     paramiko                [-]  Connected To Ralf Node
+2015-11-23 06:24:59,309 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-23 06:24:59,310 INFO     __main__                [-]  Configuring APT software source
+2015-11-23 06:24:59,311 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-23 06:24:59,315 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-23 06:27:07,291 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-23 06:29:22,896 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-23 06:29:22,938 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-23 06:29:22,978 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-23 06:29:23,003 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-23 06:29:23,007 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-23 06:29:23,034 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-23 06:29:23,036 INFO     __main__                [-]  Installing Ralf software packages.
+2015-11-23 06:29:23,074 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-23 06:35:23,451 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-23 06:35:23,452 INFO     __main__                [-]  Installed Ralf software packages.
+2015-11-23 06:42:53,853 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-23 06:43:23,874 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-23 06:43:53,906 INFO     __main__                [-]  Finished Installation in Ralf
+2015-11-23 06:43:53,906 INFO     __main__                [-]  Finished Installation in Ralf
+2015-11-23 06:43:53,906 INFO     __main__                [-]  Updating DNS server for Ralf
+2015-11-23 06:43:53,907 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-23 06:43:53,946 INFO     paramiko.transport      [-]  Secsh channel 15 opened.
+2015-11-23 06:43:53,987 INFO     paramiko.transport      [-]  Secsh channel 16 opened.
+2015-11-23 06:43:55,450 INFO     paramiko.transport      [-]  Secsh channel 17 opened.
+2015-11-23 06:43:55,492 INFO     paramiko.transport      [-]  Secsh channel 18 opened.
+2015-11-23 06:43:55,495 INFO     paramiko.transport      [-]  Secsh channel 19 opened.
+2015-11-23 06:43:57,609 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:43:57,630 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-23 06:43:57,781 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:43:57,874 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-23 06:43:58,032 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:44:01,594 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:44:01,703 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:44:31,865 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:44:31,919 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:45:02,009 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:45:02,075 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:45:32,166 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:45:32,223 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:46:02,322 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:46:02,376 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:46:32,468 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:46:32,520 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:49:34,045 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:49:34,171 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:49:36,031 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-23 06:49:36,263 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-23 06:49:36,711 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-23 06:49:36,742 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-23 06:49:36,749 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-23 06:49:36,790 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-23 06:49:36,831 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-23 06:49:36,866 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-23 06:49:36,904 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-23 06:49:36,915 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-23 06:49:36,956 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-23 06:49:36,960 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-23 06:49:36,966 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-23 06:49:37,007 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-23 06:49:40,537 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-23 06:50:08,059 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-23 06:50:43,269 INFO     paramiko.transport      [-]  Secsh channel 15 opened.
+2015-11-23 06:50:48,276 INFO     paramiko.transport      [-]  Secsh channel 16 opened.
+2015-11-23 06:50:48,957 INFO     paramiko.transport      [-]  Secsh channel 17 opened.
+2015-11-23 06:50:54,002 INFO     paramiko.transport      [-]  Secsh channel 18 opened.
+2015-11-23 06:51:23,399 INFO     paramiko.transport      [-]  Secsh channel 19 opened.
+2015-11-23 06:51:28,443 INFO     paramiko.transport      [-]  Secsh channel 20 opened.
+2015-11-23 06:51:32,402 INFO     paramiko.transport      [-]  Secsh channel 21 opened.
+2015-11-23 06:51:37,448 INFO     paramiko.transport      [-]  Secsh channel 22 opened.
+2015-11-23 06:51:38,002 INFO     paramiko.transport      [-]  Secsh channel 23 opened.
+2015-11-23 06:51:38,355 INFO     paramiko.transport      [-]  Secsh channel 24 opened.
+2015-11-23 06:51:38,400 INFO     paramiko.transport      [-]  Secsh channel 25 opened.
+2015-11-23 06:51:38,442 INFO     paramiko.transport      [-]  Secsh channel 26 opened.
+2015-11-23 06:51:38,656 INFO     paramiko.transport      [-]  Secsh channel 27 opened.
+2015-11-23 06:51:38,698 INFO     paramiko.transport      [-]  Secsh channel 28 opened.
+2015-11-23 06:51:38,746 INFO     paramiko.transport      [-]  Secsh channel 29 opened.
+2015-11-23 06:51:40,896 INFO     paramiko.transport      [-]  Secsh channel 30 opened.
+2015-11-23 06:51:40,939 INFO     paramiko.transport      [-]  Secsh channel 31 opened.
+2015-11-23 06:51:41,218 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:51:41,271 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:51:43,575 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-23 06:51:43,824 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-23 06:51:44,272 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-23 06:51:44,284 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-23 06:51:44,293 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-23 06:51:44,304 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-23 06:51:44,313 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-23 06:51:44,356 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-23 06:51:44,420 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-23 06:51:44,454 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-23 06:51:44,493 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-23 06:51:44,497 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-23 06:51:44,505 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-23 06:51:44,584 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-23 06:52:46,963 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-23 06:52:52,008 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-23 06:53:51,492 INFO     paramiko.transport      [-]  Secsh channel 15 opened.
+2015-11-23 06:53:56,539 INFO     paramiko.transport      [-]  Secsh channel 16 opened.
+2015-11-23 06:54:10,312 INFO     paramiko.transport      [-]  Secsh channel 17 opened.
+2015-11-23 06:54:15,359 INFO     paramiko.transport      [-]  Secsh channel 18 opened.
+2015-11-23 06:54:16,239 INFO     paramiko.transport      [-]  Secsh channel 19 opened.
+2015-11-23 06:54:16,973 INFO     paramiko.transport      [-]  Secsh channel 20 opened.
+2015-11-23 06:56:18,008 INFO     paramiko.transport      [-]  Secsh channel 21 opened.
+2015-11-23 06:58:19,086 INFO     paramiko.transport      [-]  Secsh channel 22 opened.
+2015-11-23 06:58:19,664 INFO     paramiko.transport      [-]  Secsh channel 23 opened.
+2015-11-23 06:58:20,099 INFO     paramiko.transport      [-]  Secsh channel 24 opened.
+2015-11-23 06:58:20,163 INFO     paramiko.transport      [-]  Secsh channel 25 opened.
+2015-11-23 06:58:20,204 INFO     paramiko.transport      [-]  Secsh channel 26 opened.
+2015-11-23 06:58:20,342 INFO     paramiko.transport      [-]  Secsh channel 27 opened.
+2015-11-23 06:58:20,384 INFO     paramiko.transport      [-]  Secsh channel 28 opened.
+2015-11-23 06:58:25,388 INFO     paramiko.transport      [-]  Secsh channel 29 opened.
+2015-11-23 06:58:25,391 INFO     paramiko.transport      [-]  Secsh channel 30 opened.
+2015-11-23 06:58:25,396 INFO     paramiko.transport      [-]  Secsh channel 31 opened.
+2015-11-23 06:58:27,542 INFO     paramiko.transport      [-]  Secsh channel 32 opened.
+2015-11-23 06:58:27,715 INFO     paramiko.transport      [-]  Secsh channel 33 opened.
+2015-11-23 06:58:28,004 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:58:28,103 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 06:58:31,231 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-23 06:58:31,486 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-23 06:58:31,939 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-23 06:58:31,968 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-23 06:58:31,978 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-23 07:00:39,567 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-23 07:02:43,134 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-23 07:02:43,215 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-23 07:02:43,241 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-23 07:02:43,245 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-23 07:02:43,257 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-23 07:02:43,299 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-23 07:03:13,357 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-23 07:04:13,430 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-23 07:04:43,476 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-23 07:05:13,524 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-23 07:05:13,567 INFO     paramiko.transport      [-]  Secsh channel 15 opened.
+2015-11-23 07:05:13,612 INFO     paramiko.transport      [-]  Secsh channel 16 opened.
+2015-11-23 07:05:13,617 INFO     paramiko.transport      [-]  Secsh channel 17 opened.
+2015-11-23 07:05:13,854 INFO     paramiko.transport      [-]  Secsh channel 18 opened.
+2015-11-23 07:05:13,894 INFO     paramiko.transport      [-]  Secsh channel 19 opened.
+2015-11-23 07:05:13,898 INFO     paramiko.transport      [-]  Secsh channel 20 opened.
+2015-11-23 07:05:16,035 INFO     paramiko.transport      [-]  Secsh channel 21 opened.
+2015-11-23 07:05:16,080 INFO     paramiko.transport      [-]  Secsh channel 22 opened.
+2015-11-23 07:05:16,362 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 07:05:16,971 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 07:05:20,398 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-23 07:05:20,650 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-23 07:05:21,107 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-23 07:05:21,120 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-23 07:05:21,141 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-23 07:05:21,163 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-23 07:05:21,205 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-23 07:05:21,210 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-23 07:05:21,272 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-23 07:05:21,303 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-23 07:05:21,344 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-23 07:05:21,354 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-23 07:05:21,431 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-23 07:05:21,510 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-23 07:05:21,552 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-23 07:05:21,558 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-23 07:05:51,642 INFO     paramiko.transport      [-]  Secsh channel 15 opened.
+2015-11-23 07:07:51,740 INFO     paramiko.transport      [-]  Secsh channel 16 opened.
+2015-11-23 07:08:51,792 INFO     paramiko.transport      [-]  Secsh channel 17 opened.
+2015-11-23 07:09:21,831 INFO     paramiko.transport      [-]  Secsh channel 18 opened.
+2015-11-23 07:09:51,871 INFO     paramiko.transport      [-]  Secsh channel 19 opened.
+2015-11-23 07:10:34,667 INFO     paramiko.transport      [-]  Secsh channel 20 opened.
+2015-11-23 07:10:39,713 INFO     paramiko.transport      [-]  Secsh channel 21 opened.
+2015-11-23 07:10:40,464 INFO     paramiko.transport      [-]  Secsh channel 22 opened.
+2015-11-23 07:10:45,509 INFO     paramiko.transport      [-]  Secsh channel 23 opened.
+2015-11-23 07:10:45,632 INFO     paramiko.transport.sftp [-]  [chan 23] Opened sftp connection (server version 3)
+2015-11-23 07:10:45,648 INFO     paramiko.transport      [-]  Secsh channel 24 opened.
+2015-11-23 07:11:17,734 INFO     paramiko.transport      [-]  Secsh channel 25 opened.
+2015-11-23 07:11:17,739 INFO     paramiko.transport      [-]  Secsh channel 26 opened.
+2015-11-23 07:11:18,359 INFO     paramiko.transport      [-]  Secsh channel 27 opened.
+2015-11-23 07:11:18,755 INFO     paramiko.transport      [-]  Secsh channel 28 opened.
+2015-11-23 07:11:18,801 INFO     paramiko.transport      [-]  Secsh channel 29 opened.
+2015-11-23 07:11:18,839 INFO     paramiko.transport      [-]  Secsh channel 30 opened.
+2015-11-23 07:11:18,845 INFO     paramiko.transport      [-]  Secsh channel 31 opened.
+2015-11-23 07:11:20,440 INFO     paramiko.transport      [-]  Secsh channel 32 opened.
+2015-11-23 07:11:20,480 INFO     paramiko.transport      [-]  Secsh channel 33 opened.
+2015-11-23 07:11:25,489 INFO     paramiko.transport      [-]  Secsh channel 34 opened.
+2015-11-23 07:11:25,492 INFO     paramiko.transport      [-]  Secsh channel 35 opened.
+2015-11-23 07:11:25,499 INFO     paramiko.transport      [-]  Secsh channel 36 opened.
+2015-11-23 07:11:27,701 INFO     paramiko.transport      [-]  Secsh channel 37 opened.
+2015-11-23 07:11:27,912 INFO     paramiko.transport      [-]  Secsh channel 38 opened.
+2015-11-23 07:11:28,202 INFO     __main__                [-]  Configure Homer Node
+2015-11-23 07:11:28,202 INFO     __main__                [-]  Get Homer IP
+2015-11-23 07:11:28,203 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 07:11:28,303 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 07:11:30,603 INFO     paramiko                [-]  Connecting To Homer Node
+2015-11-23 07:11:30,633 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-23 07:11:30,947 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-23 07:11:30,973 INFO     __main__                [-]  Connected To Homer Node
+2015-11-23 07:11:31,431 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-23 07:11:31,439 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-23 07:11:31,453 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-23 07:11:31,465 INFO     __main__                [-]  Configuring APT software source
+2015-11-23 07:11:31,503 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-23 07:11:31,531 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-23 07:11:31,537 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-23 07:11:31,542 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-23 07:11:31,579 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-23 07:11:31,651 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-23 07:11:31,675 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-23 07:11:31,684 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-23 07:11:31,724 INFO     __main__                [-]  Configuring clearwater shared settings
+2015-11-23 07:11:31,763 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-23 07:11:31,805 INFO     __main__                [-]  Installing Homer packages.
+2015-11-23 07:11:31,843 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-23 07:11:53,624 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-23 07:11:53,664 INFO     __main__                [-]  Retrying Installation.
+2015-11-23 07:17:26,368 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-23 07:26:26,906 INFO     paramiko.transport      [-]  Secsh channel 15 opened.
+2015-11-23 07:30:27,143 INFO     __main__                [-]  Installing Homer packages.
+2015-11-23 07:30:27,144 INFO     paramiko.transport      [-]  Secsh channel 16 opened.
+2015-11-23 07:30:27,917 INFO     paramiko.transport      [-]  Secsh channel 17 opened.
+2015-11-23 07:30:57,994 INFO     __main__                [-]  Finished Installation in Homer
+2015-11-23 07:30:57,994 INFO     __main__                [-]  Uploading shared configuration
+2015-11-23 07:30:57,996 INFO     paramiko.transport      [-]  Secsh channel 18 opened.
+2015-11-23 07:30:58,692 INFO     __main__                [-]  Applying shared configuration
+2015-11-23 07:30:58,732 INFO     paramiko.transport      [-]  Secsh channel 19 opened.
+2015-11-23 07:30:59,082 INFO     __main__                [-]  Updating DNS server for homer
+2015-11-23 07:30:59,083 INFO     paramiko.transport      [-]  Secsh channel 20 opened.
+2015-11-23 07:30:59,160 INFO     paramiko.transport      [-]  Secsh channel 21 opened.
+2015-11-23 07:30:59,201 INFO     paramiko.transport      [-]  Secsh channel 22 opened.
+2015-11-23 07:31:00,810 INFO     paramiko.transport      [-]  Secsh channel 23 opened.
+2015-11-23 07:31:00,850 INFO     paramiko.transport      [-]  Secsh channel 24 opened.
+2015-11-23 07:31:00,856 INFO     paramiko.transport      [-]  Secsh channel 25 opened.
+2015-11-23 07:31:03,018 INFO     paramiko.transport      [-]  Secsh channel 26 opened.
+2015-11-23 07:31:03,230 INFO     paramiko.transport      [-]  Secsh channel 27 opened.
+2015-11-23 07:31:03,551 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 07:31:03,662 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 07:31:06,805 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 07:31:06,869 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 07:31:11,639 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-23 07:31:11,694 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40

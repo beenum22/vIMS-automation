@@ -1,0 +1,223 @@
+2015-11-21 13:47:07,325 INFO     Scale_down              [-]  Getting initial user confiurations.
+2015-11-21 13:47:07,325 INFO     Scale_down              [-]  Getting initial user confiurations Successfull.
+2015-11-21 13:47:07,325 INFO     Scale_down              [-]  Getting client credentials
+2015-11-21 13:47:07,326 INFO     Scale_down              [-]  opening file to detect the environment
+2015-11-21 13:47:07,329 INFO     Scale_down              [-]  Environment returned CentOS
+2015-11-21 13:47:07,329 INFO     Scale_down              [-]  Creating authorized instance of keystone client
+2015-11-21 13:47:07,335 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-21 13:47:07,483 INFO     Scale_down              [-]  Authorized keystone instance ....
+2015-11-21 13:47:07,483 INFO     Scale_down              [-]  Environment is CentOS ...
+2015-11-21 13:47:07,483 INFO     nova                    [-]  Creating authorized instance of nova client instance ...
+2015-11-21 13:47:07,483 INFO     nova                    [-]  Authorized nova instance ....
+2015-11-21 13:47:07,483 INFO     nova                    [-]  Environment is CentOS ...
+2015-11-21 13:47:07,483 INFO     neutron                 [-]  Creating authorized instance of neutron client instance ...
+2015-11-21 13:47:07,483 INFO     neutron                 [-]  Authorized neutron instance ....
+2015-11-21 13:47:07,483 INFO     neutron                 [-]  Environment is CentOS ...
+2015-11-21 13:47:07,483 INFO     glance                  [-]  Creating authorized instance of glance client instance ...
+2015-11-21 13:47:07,545 INFO     glance                  [-]  Authorized glance instance ....
+2015-11-21 13:47:07,545 INFO     glance                  [-]  Environment is CentOS ...
+2015-11-21 13:47:07,575 INFO     Scale                   [-]  Getting initial user confiurations.
+2015-11-21 13:47:07,575 INFO     Scale                   [-]  Getting initial user confiurations Successfull.
+2015-11-21 13:47:07,575 INFO     Scale                   [-]  Getting client credentials
+2015-11-21 13:47:07,575 INFO     Scale                   [-]  opening file to detect the environment
+2015-11-21 13:47:07,579 INFO     Scale                   [-]  Environment returned CentOS
+2015-11-21 13:47:07,579 INFO     Scale                   [-]  Creating authorized instance of keystone client
+2015-11-21 13:47:07,581 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-21 13:47:07,721 INFO     Scale                   [-]  Authorized keystone instance ....
+2015-11-21 13:47:07,721 INFO     Scale                   [-]  Environment is CentOS ...
+2015-11-21 13:47:07,721 INFO     nova                    [-]  Creating authorized instance of nova client instance ...
+2015-11-21 13:47:07,721 INFO     nova                    [-]  Authorized nova instance ....
+2015-11-21 13:47:07,721 INFO     nova                    [-]  Environment is CentOS ...
+2015-11-21 13:47:07,721 INFO     neutron                 [-]  Creating authorized instance of neutron client instance ...
+2015-11-21 13:47:07,721 INFO     neutron                 [-]  Authorized neutron instance ....
+2015-11-21 13:47:07,721 INFO     neutron                 [-]  Environment is CentOS ...
+2015-11-21 13:47:07,722 INFO     glance                  [-]  Creating authorized instance of glance client instance ...
+2015-11-21 13:47:07,722 INFO     glance                  [-]  Authorized glance instance ....
+2015-11-21 13:47:07,722 INFO     glance                  [-]  Environment is CentOS ...
+2015-11-21 13:47:07,726 INFO     __main__                [-]  Getting initial user confiurations.
+2015-11-21 13:47:07,726 INFO     __main__                [-]  Getting initial user confiurations Successfull.
+2015-11-21 13:47:07,726 INFO     __main__                [-]  Getting client credentials
+2015-11-21 13:47:07,726 INFO     __main__                [-]  Credentials Loaded
+2015-11-21 13:47:07,726 INFO     __main__                [-]  Getting Keystone credentials
+2015-11-21 13:47:07,726 INFO     nova                    [-]  Getting of nova credentials
+2015-11-21 13:47:07,727 INFO     __main__                [-]  opening file to detect the environment
+2015-11-21 13:47:07,730 INFO     __main__                [-]  Environment returned CentOS
+2015-11-21 13:47:07,730 INFO     __main__                [-]  Creating authorized instance of keystone client
+2015-11-21 13:47:07,732 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-21 13:47:07,880 INFO     __main__                [-]  Authorized keystone instance ....
+2015-11-21 13:47:07,880 INFO     __main__                [-]  Environment is CentOS ...
+2015-11-21 13:47:07,880 INFO     nova                    [-]  Creating authorized instance of nova client instance ...
+2015-11-21 13:47:07,881 INFO     nova                    [-]  Authorized nova instance ....
+2015-11-21 13:47:07,881 INFO     nova                    [-]  Environment is CentOS ...
+2015-11-21 13:47:07,881 INFO     neutron                 [-]  Creating authorized instance of neutron client instance ...
+2015-11-21 13:47:07,881 INFO     neutron                 [-]  Authorized neutron instance ....
+2015-11-21 13:47:07,881 INFO     neutron                 [-]  Environment is CentOS ...
+2015-11-21 13:47:07,881 INFO     glance                  [-]  Creating authorized instance of glance client instance ...
+2015-11-21 13:47:07,882 INFO     glance                  [-]  Authorized glance instance ....
+2015-11-21 13:47:07,882 INFO     glance                  [-]  Environment is CentOS ...
+2015-11-21 13:47:07,883 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-21 13:47:08,036 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:47:08,243 INFO     __main__                [-]  Creating Keypair
+2015-11-21 13:47:08,244 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:47:08,476 INFO     __main__                [-]  Finished Creating Keypairs
+2015-11-21 13:47:08,477 INFO     nova                    [-]  Getting hypervisor list
+2015-11-21 13:47:08,477 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:47:08,505 INFO     nova                    [-]  Checking if aggregate group GroupA already exists
+2015-11-21 13:47:08,505 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:47:08,524 INFO     nova                    [-]  Aggregate group GroupA already exists
+2015-11-21 13:47:08,524 INFO     nova                    [-]  getting ID of aggregate group GroupA
+2015-11-21 13:47:08,525 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:47:08,554 INFO     nova                    [-]  Done getting ID of aggregate group GroupA
+2015-11-21 13:47:08,554 INFO     nova                    [-]  ID of aggregate group GroupA 427
+2015-11-21 13:47:08,555 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:47:10,616 INFO     nova                    [-]  Checking if node-6.10.204.64.10 exists in aggregate group GroupA
+2015-11-21 13:47:10,616 INFO     nova                    [-]  Getting hosts details [u'node-6.10.204.64.10'] (name from aggregate group)
+2015-11-21 13:47:10,616 INFO     nova                    [-]  Done checking [u'node-6.10.204.64.10'] is already added to aggregate group GroupA
+2015-11-21 13:47:10,616 INFO     nova                    [-]  Checking if aggregate group GroupB already exists
+2015-11-21 13:47:10,617 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:47:10,648 INFO     nova                    [-]  Aggregate group GroupB already exists
+2015-11-21 13:47:10,648 INFO     nova                    [-]  getting ID of aggregate group GroupB
+2015-11-21 13:47:10,649 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:47:10,670 INFO     nova                    [-]  Done getting ID of aggregate group GroupB
+2015-11-21 13:47:10,670 INFO     nova                    [-]  ID of aggregate group GroupB 428
+2015-11-21 13:47:10,670 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:47:10,707 INFO     nova                    [-]  Checking if node-7.10.204.64.10 exists in aggregate group GroupB
+2015-11-21 13:47:10,707 INFO     nova                    [-]  Getting hosts details [u'node-7.10.204.64.10'] (name from aggregate group)
+2015-11-21 13:47:10,707 INFO     nova                    [-]  Done checking [u'node-7.10.204.64.10'] is already added to aggregate group GroupB
+2015-11-21 13:47:10,708 INFO     __main__                [-]  Successfully added availaibility zones
+2015-11-21 13:47:10,708 INFO     __main__                [-]  getting keystone client credentials
+2015-11-21 13:47:10,709 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-21 13:47:10,851 INFO     glance                  [-]  Creating Glance endpoint
+2015-11-21 13:47:10,851 INFO     glance                  [-]  Creating Glance client
+2015-11-21 13:47:10,851 INFO     glance                  [-]  Creating Glance image
+2015-11-21 13:47:10,853 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:47:11,816 INFO     glance                  [-]  Uploading Glance Image
+2015-11-21 13:47:56,566 INFO     glance                  [-]  Successfully added image
+2015-11-21 13:47:56,568 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-21 13:47:56,713 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:47:56,817 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:47:56,873 INFO     __main__                [-]  Successfully created a DNS security key
+2015-11-21 13:47:56,873 INFO     __main__                [-]  creating heat endpoint
+2015-11-21 13:47:56,873 INFO     __main__                [-]  creating heat client
+2015-11-21 13:47:56,873 INFO     __main__                [-]  creating heatstack Cluster
+2015-11-21 13:47:56,907 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:48:02,045 INFO     __main__                [-]  Creating Heat Stack
+2015-11-21 13:48:02,046 INFO     __main__                [-]  Deployong Heat Stack
+2015-11-21 13:48:02,047 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:48:02,307 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:48:32,426 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:48:32,481 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:49:02,586 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:49:02,643 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:49:32,762 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:49:32,810 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:50:02,918 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:50:02,973 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:50:33,083 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:50:33,137 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:51:04,735 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:51:04,789 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:51:09,891 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:51:09,943 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:51:20,032 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:51:20,086 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:51:30,180 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:51:30,239 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:51:40,330 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:51:40,387 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:51:50,474 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:51:50,536 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:52:00,621 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:52:00,680 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:52:10,766 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:52:10,821 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:52:20,910 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:52:20,970 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:52:31,065 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:52:31,124 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:52:41,218 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:52:41,272 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:52:51,357 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:52:51,415 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:53:01,497 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:53:01,548 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:53:11,710 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:53:11,860 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:53:21,948 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:53:22,004 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:53:32,134 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:53:52,194 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:53:55,686 INFO     __main__                [-]  Creating Heat Stack
+2015-11-21 13:53:55,687 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:53:55,740 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:54:25,857 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:54:25,914 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:54:56,010 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:54:56,062 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:55:26,170 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:55:26,226 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:55:56,333 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:55:56,393 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:56:26,499 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:56:26,550 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:56:56,659 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:56:56,712 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:57:27,227 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:57:27,284 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:57:32,381 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:57:32,434 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:57:42,522 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:57:42,575 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:57:52,661 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:57:52,717 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:58:02,805 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:58:02,859 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:58:12,983 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:58:13,103 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:58:23,194 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:58:23,258 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:58:33,346 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:58:33,401 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:58:43,492 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:58:43,548 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:58:53,627 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:58:53,684 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:59:03,764 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:59:03,863 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:59:13,954 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:59:14,012 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:59:24,098 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:59:24,157 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:59:34,246 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:59:34,300 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:59:44,381 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:59:44,435 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:59:54,525 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 13:59:54,578 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:00:04,665 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:00:04,718 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:00:14,811 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:00:14,877 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:00:24,970 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:00:25,026 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:00:35,122 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:00:35,174 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:00:45,269 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:00:45,326 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:00:55,412 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:00:55,465 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:01:05,558 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:01:05,614 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:01:15,710 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:01:35,770 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:01:39,083 INFO     __main__                [-]  Creating Heat Stack
+2015-11-21 14:01:39,085 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:01:39,142 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:02:09,329 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:02:09,547 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:02:40,634 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:02:40,686 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:03:10,796 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:03:10,854 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:03:41,027 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-21 14:03:41,127 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40

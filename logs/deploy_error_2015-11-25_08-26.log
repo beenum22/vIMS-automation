@@ -1,0 +1,45 @@
+2015-11-25 09:59:18,759 - error_log - ERROR - Unable to create keyclient instance...
+Traceback (most recent call last):
+  File "/vIMS/Scale_down.py", line 185, in keytsone_auth
+    tenant_name = configurations['os-creds']['os-tenant-name'])
+  File "/usr/lib/python2.6/site-packages/keystoneclient/v2_0/client.py", line 147, in __init__
+    self.authenticate()
+  File "/usr/lib/python2.6/site-packages/keystoneclient/utils.py", line 318, in inner
+    return func(*args, **kwargs)
+  File "/usr/lib/python2.6/site-packages/keystoneclient/httpclient.py", line 425, in authenticate
+    resp = self.get_raw_token_from_identity_service(**kwargs)
+  File "/usr/lib/python2.6/site-packages/keystoneclient/v2_0/client.py", line 181, in get_raw_token_from_identity_service
+    return plugin.get_auth_ref(self.session)
+  File "/usr/lib/python2.6/site-packages/keystoneclient/auth/identity/v2.py", line 79, in get_auth_ref
+    authenticated=False, log=False)
+  File "/usr/lib/python2.6/site-packages/keystoneclient/session.py", line 430, in post
+    return self.request(url, 'POST', **kwargs)
+  File "/usr/lib/python2.6/site-packages/keystoneclient/utils.py", line 318, in inner
+    return func(*args, **kwargs)
+  File "/usr/lib/python2.6/site-packages/keystoneclient/session.py", line 332, in request
+    resp = send(**kwargs)
+  File "/usr/lib/python2.6/site-packages/keystoneclient/session.py", line 365, in _send_request
+    resp = self.session.request(method, url, **kwargs)
+  File "/usr/lib/python2.6/site-packages/keystoneclient/httpclient.py", line 83, in request
+    return requests.request(*args, **kwargs)
+  File "/usr/lib/python2.6/site-packages/requests/api.py", line 44, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/usr/lib/python2.6/site-packages/requests/sessions.py", line 335, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/usr/lib/python2.6/site-packages/requests/sessions.py", line 438, in send
+    r = adapter.send(request, **kwargs)
+  File "/usr/lib/python2.6/site-packages/requests/adapters.py", line 292, in send
+    timeout=timeout
+  File "/usr/lib/python2.6/site-packages/urllib3/connectionpool.py", line 459, in urlopen
+    body=body, headers=headers)
+  File "/usr/lib/python2.6/site-packages/urllib3/connectionpool.py", line 324, in _make_request
+    httplib_response = conn.getresponse()
+  File "/usr/lib64/python2.6/httplib.py", line 990, in getresponse
+    response.begin()
+  File "/usr/lib64/python2.6/httplib.py", line 391, in begin
+    version, status, reason = self._read_status()
+  File "/usr/lib64/python2.6/httplib.py", line 349, in _read_status
+    line = self.fp.readline()
+  File "/usr/lib64/python2.6/socket.py", line 433, in readline
+    data = recv(1)
+KeyboardInterrupt

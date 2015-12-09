@@ -1,0 +1,234 @@
+2015-11-24 12:17:29,626 INFO     Scale_down              [-]  Getting initial user confiurations.
+2015-11-24 12:17:29,626 INFO     Scale_down              [-]  Getting initial user confiurations Successfull.
+2015-11-24 12:17:29,626 INFO     Scale_down              [-]  Getting client credentials
+2015-11-24 12:17:29,627 INFO     Scale_down              [-]  opening file to detect the environment
+2015-11-24 12:17:29,630 INFO     Scale_down              [-]  Environment returned CentOS
+2015-11-24 12:17:29,630 INFO     Scale_down              [-]  Creating authorized instance of keystone client
+2015-11-24 12:17:29,638 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-24 12:17:29,781 INFO     Scale_down              [-]  Authorized keystone instance ....
+2015-11-24 12:17:29,781 INFO     Scale_down              [-]  Environment is CentOS ...
+2015-11-24 12:17:29,781 INFO     nova                    [-]  Creating authorized instance of nova client instance ...
+2015-11-24 12:17:29,782 INFO     nova                    [-]  Authorized nova instance ....
+2015-11-24 12:17:29,782 INFO     nova                    [-]  Environment is CentOS ...
+2015-11-24 12:17:29,782 INFO     neutron                 [-]  Creating authorized instance of neutron client instance ...
+2015-11-24 12:17:29,782 INFO     neutron                 [-]  Authorized neutron instance ....
+2015-11-24 12:17:29,782 INFO     neutron                 [-]  Environment is CentOS ...
+2015-11-24 12:17:29,782 INFO     glance                  [-]  Creating authorized instance of glance client instance ...
+2015-11-24 12:17:29,809 INFO     glance                  [-]  Authorized glance instance ....
+2015-11-24 12:17:29,809 INFO     glance                  [-]  Environment is CentOS ...
+2015-11-24 12:17:29,816 INFO     Scale                   [-]  Getting initial user confiurations.
+2015-11-24 12:17:29,816 INFO     Scale                   [-]  Getting initial user confiurations Successfull.
+2015-11-24 12:17:29,816 INFO     Scale                   [-]  Getting client credentials
+2015-11-24 12:17:29,817 INFO     Scale                   [-]  opening file to detect the environment
+2015-11-24 12:17:29,819 INFO     Scale                   [-]  Environment returned CentOS
+2015-11-24 12:17:29,820 INFO     Scale                   [-]  Creating authorized instance of keystone client
+2015-11-24 12:17:29,822 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-24 12:17:29,968 INFO     Scale                   [-]  Authorized keystone instance ....
+2015-11-24 12:17:29,968 INFO     Scale                   [-]  Environment is CentOS ...
+2015-11-24 12:17:29,969 INFO     nova                    [-]  Creating authorized instance of nova client instance ...
+2015-11-24 12:17:29,969 INFO     nova                    [-]  Authorized nova instance ....
+2015-11-24 12:17:29,969 INFO     nova                    [-]  Environment is CentOS ...
+2015-11-24 12:17:29,969 INFO     neutron                 [-]  Creating authorized instance of neutron client instance ...
+2015-11-24 12:17:29,969 INFO     neutron                 [-]  Authorized neutron instance ....
+2015-11-24 12:17:29,969 INFO     neutron                 [-]  Environment is CentOS ...
+2015-11-24 12:17:29,969 INFO     glance                  [-]  Creating authorized instance of glance client instance ...
+2015-11-24 12:17:29,970 INFO     glance                  [-]  Authorized glance instance ....
+2015-11-24 12:17:29,970 INFO     glance                  [-]  Environment is CentOS ...
+2015-11-24 12:17:29,974 INFO     __main__                [-]  Getting initial user confiurations.
+2015-11-24 12:17:29,974 INFO     __main__                [-]  Getting initial user confiurations Successfull.
+2015-11-24 12:17:29,975 INFO     __main__                [-]  Getting client credentials
+2015-11-24 12:17:29,975 INFO     __main__                [-]  opening file to detect the environment
+2015-11-24 12:17:29,977 INFO     __main__                [-]  Environment returned CentOS
+2015-11-24 12:17:29,978 INFO     __main__                [-]  Creating authorized instance of keystone client
+2015-11-24 12:17:29,980 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-24 12:17:30,125 INFO     __main__                [-]  Authorized keystone instance ....
+2015-11-24 12:17:30,125 INFO     __main__                [-]  Environment is CentOS ...
+2015-11-24 12:17:30,125 INFO     nova                    [-]  Creating authorized instance of nova client instance ...
+2015-11-24 12:17:30,125 INFO     nova                    [-]  Authorized nova instance ....
+2015-11-24 12:17:30,125 INFO     nova                    [-]  Environment is CentOS ...
+2015-11-24 12:17:30,125 INFO     neutron                 [-]  Creating authorized instance of neutron client instance ...
+2015-11-24 12:17:30,125 INFO     neutron                 [-]  Authorized neutron instance ....
+2015-11-24 12:17:30,125 INFO     neutron                 [-]  Environment is CentOS ...
+2015-11-24 12:17:30,126 INFO     glance                  [-]  Creating authorized instance of glance client instance ...
+2015-11-24 12:17:30,126 INFO     glance                  [-]  Authorized glance instance ....
+2015-11-24 12:17:30,127 INFO     glance                  [-]  Environment is CentOS ...
+2015-11-24 12:17:30,128 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:17:30,418 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:17:33,387 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:17:33,486 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:17:36,225 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:17:36,301 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:17:38,228 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-24 12:17:38,726 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-24 12:17:40,301 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-24 12:17:40,316 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-24 12:17:40,838 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-24 12:17:41,142 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-24 12:17:41,566 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-24 12:17:42,716 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-24 12:17:42,736 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-24 12:17:42,953 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-24 12:17:43,011 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-24 12:17:43,126 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-24 12:17:43,435 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-24 12:17:43,456 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-24 12:17:43,473 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-24 12:17:43,624 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:17:43,914 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:17:46,891 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-24 12:17:47,057 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:17:47,145 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:17:47,239 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-24 12:17:47,389 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:17:47,616 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:17:50,809 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:17:50,860 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:18:20,984 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:18:21,030 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:18:51,121 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:18:51,169 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:19:21,261 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:19:21,311 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:19:51,399 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:19:51,444 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:20:21,543 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:20:23,071 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:23:24,587 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:23:24,680 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:23:26,747 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-24 12:23:27,090 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-24 12:23:27,542 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-24 12:23:27,556 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-24 12:23:27,572 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-24 12:23:27,613 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-24 12:23:27,654 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-24 12:23:27,718 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-24 12:23:27,777 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-24 12:23:27,787 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-24 12:23:27,828 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-24 12:23:27,838 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-24 12:23:27,845 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-24 12:23:27,923 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-24 12:23:38,748 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-24 12:23:43,794 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-24 12:23:43,807 INFO     paramiko.transport      [-]  Secsh channel 15 opened.
+2015-11-24 12:23:48,848 INFO     paramiko.transport      [-]  Secsh channel 16 opened.
+2015-11-24 12:26:46,531 INFO     paramiko.transport      [-]  Secsh channel 17 opened.
+2015-11-24 12:28:04,576 INFO     paramiko.transport      [-]  Secsh channel 18 opened.
+2015-11-24 12:28:09,623 INFO     paramiko.transport      [-]  Secsh channel 19 opened.
+2015-11-24 12:28:10,787 INFO     paramiko.transport      [-]  Secsh channel 20 opened.
+2015-11-24 12:28:11,203 INFO     paramiko.transport      [-]  Secsh channel 21 opened.
+2015-11-24 12:28:11,247 INFO     paramiko.transport      [-]  Secsh channel 22 opened.
+2015-11-24 12:28:11,285 INFO     paramiko.transport      [-]  Secsh channel 23 opened.
+2015-11-24 12:28:12,229 INFO     paramiko.transport      [-]  Secsh channel 24 opened.
+2015-11-24 12:28:12,232 INFO     paramiko.transport      [-]  Secsh channel 25 opened.
+2015-11-24 12:28:12,238 INFO     paramiko.transport      [-]  Secsh channel 26 opened.
+2015-11-24 12:28:14,427 INFO     paramiko.transport      [-]  Secsh channel 27 opened.
+2015-11-24 12:28:14,471 INFO     paramiko.transport      [-]  Secsh channel 28 opened.
+2015-11-24 12:28:15,155 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:28:15,205 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:28:17,636 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-24 12:28:17,950 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-24 12:28:18,483 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-24 12:28:18,488 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-24 12:28:18,500 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-24 12:28:18,514 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-24 12:28:18,556 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-24 12:28:18,560 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-24 12:28:18,603 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-24 12:28:18,641 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-24 12:28:18,685 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-24 12:28:18,695 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-24 12:28:18,775 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-24 12:28:18,855 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-24 12:28:35,012 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-24 12:33:15,523 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-24 12:41:33,917 INFO     paramiko.transport      [-]  Secsh channel 15 opened.
+2015-11-24 12:41:38,964 INFO     paramiko.transport      [-]  Secsh channel 16 opened.
+2015-11-24 12:44:08,100 INFO     paramiko.transport      [-]  Secsh channel 17 opened.
+2015-11-24 12:44:13,145 INFO     paramiko.transport      [-]  Secsh channel 18 opened.
+2015-11-24 12:44:14,009 INFO     paramiko.transport      [-]  Secsh channel 19 opened.
+2015-11-24 12:44:14,787 INFO     paramiko.transport      [-]  Secsh channel 20 opened.
+2015-11-24 12:44:30,005 INFO     paramiko.transport      [-]  Secsh channel 21 opened.
+2015-11-24 12:44:35,049 INFO     paramiko.transport      [-]  Secsh channel 22 opened.
+2015-11-24 12:44:38,126 INFO     paramiko.transport      [-]  Secsh channel 23 opened.
+2015-11-24 12:44:38,662 INFO     paramiko.transport      [-]  Secsh channel 24 opened.
+2015-11-24 12:44:38,730 INFO     paramiko.transport      [-]  Secsh channel 25 opened.
+2015-11-24 12:44:38,771 INFO     paramiko.transport      [-]  Secsh channel 26 opened.
+2015-11-24 12:44:39,892 INFO     paramiko.transport      [-]  Secsh channel 27 opened.
+2015-11-24 12:44:39,931 INFO     paramiko.transport      [-]  Secsh channel 28 opened.
+2015-11-24 12:44:44,942 INFO     paramiko.transport      [-]  Secsh channel 29 opened.
+2015-11-24 12:44:44,945 INFO     paramiko.transport      [-]  Secsh channel 30 opened.
+2015-11-24 12:44:44,949 INFO     paramiko.transport      [-]  Secsh channel 31 opened.
+2015-11-24 12:44:47,079 INFO     paramiko.transport      [-]  Secsh channel 32 opened.
+2015-11-24 12:44:47,295 INFO     paramiko.transport      [-]  Secsh channel 33 opened.
+2015-11-24 12:44:47,586 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:44:47,709 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:44:50,622 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-24 12:44:51,092 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-24 12:45:05,200 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-24 12:45:05,226 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-24 12:45:05,249 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-24 12:45:09,018 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-24 12:45:56,324 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-24 12:45:56,374 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-24 12:45:56,413 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-24 12:45:56,421 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-24 12:45:56,461 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-24 12:45:56,468 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-24 12:51:56,799 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-24 12:55:27,016 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-24 12:56:27,095 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-24 12:56:57,148 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-24 12:56:57,193 INFO     paramiko.transport      [-]  Secsh channel 15 opened.
+2015-11-24 12:56:57,234 INFO     paramiko.transport      [-]  Secsh channel 16 opened.
+2015-11-24 12:56:57,239 INFO     paramiko.transport      [-]  Secsh channel 17 opened.
+2015-11-24 12:56:59,160 INFO     paramiko.transport      [-]  Secsh channel 18 opened.
+2015-11-24 12:56:59,202 INFO     paramiko.transport      [-]  Secsh channel 19 opened.
+2015-11-24 12:56:59,206 INFO     paramiko.transport      [-]  Secsh channel 20 opened.
+2015-11-24 12:57:01,478 INFO     paramiko.transport      [-]  Secsh channel 21 opened.
+2015-11-24 12:57:01,522 INFO     paramiko.transport      [-]  Secsh channel 22 opened.
+2015-11-24 12:57:01,851 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:57:01,949 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 12:57:04,351 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-24 12:57:04,835 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-24 12:57:08,715 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-24 12:57:08,749 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-24 12:57:08,791 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-24 12:57:08,824 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-24 12:57:08,865 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-24 12:57:08,907 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-24 12:57:08,975 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-24 12:57:09,009 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-24 12:57:09,048 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-24 12:57:09,053 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-24 12:57:09,060 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-24 12:57:09,144 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-24 12:57:09,184 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-24 12:57:09,189 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-24 13:08:39,800 INFO     paramiko.transport      [-]  Secsh channel 15 opened.
+2015-11-24 13:22:40,436 INFO     paramiko.transport      [-]  Secsh channel 16 opened.
+2015-11-24 13:23:10,466 INFO     paramiko.transport      [-]  Secsh channel 17 opened.
+2015-11-24 13:23:40,511 INFO     paramiko.transport      [-]  Secsh channel 18 opened.
+2015-11-24 13:24:10,559 INFO     paramiko.transport      [-]  Secsh channel 19 opened.
+2015-11-24 13:26:04,284 INFO     paramiko.transport      [-]  Secsh channel 20 opened.
+2015-11-24 13:26:09,336 INFO     paramiko.transport      [-]  Secsh channel 21 opened.
+2015-11-24 13:26:10,337 INFO     paramiko.transport      [-]  Secsh channel 22 opened.
+2015-11-24 13:26:15,383 INFO     paramiko.transport      [-]  Secsh channel 23 opened.
+2015-11-24 13:26:25,544 INFO     paramiko.transport.sftp [-]  [chan 23] Opened sftp connection (server version 3)
+2015-11-24 13:26:33,899 INFO     paramiko.transport      [-]  Secsh channel 24 opened.
+2015-11-24 13:27:05,963 INFO     paramiko.transport      [-]  Secsh channel 25 opened.
+2015-11-24 13:27:05,966 INFO     paramiko.transport      [-]  Secsh channel 26 opened.
+2015-11-24 13:27:07,133 INFO     paramiko.transport      [-]  Secsh channel 27 opened.
+2015-11-24 13:27:07,561 INFO     paramiko.transport      [-]  Secsh channel 28 opened.
+2015-11-24 13:27:07,612 INFO     paramiko.transport      [-]  Secsh channel 29 opened.
+2015-11-24 13:27:07,650 INFO     paramiko.transport      [-]  Secsh channel 30 opened.
+2015-11-24 13:27:07,656 INFO     paramiko.transport      [-]  Secsh channel 31 opened.
+2015-11-24 13:27:11,851 INFO     paramiko.transport      [-]  Secsh channel 32 opened.
+2015-11-24 13:27:11,891 INFO     paramiko.transport      [-]  Secsh channel 33 opened.
+2015-11-24 13:27:16,896 INFO     paramiko.transport      [-]  Secsh channel 34 opened.
+2015-11-24 13:27:16,898 INFO     paramiko.transport      [-]  Secsh channel 35 opened.
+2015-11-24 13:27:16,904 INFO     paramiko.transport      [-]  Secsh channel 36 opened.
+2015-11-24 13:27:19,085 INFO     paramiko.transport      [-]  Secsh channel 37 opened.
+2015-11-24 13:27:19,415 INFO     paramiko.transport      [-]  Secsh channel 38 opened.
+2015-11-24 13:27:19,800 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40

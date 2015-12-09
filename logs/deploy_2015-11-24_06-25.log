@@ -1,0 +1,326 @@
+2015-11-24 06:25:15,969 INFO     Scale_down              [-]  Getting initial user confiurations.
+2015-11-24 06:25:15,969 INFO     Scale_down              [-]  Getting initial user confiurations Successfull.
+2015-11-24 06:25:15,970 INFO     Scale_down              [-]  Getting client credentials
+2015-11-24 06:25:15,970 INFO     Scale_down              [-]  opening file to detect the environment
+2015-11-24 06:25:15,972 INFO     Scale_down              [-]  Environment returned CentOS
+2015-11-24 06:25:15,972 INFO     Scale_down              [-]  Creating authorized instance of keystone client
+2015-11-24 06:25:15,979 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-24 06:25:16,129 INFO     Scale_down              [-]  Authorized keystone instance ....
+2015-11-24 06:25:16,129 INFO     Scale_down              [-]  Environment is CentOS ...
+2015-11-24 06:25:16,129 INFO     nova                    [-]  Creating authorized instance of nova client instance ...
+2015-11-24 06:25:16,130 INFO     nova                    [-]  Authorized nova instance ....
+2015-11-24 06:25:16,130 INFO     nova                    [-]  Environment is CentOS ...
+2015-11-24 06:25:16,130 INFO     neutron                 [-]  Creating authorized instance of neutron client instance ...
+2015-11-24 06:25:16,130 INFO     neutron                 [-]  Authorized neutron instance ....
+2015-11-24 06:25:16,130 INFO     neutron                 [-]  Environment is CentOS ...
+2015-11-24 06:25:16,130 INFO     glance                  [-]  Creating authorized instance of glance client instance ...
+2015-11-24 06:25:16,156 INFO     glance                  [-]  Authorized glance instance ....
+2015-11-24 06:25:16,156 INFO     glance                  [-]  Environment is CentOS ...
+2015-11-24 06:25:16,162 INFO     Scale                   [-]  Getting initial user confiurations.
+2015-11-24 06:25:16,162 INFO     Scale                   [-]  Getting initial user confiurations Successfull.
+2015-11-24 06:25:16,162 INFO     Scale                   [-]  Getting client credentials
+2015-11-24 06:25:16,162 INFO     Scale                   [-]  opening file to detect the environment
+2015-11-24 06:25:16,165 INFO     Scale                   [-]  Environment returned CentOS
+2015-11-24 06:25:16,165 INFO     Scale                   [-]  Creating authorized instance of keystone client
+2015-11-24 06:25:16,167 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-24 06:25:16,307 INFO     Scale                   [-]  Authorized keystone instance ....
+2015-11-24 06:25:16,307 INFO     Scale                   [-]  Environment is CentOS ...
+2015-11-24 06:25:16,308 INFO     nova                    [-]  Creating authorized instance of nova client instance ...
+2015-11-24 06:25:16,308 INFO     nova                    [-]  Authorized nova instance ....
+2015-11-24 06:25:16,308 INFO     nova                    [-]  Environment is CentOS ...
+2015-11-24 06:25:16,308 INFO     neutron                 [-]  Creating authorized instance of neutron client instance ...
+2015-11-24 06:25:16,308 INFO     neutron                 [-]  Authorized neutron instance ....
+2015-11-24 06:25:16,308 INFO     neutron                 [-]  Environment is CentOS ...
+2015-11-24 06:25:16,308 INFO     glance                  [-]  Creating authorized instance of glance client instance ...
+2015-11-24 06:25:16,309 INFO     glance                  [-]  Authorized glance instance ....
+2015-11-24 06:25:16,309 INFO     glance                  [-]  Environment is CentOS ...
+2015-11-24 06:25:16,313 INFO     __main__                [-]  Getting initial user confiurations.
+2015-11-24 06:25:16,313 INFO     __main__                [-]  Getting initial user confiurations Successfull.
+2015-11-24 06:25:16,313 INFO     __main__                [-]  Getting client credentials
+2015-11-24 06:25:16,313 INFO     __main__                [-]  opening file to detect the environment
+2015-11-24 06:25:16,316 INFO     __main__                [-]  Environment returned CentOS
+2015-11-24 06:25:16,317 INFO     __main__                [-]  Creating authorized instance of keystone client
+2015-11-24 06:25:16,318 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-24 06:25:16,460 INFO     __main__                [-]  Authorized keystone instance ....
+2015-11-24 06:25:16,460 INFO     __main__                [-]  Environment is CentOS ...
+2015-11-24 06:25:16,460 INFO     nova                    [-]  Creating authorized instance of nova client instance ...
+2015-11-24 06:25:16,461 INFO     nova                    [-]  Authorized nova instance ....
+2015-11-24 06:25:16,461 INFO     nova                    [-]  Environment is CentOS ...
+2015-11-24 06:25:16,461 INFO     neutron                 [-]  Creating authorized instance of neutron client instance ...
+2015-11-24 06:25:16,461 INFO     neutron                 [-]  Authorized neutron instance ....
+2015-11-24 06:25:16,461 INFO     neutron                 [-]  Environment is CentOS ...
+2015-11-24 06:25:16,461 INFO     glance                  [-]  Creating authorized instance of glance client instance ...
+2015-11-24 06:25:16,462 INFO     glance                  [-]  Authorized glance instance ....
+2015-11-24 06:25:16,462 INFO     glance                  [-]  Environment is CentOS ...
+2015-11-24 06:25:18,907 INFO     __main__                [-]  Getting user confiurations.
+2015-11-24 06:25:18,907 INFO     __main__                [-]  Getting user confiurations Successfull.
+2015-11-24 06:25:18,908 INFO     __main__                [-]  Credentials Loaded
+2015-11-24 06:25:18,908 INFO     __main__                [-]  Getting keystone credentials
+2015-11-24 06:25:18,908 INFO     nova                    [-]  Getting Nova Credentials
+2015-11-24 06:25:18,908 INFO     __main__                [-]  Successfully added availaibility zones
+2015-11-24 06:25:18,909 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-24 06:25:19,067 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:25:19,193 INFO     __main__                [-]  Fetch network ID of network netname
+2015-11-24 06:25:19,194 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.111.43
+2015-11-24 06:25:19,343 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:25:19,734 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:25:19,800 INFO     __main__                [-]  Fetch network ID of private network
+2015-11-24 06:25:19,800 INFO     __main__                [-]  creating heat endpoint
+2015-11-24 06:25:19,800 INFO     __main__                [-]  creating heat client
+2015-11-24 06:25:19,803 INFO     __main__                [-]  Create Heat stack
+2015-11-24 06:25:19,804 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:25:20,921 INFO     __main__                [-]  deploying heat stack
+2015-11-24 06:25:20,922 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:25:21,040 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:25:51,091 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:25:51,143 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:26:21,206 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:26:21,258 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:26:21,795 INFO     __main__                [-]  Getting bono IP
+2015-11-24 06:26:21,795 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:26:21,888 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:26:23,775 INFO     __main__                [-]  configure test node
+2015-11-24 06:26:23,775 INFO     __main__                [-]  getting node IP
+2015-11-24 06:26:23,776 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:26:23,828 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:27:24,227 INFO     paramiko                [-]  Connecting To Test Node
+2015-11-24 06:27:24,284 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-24 06:27:24,960 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-24 06:27:24,964 INFO     paramiko                [-]  Connected To Test Node
+2015-11-24 06:27:29,382 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-24 06:27:29,440 INFO     __main__                [-]  Configuring APT software source
+2015-11-24 06:27:29,478 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-24 06:27:29,507 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-24 06:27:29,510 INFO     __main__                [-]  Updating Ubuntu.
+2015-11-24 06:27:29,513 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-24 06:28:22,501 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-24 06:28:22,502 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-24 06:28:22,541 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-24 06:28:22,543 INFO     __main__                [-]  Configuring clearwater shared settings
+2015-11-24 06:28:22,548 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-24 06:28:22,553 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-24 06:28:22,591 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-24 06:28:22,633 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-24 06:28:22,636 INFO     __main__                [-]  Configuring clearwater shared settings
+2015-11-24 06:28:22,639 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-24 06:28:22,719 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-24 06:30:58,593 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-24 06:31:03,633 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-24 06:31:04,503 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-24 06:31:04,543 INFO     __main__                [-]  Finished installing software
+2015-11-24 06:31:04,544 INFO     __main__                [-]  Getting user confiurations.
+2015-11-24 06:31:04,544 INFO     __main__                [-]  Getting user confiurations Successfull.
+2015-11-24 06:31:04,544 INFO     __main__                [-]  Credentials Loaded
+2015-11-24 06:31:04,544 INFO     __main__                [-]  Getting keystone credentials
+2015-11-24 06:31:04,544 INFO     nova                    [-]  Getting Nova Credentials
+2015-11-24 06:31:04,544 INFO     __main__                [-]  Successfully added availaibility zones
+2015-11-24 06:31:04,545 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:31:04,645 INFO     __main__                [-]  Fetch network ID of network netname
+2015-11-24 06:31:04,646 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:31:05,124 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:31:05,237 INFO     __main__                [-]  Fetch network ID of private network
+2015-11-24 06:31:05,237 INFO     __main__                [-]  creating heat endpoint
+2015-11-24 06:31:05,237 INFO     __main__                [-]  creating heat client
+2015-11-24 06:31:05,238 INFO     __main__                [-]  Create Heat stack
+2015-11-24 06:31:05,238 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:31:06,090 INFO     __main__                [-]  deploying heat stack
+2015-11-24 06:31:06,091 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:31:06,230 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:31:36,292 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:31:36,349 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:32:06,414 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:32:06,474 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:32:06,853 INFO     __main__                [-]  Getting bono IP
+2015-11-24 06:32:06,854 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:32:06,942 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:32:08,799 INFO     __main__                [-]  configure test node
+2015-11-24 06:32:08,799 INFO     __main__                [-]  getting node IP
+2015-11-24 06:32:08,800 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:32:08,861 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:33:09,298 INFO     paramiko                [-]  Connecting To Test Node
+2015-11-24 06:33:09,368 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-24 06:33:10,185 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-24 06:33:10,214 INFO     paramiko                [-]  Connected To Test Node
+2015-11-24 06:33:10,737 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-24 06:33:10,805 INFO     __main__                [-]  Configuring APT software source
+2015-11-24 06:33:10,806 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-24 06:33:10,846 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-24 06:33:10,848 INFO     __main__                [-]  Updating Ubuntu.
+2015-11-24 06:33:10,889 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-24 06:34:14,656 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-24 06:34:14,657 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-24 06:34:14,697 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-24 06:34:14,699 INFO     __main__                [-]  Configuring clearwater shared settings
+2015-11-24 06:34:14,701 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-24 06:34:14,709 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-24 06:34:14,749 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-24 06:34:14,790 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-24 06:34:14,791 INFO     __main__                [-]  Configuring clearwater shared settings
+2015-11-24 06:34:14,794 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-24 06:34:14,873 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-24 06:39:11,712 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-24 06:39:16,755 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-24 06:39:17,400 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-24 06:39:17,437 INFO     __main__                [-]  Finished installing software
+2015-11-24 06:39:17,437 INFO     __main__                [-]  Getting user confiurations.
+2015-11-24 06:39:17,438 INFO     __main__                [-]  Getting user confiurations Successfull.
+2015-11-24 06:39:17,438 INFO     __main__                [-]  Credentials Loaded
+2015-11-24 06:39:17,438 INFO     __main__                [-]  Getting keystone credentials
+2015-11-24 06:39:17,438 INFO     nova                    [-]  Getting Nova Credentials
+2015-11-24 06:39:17,438 INFO     __main__                [-]  Successfully added availaibility zones
+2015-11-24 06:39:17,439 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:39:17,539 INFO     __main__                [-]  Fetch network ID of network netname
+2015-11-24 06:39:17,540 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:39:17,857 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:39:17,964 INFO     __main__                [-]  Fetch network ID of private network
+2015-11-24 06:39:17,965 INFO     __main__                [-]  creating heat endpoint
+2015-11-24 06:39:17,965 INFO     __main__                [-]  creating heat client
+2015-11-24 06:39:17,965 INFO     __main__                [-]  Create Heat stack
+2015-11-24 06:39:17,966 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:39:19,173 INFO     __main__                [-]  deploying heat stack
+2015-11-24 06:39:19,174 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:39:19,273 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:39:49,342 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:39:49,395 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:40:19,461 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:40:19,511 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:40:19,983 INFO     __main__                [-]  Getting bono IP
+2015-11-24 06:40:19,984 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:40:20,047 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:40:22,646 INFO     __main__                [-]  configure test node
+2015-11-24 06:40:22,646 INFO     __main__                [-]  getting node IP
+2015-11-24 06:40:22,647 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:40:22,697 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:41:23,167 INFO     paramiko                [-]  Connecting To Test Node
+2015-11-24 06:41:24,897 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-24 06:41:25,234 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-24 06:41:25,245 INFO     paramiko                [-]  Connected To Test Node
+2015-11-24 06:41:25,458 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-24 06:41:25,470 INFO     __main__                [-]  Configuring APT software source
+2015-11-24 06:41:25,471 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-24 06:41:25,513 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-24 06:41:25,514 INFO     __main__                [-]  Updating Ubuntu.
+2015-11-24 06:41:25,515 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-24 06:41:56,491 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-24 06:41:56,493 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-24 06:41:56,531 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-24 06:41:56,533 INFO     __main__                [-]  Configuring clearwater shared settings
+2015-11-24 06:41:56,535 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-24 06:41:56,574 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-24 06:41:56,614 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-24 06:41:56,655 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-24 06:41:56,657 INFO     __main__                [-]  Configuring clearwater shared settings
+2015-11-24 06:41:56,694 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-24 06:41:56,774 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-24 06:43:54,874 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-24 06:43:59,920 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-24 06:44:00,344 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-24 06:44:00,382 INFO     __main__                [-]  Finished installing software
+2015-11-24 06:44:00,383 INFO     __main__                [-]  Getting user confiurations.
+2015-11-24 06:44:00,383 INFO     __main__                [-]  Getting user confiurations Successfull.
+2015-11-24 06:44:00,383 INFO     __main__                [-]  Credentials Loaded
+2015-11-24 06:44:00,383 INFO     __main__                [-]  Getting keystone credentials
+2015-11-24 06:44:00,383 INFO     nova                    [-]  Getting Nova Credentials
+2015-11-24 06:44:00,383 INFO     __main__                [-]  Successfully added availaibility zones
+2015-11-24 06:44:00,384 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:44:00,456 INFO     __main__                [-]  Fetch network ID of network netname
+2015-11-24 06:44:00,457 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:44:00,775 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:44:00,845 INFO     __main__                [-]  Fetch network ID of private network
+2015-11-24 06:44:00,845 INFO     __main__                [-]  creating heat endpoint
+2015-11-24 06:44:00,845 INFO     __main__                [-]  creating heat client
+2015-11-24 06:44:00,845 INFO     __main__                [-]  Create Heat stack
+2015-11-24 06:44:00,846 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:44:01,782 INFO     __main__                [-]  deploying heat stack
+2015-11-24 06:44:01,783 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:44:01,835 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:44:31,879 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:44:32,003 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:45:02,110 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:45:02,160 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:45:02,572 INFO     __main__                [-]  Getting bono IP
+2015-11-24 06:45:02,574 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:45:02,672 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:45:06,466 INFO     __main__                [-]  configure test node
+2015-11-24 06:45:06,466 INFO     __main__                [-]  getting node IP
+2015-11-24 06:45:06,467 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:45:06,517 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:46:06,899 INFO     paramiko                [-]  Connecting To Test Node
+2015-11-24 06:46:06,939 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-24 06:46:07,244 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-24 06:46:07,267 INFO     paramiko                [-]  Connected To Test Node
+2015-11-24 06:46:07,500 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-24 06:46:07,572 INFO     __main__                [-]  Configuring APT software source
+2015-11-24 06:46:07,612 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-24 06:46:07,638 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-24 06:46:07,639 INFO     __main__                [-]  Updating Ubuntu.
+2015-11-24 06:46:07,641 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-24 06:46:47,165 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-24 06:46:47,166 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-24 06:46:47,205 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-24 06:46:47,207 INFO     __main__                [-]  Configuring clearwater shared settings
+2015-11-24 06:46:47,210 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-24 06:46:47,249 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-24 06:46:47,252 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-24 06:46:47,289 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-24 06:46:47,291 INFO     __main__                [-]  Configuring clearwater shared settings
+2015-11-24 06:46:47,293 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-24 06:46:47,352 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-24 06:48:47,990 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-24 06:48:53,034 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-24 06:48:53,447 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-24 06:48:53,485 INFO     __main__                [-]  Finished installing software
+2015-11-24 06:48:53,486 INFO     __main__                [-]  Getting user confiurations.
+2015-11-24 06:48:53,486 INFO     __main__                [-]  Getting user confiurations Successfull.
+2015-11-24 06:48:53,486 INFO     __main__                [-]  Credentials Loaded
+2015-11-24 06:48:53,486 INFO     __main__                [-]  Getting keystone credentials
+2015-11-24 06:48:53,486 INFO     nova                    [-]  Getting Nova Credentials
+2015-11-24 06:48:53,486 INFO     __main__                [-]  Successfully added availaibility zones
+2015-11-24 06:48:53,487 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:48:53,609 INFO     __main__                [-]  Fetch network ID of network netname
+2015-11-24 06:48:53,610 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:48:54,030 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:48:54,124 INFO     __main__                [-]  Fetch network ID of private network
+2015-11-24 06:48:54,125 INFO     __main__                [-]  creating heat endpoint
+2015-11-24 06:48:54,125 INFO     __main__                [-]  creating heat client
+2015-11-24 06:48:54,125 INFO     __main__                [-]  Create Heat stack
+2015-11-24 06:48:54,126 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:48:54,711 INFO     __main__                [-]  deploying heat stack
+2015-11-24 06:48:54,711 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:48:54,760 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:49:24,807 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:49:24,859 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:49:54,923 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:49:55,037 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:49:55,621 INFO     __main__                [-]  Getting bono IP
+2015-11-24 06:49:55,621 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:49:55,712 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:49:57,951 INFO     __main__                [-]  configure test node
+2015-11-24 06:49:57,951 INFO     __main__                [-]  getting node IP
+2015-11-24 06:49:57,952 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:49:57,997 INFO     urllib3.connectionpool  [-]  Starting new HTTP connection (1): 10.204.110.40
+2015-11-24 06:50:58,423 INFO     paramiko                [-]  Connecting To Test Node
+2015-11-24 06:50:58,437 INFO     paramiko.transport      [-]  Connected (version 2.0, client OpenSSH_6.6.1p1)
+2015-11-24 06:50:58,766 INFO     paramiko.transport      [-]  Authentication (password) successful!
+2015-11-24 06:50:58,791 INFO     paramiko                [-]  Connected To Test Node
+2015-11-24 06:50:59,078 INFO     paramiko.transport      [-]  Secsh channel 1 opened.
+2015-11-24 06:50:59,110 INFO     __main__                [-]  Configuring APT software source
+2015-11-24 06:50:59,150 INFO     paramiko.transport      [-]  Secsh channel 2 opened.
+2015-11-24 06:50:59,176 INFO     paramiko.transport      [-]  Secsh channel 3 opened.
+2015-11-24 06:50:59,178 INFO     __main__                [-]  Updating Ubuntu.
+2015-11-24 06:50:59,178 INFO     paramiko.transport      [-]  Secsh channel 4 opened.
+2015-11-24 06:51:35,890 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-24 06:51:35,891 INFO     paramiko.transport      [-]  Secsh channel 5 opened.
+2015-11-24 06:51:35,893 INFO     paramiko.transport      [-]  Secsh channel 6 opened.
+2015-11-24 06:51:35,895 INFO     __main__                [-]  Configuring clearwater shared settings
+2015-11-24 06:51:35,897 INFO     paramiko.transport      [-]  Secsh channel 7 opened.
+2015-11-24 06:51:35,936 INFO     __main__                [-]  Configuring clearwater local settings
+2015-11-24 06:51:35,938 INFO     paramiko.transport      [-]  Secsh channel 8 opened.
+2015-11-24 06:51:35,945 INFO     paramiko.transport      [-]  Secsh channel 9 opened.
+2015-11-24 06:51:35,947 INFO     __main__                [-]  Configuring clearwater shared settings
+2015-11-24 06:51:35,948 INFO     paramiko.transport      [-]  Secsh channel 10 opened.
+2015-11-24 06:51:36,027 INFO     paramiko.transport      [-]  Secsh channel 11 opened.
+2015-11-24 06:53:38,503 INFO     paramiko.transport      [-]  Secsh channel 12 opened.
+2015-11-24 06:53:43,510 INFO     paramiko.transport      [-]  Secsh channel 13 opened.
+2015-11-24 06:53:43,925 INFO     paramiko.transport      [-]  Secsh channel 14 opened.
+2015-11-24 06:53:43,964 INFO     __main__                [-]  Finished installing software
