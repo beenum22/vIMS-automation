@@ -1,4 +1,4 @@
-package com.xflowresearch.nfv.testertool.simulationcontrol;
+package com.xflowresearch.nfv.testertool.ue;
 
 public class UEParameter
 {

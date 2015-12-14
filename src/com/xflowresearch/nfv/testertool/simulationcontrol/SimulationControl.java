@@ -94,7 +94,7 @@ public class SimulationControl
 			
 			for(int i = 0; i < UECount; i++)
 			{
-				UEs.add(new Thread(new UE(xmlparser.getUEParameters(i))));
+				UEs.add(new Thread(new UE(xmlparser.getUEParameters(i), xmlparser)));
 				UEs.get(i).setName("UEThread"+i);
 				logger.info("UE Thread " + i + " Spawned");
 				UEs.get(i).start();

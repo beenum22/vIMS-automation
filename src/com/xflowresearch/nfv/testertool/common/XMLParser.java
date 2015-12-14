@@ -11,7 +11,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
 import com.xflowresearch.nfv.testertool.simulationcontrol.SimulationControl;
-import com.xflowresearch.nfv.testertool.simulationcontrol.UEParameter;
+import com.xflowresearch.nfv.testertool.ue.UEParameter;
 
 /**
  * XMLParser
@@ -50,10 +50,17 @@ public class XMLParser
 
 	private int UECount;
 	private int eNBCount;
+	
+	private String eNBIP;
 
 	public String geteNBUES1APID()
 	{
 		return eNBUES1APID;
+	}
+	
+	public String geteNBIP()
+	{
+		return eNBIP;
 	}
 
 	public String getTAI()
@@ -135,6 +142,44 @@ public class XMLParser
 		}
 	}
 	
+	private String MCC, MNC;
+	
+	public String getPLMN()
+	{
+		try
+		{
+			if(MNC.length() == 2)
+			{
+				MNC = MNC + "f";
+			}
+			
+			char [] MCCArray = MCC.toCharArray();
+			char [] MNCArray = MNC.toCharArray();
+			char [] PLMNArray = new char[6];
+			
+			PLMNArray[0] = MCCArray[1];
+			PLMNArray[1] = MCCArray[0];
+			PLMNArray[2] = MNCArray[2];
+			PLMNArray[3] = MCCArray[2];
+			PLMNArray[4] = MNCArray[1];
+			PLMNArray[5] = MNCArray[0];
+			
+			return new String(PLMNArray);
+		}
+		
+		catch(NullPointerException npe)
+		{
+			System.out.println("Null Pointer Exception while computing PLMN. Check if MCC/MNC are null.");
+		}
+		
+		catch(Exception exc)
+		{
+			exc.printStackTrace();
+		}
+		
+		return null;
+	}	
+	
 	public void readSimulationParameters()
 	{
 		try
@@ -148,11 +193,21 @@ public class XMLParser
 			Element classElement = document.getRootElement();
 
 			List <Element> itemList = classElement.getChildren();
-
+			
 			for(int temp = 0; temp < itemList.size(); temp++)
 			{
 				Element item = itemList.get(temp);
 
+				if(item.getName().equals("MCC"))
+				{
+					MCC = item.getText();
+				}
+				
+				else if(item.getName().equals("MNC"))
+				{
+					MNC = item.getText();
+				}
+				
 				if(item.getName().equals("SimulationParams"))
 				{
 					UECount = Integer.parseInt(item.getChild("UECount").getText());
@@ -164,28 +219,48 @@ public class XMLParser
 				if(item.getName().equals("UEParams"))
 				{
 					eNBUES1APID = item.getChild("eNBUES1APID").getText();
+					
 					TAI = item.getChild("TAI").getText();
+					TAI = new StringBuilder(TAI).insert(2, getPLMN()).toString();
+					//System.out.println("TAI: " + TAI);
+					
 					EUTRANCGI = item.getChild("EUTRANCGI").getText();
+					EUTRANCGI = new StringBuilder(EUTRANCGI).insert(2, getPLMN()).toString();
+					//System.out.println("EUTRANCGI: " + EUTRANCGI);
+					
 					RRCEstablishmentCause = item.getChild("RRCEstablishmentCause").getText();
 				}
 
 				if(item.getName().equals("eNBParams"))
 				{
-
+					eNBIP = item.getChild("eNBIP").getText();
 				}
 
 				if(item.getName().equals("S1SignallingParams"))
 				{
 					s1signallingParams.GlobalENBID = item.getChild("GlobalENBID").getText();
+					s1signallingParams.GlobalENBID = new StringBuilder(s1signallingParams.GlobalENBID).insert(2, getPLMN()).toString();
+					System.out.println("GlobalENBID: " + s1signallingParams.GlobalENBID);
+					
 					s1signallingParams.eNBname = item.getChild("eNBname").getText();
+					
 					s1signallingParams.SupportedTAs = item.getChild("SupportedTAs").getText();
+					s1signallingParams.SupportedTAs = new StringBuilder(s1signallingParams.SupportedTAs).insert(8, getPLMN()).toString();
+					//System.out.println("SupportedTAs: " + s1signallingParams.SupportedTAs);
+					
 					s1signallingParams.DefaultPagingDRX = item.getChild("DefaultPagingDRX").getText();
 				}
 
 				if(item.getName().equals("AuthenticationResponseParams"))
 				{
 					authenticationResponseParams.EUTRANCGI = item.getChild("EUTRANCGI").getText();
+					authenticationResponseParams.EUTRANCGI = new StringBuilder(authenticationResponseParams.EUTRANCGI).insert(2, getPLMN()).toString();
+					//System.out.println("EUTRANCGI: " + authenticationResponseParams.EUTRANCGI);
+
+					
 					authenticationResponseParams.TAI = item.getChild("TAI").getText();
+					authenticationResponseParams.TAI= new StringBuilder(authenticationResponseParams.TAI).insert(2, getPLMN()).toString();
+					//System.out.println("TAI: " + authenticationResponseParams.TAI);
 				}
 			}
 		}

@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import com.xflowresearch.nfv.testertool.common.XMLParser;
-import com.xflowresearch.nfv.testertool.enodeb.AttachSimulator;
 import com.xflowresearch.nfv.testertool.enodeb.eNodeB;
 
 public class UserControlInterface
@@ -23,7 +21,7 @@ public class UserControlInterface
 				DatagramSocket serverSocket = null;
 				try
 				{
-					serverSocket = new DatagramSocket(9877, InetAddress.getByName("10.20.30.8"));
+					serverSocket = new DatagramSocket(9877, InetAddress.getByName(xmlparser.geteNBIP()));
 					//serverSocket = new ServerSocket(9877, 20, InetAddress.);
 				}
 				catch(SocketException e)

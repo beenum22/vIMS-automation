@@ -3,6 +3,9 @@
 
 <TesterToolConfig>
 
+	<MCC>011</MCC>
+	<MNC>23</MNC>
+
 	<SimulationParams>
 		<UECount>1</UECount>
 		<eNBCount>0</eNBCount>
@@ -12,34 +15,26 @@
 	</SimulationParams>
 	
 	<S1SignallingParams>
-		<GlobalENBID>0010f13200013880</GlobalENBID>
+		<GlobalENBID>0000013880</GlobalENBID>
 		<eNBname>050049784c6f61642d654e4231</eNBname>
-		<SupportedTAs>0004044010f132</SupportedTAs>
+		<SupportedTAs>00040440</SupportedTAs>
 		<DefaultPagingDRX>00</DefaultPagingDRX>
 	</S1SignallingParams>
 	
 	<AuthenticationResponseParams>
-		<EUTRANCGI>0010f13201388010</EUTRANCGI>
-		<TAI>0010f1321011</TAI>
+		<EUTRANCGI>0001388010</EUTRANCGI>
+		<TAI>001011</TAI>
 	</AuthenticationResponseParams>
 	
-	<UEParams>
-		<IMSI>1234</IMSI>
-		<IMEI>4567</IMEI>
-		
+	<UEParams>	
 		<eNBUES1APID>0001</eNBUES1APID>
-		<TAI>0010f1321011</TAI>
-		<EUTRANCGI>4010f13201388010000000010004ac110128</EUTRANCGI>
+		<TAI>001011</TAI>
+		<EUTRANCGI>4001388010000000010004ac110128</EUTRANCGI>
 		<RRCEstablishmentCause>30</RRCEstablishmentCause>
 	</UEParams>
 	
 	<eNBParams>
-		<eNBID>1234</eNBID>
-		<TAC>4567</TAC>
-		<MNC>1346</MNC>
-		<MCC>7954</MCC>
-		<MMEI>1973</MMEI>
-		<PLMN>00110030000004003b00080004f55100013880003c400d050049784c6f61642d654e4231004000070004044010f1320089400100</PLMN>
+		<eNBIP>10.20.30.3</eNBIP>
 	</eNBParams>
 	
 	

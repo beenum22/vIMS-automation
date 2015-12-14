@@ -11,7 +11,7 @@ import java.nio.charset.Charset;
 public class UEControlInterface
 {
 
-	public String sendControlCommand(String command)
+	public String sendControlCommand(String command, String eNBIP)
 	{
 		DatagramSocket clientSocket = null;
 		
@@ -29,7 +29,7 @@ public class UEControlInterface
 		
 		try
 		{
-			IPAddress = InetAddress.getByName("10.20.30.8");
+			IPAddress = InetAddress.getByName(eNBIP);
 		}
 		
 		catch(UnknownHostException e1)

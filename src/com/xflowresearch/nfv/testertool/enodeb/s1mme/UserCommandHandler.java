@@ -87,8 +87,8 @@ public class UserCommandHandler implements Runnable
 	{
 		// Assign eNBUES1SP id here/..
 		int id = enodeb.getSizeOfUsers() + 1;
-
 		String eNBUES1APID = Integer.toHexString(id);
+		
 		if(eNBUES1APID.length() == 3)
 			eNBUES1APID = "0" + eNBUES1APID;
 		if(eNBUES1APID.length() == 2)

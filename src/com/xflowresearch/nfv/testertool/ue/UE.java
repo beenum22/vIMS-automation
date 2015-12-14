@@ -7,7 +7,7 @@ import java.net.UnknownHostException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xflowresearch.nfv.testertool.simulationcontrol.UEParameter;
+import com.xflowresearch.nfv.testertool.common.XMLParser;
 
 /**
  * UE
@@ -24,12 +24,15 @@ public class UE implements Runnable
 	private UEControlInterface ueControlInterface;
 	private HTTPClient httpClient;
 	UEParameter UEParameters;
+	private XMLParser xmlparser;
 
-	public UE(UEParameter UEParams)
+	public UE(UEParameter UEParams, XMLParser xmlparser)
 	{
 		UEParameters = UEParams;
 		ueControlInterface = new UEControlInterface();
 		httpClient = new HTTPClient();
+		
+		this.xmlparser = xmlparser;
 	}
 
 	public Logger getLogger()
@@ -43,7 +46,7 @@ public class UE implements Runnable
 		logger.info("UE started");
 
 		/* Send Attach command to eNB for attaching to the MME!! to the MME */
-		String pdnipv4 = ueControlInterface.sendControlCommand("Attach;" + UEParameters.toString()); /* UEParams = IMSI + K?" */
+		String pdnipv4 = ueControlInterface.sendControlCommand("Attach;" + UEParameters.toString(), xmlparser.geteNBIP()); /* UEParams = IMSI + K?" */
 
 		try
 		{
@@ -73,6 +76,5 @@ public class UE implements Runnable
 		{
 			e.printStackTrace();
 		}
-
 	}
 }
