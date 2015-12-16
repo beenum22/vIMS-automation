@@ -46,7 +46,7 @@ public class UE implements Runnable
 		logger.info("UE started");
 
 		/* Send Attach command to eNB for attaching to the MME!! to the MME */
-		String pdnipv4 = ueControlInterface.sendControlCommand("Attach;" + UEParameters.toString(), xmlparser.geteNBIP()); /* UEParams = IMSI + K?" */
+		String pdnipv4 = ueControlInterface.sendAttachRequest("Attach;" + UEParameters.toString(), xmlparser.geteNBIP(), xmlparser.geteNBPort());
 
 		try
 		{

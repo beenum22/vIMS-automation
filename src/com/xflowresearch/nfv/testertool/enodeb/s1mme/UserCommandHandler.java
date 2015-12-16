@@ -1,9 +1,8 @@
 package com.xflowresearch.nfv.testertool.enodeb.s1mme;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 import com.xflowresearch.nfv.testertool.common.XMLParser;
 import com.xflowresearch.nfv.testertool.enodeb.AttachSimulator;
@@ -13,77 +12,58 @@ import com.xflowresearch.nfv.testertool.enodeb.s1u.User;
 
 public class UserCommandHandler implements Runnable
 {
-
-	private String command;
-	private DatagramSocket serverSocket;
+	private Socket socket;
 	private eNodeB enodeb;
 	private XMLParser xmlparser;
-	private AttachSimulator attachSimulator;
 	
-	private InetAddress IPAddress;
-	private int port;
+	private AttachSimulator attachSimulator;
 	
 	private SctpClient sctpClient;
 
-	public UserCommandHandler(String command, DatagramSocket serverSocket, eNodeB enodeb, XMLParser xmlparser, InetAddress IPAddress, int port, SctpClient sctpClient)
+	public UserCommandHandler(Socket socket, eNodeB enodeb, XMLParser xmlparser, SctpClient sctpClient)
 	{
 		super();
-		this.command = command;
-		this.serverSocket = serverSocket;
+		this.socket = socket;
 		this.enodeb = enodeb;
 		this.xmlparser = xmlparser;
-		this.IPAddress = IPAddress;
-		this.port = port;
 		this.sctpClient = sctpClient;
 	}
 
+	private ObjectInputStream OIS = null;
+	private ObjectOutputStream OOS = null;
+	
 	@Override
 	public void run()
-	{
-		User user;
-		Object reply = executeUECommand(command, xmlparser, enodeb);
-
-		byte [] sendData = new byte[1024];
-		if(reply != null)
-		{
-			String pdnipv4 = null;
-			if(reply.getClass().equals(com.xflowresearch.nfv.testertool.enodeb.s1u.User.class))
-			{
-				user = (User) reply;
-				pdnipv4 = user.getIP();
-				enodeb.addNewUser(user);
-			}
-			sendData = pdnipv4.getBytes();
-		}
-		else
-		{
-			sendData = new String("attachfailure").getBytes();
-		}
-		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+	{		
 		try
 		{
-			serverSocket.send(sendPacket);
+			OIS = new ObjectInputStream(socket.getInputStream());
+			OOS = new ObjectOutputStream(socket.getOutputStream());
+			
+			String command = (String) OIS.readObject();
+			executeUECommand(command, xmlparser, enodeb);
 		}
-		catch(IOException e)
+		
+		catch(Exception e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}	
 	}
 	
-	public Object executeUECommand(String command, XMLParser xmlparser, eNodeB enodeb)
+	public void executeUECommand(String command, XMLParser xmlparser, eNodeB enodeb)
 	{
 		if(command.split(";")[0].equals("Attach"))
 		{
 			//System.out.println("Received IMSI: " + command.split(";")[1]);
 			String ueparams = command.split(";")[1] + ";" + command.split(";")[2];
-			return executeAttachSequence(xmlparser, enodeb, ueparams);
+			executeAttachSequence(xmlparser, enodeb, ueparams);
 		}
-
-		return null;
+		
+		/*Cater for other commands here */
 	}
 
-	public Object executeAttachSequence(XMLParser xmlparser, eNodeB enodeb, String ueparams)
+	public void executeAttachSequence(XMLParser xmlparser, eNodeB enodeb, String ueparams)
 	{
 		// Assign eNBUES1SP id here/..
 		int id = enodeb.getSizeOfUsers() + 1;
@@ -98,16 +78,30 @@ public class UserCommandHandler implements Runnable
 
 		attachSimulator = new AttachSimulator(xmlparser, sctpClient);
 		
-		/** Test Attach Sequence initiation **/
-		if(attachSimulator.initiateAttachSequence(xmlparser, ueparams, eNBUES1APID))
+		try
 		{
-			User user = new User();
-			user.setTEID(attachSimulator.getTEID());
-			user.setIP(attachSimulator.getPDNIpv4().toString().substring(1, attachSimulator.getPDNIpv4().toString().length()));
-			enodeb.setTransportLayerAddressInUserControlInterface(attachSimulator.getTransportLayerAddress());
-			return user;
+			/** Test Attach Sequence initiation **/
+			if(attachSimulator.initiateAttachSequence(xmlparser, ueparams, eNBUES1APID))
+			{
+				User user = new User();
+				user.setTEID(attachSimulator.getTEID());
+				user.setIP(attachSimulator.getPDNIpv4().toString().substring(1, attachSimulator.getPDNIpv4().toString().length()));
+				enodeb.setTransportLayerAddressInUserControlInterface(attachSimulator.getTransportLayerAddress());
+				
+				enodeb.addNewUser(user);
+				
+				OOS.writeObject(user.getIP());
+			}
+			
+			else
+			{
+				OOS.writeObject(new String("attachfailure"));
+			}
 		}
-
-		return null;
+		
+		catch(Exception exc)
+		{
+			exc.printStackTrace();
+		}
 	}
 }

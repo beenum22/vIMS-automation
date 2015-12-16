@@ -97,7 +97,7 @@ public class SctpClient
 	/**
 	 * Send protocol payload specified by the protocol id over open SCTP Channel
 	 */
-	public void sendProtocolPayload(byte [] payload, int protocolID)
+	public synchronized void sendProtocolPayload(byte [] payload, int protocolID)
 	{
 		if(isConnected)
 		{

@@ -1,78 +1,85 @@
 package com.xflowresearch.nfv.testertool.ue;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.nio.charset.Charset;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 public class UEControlInterface
 {
-
-	public String sendControlCommand(String command, String eNBIP)
+	Socket clientSocket = null;
+	ObjectOutputStream OOS = null;
+	ObjectInputStream OIS = null;
+	
+	public String sendAttachRequest(String command, String eNBIP, String eNBPort)
 	{
-		DatagramSocket clientSocket = null;
+		String pdnipv4 = null;
+			
+		try
+		{
+			clientSocket = new Socket(eNBIP, Integer.parseInt(eNBPort));
+		}
+		
+		catch(Exception exc)
+		{
+			System.out.println("UEControlInterface: Error in connecting: " + exc.getMessage());
+		}
 		
 		try
 		{
-			clientSocket = new DatagramSocket();
+			OOS = new ObjectOutputStream(clientSocket.getOutputStream());
+			OIS = new ObjectInputStream(clientSocket.getInputStream());
 		}
-		catch(SocketException e2)
+		
+		catch(Exception exc)
 		{
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
+			System.out.println("UEControlInterface: Error in opening streams: " + exc.getMessage());
 		}
-
-		InetAddress IPAddress = null;
 		
 		try
 		{
-			IPAddress = InetAddress.getByName(eNBIP);
+			OOS.writeObject(command);
 		}
 		
-		catch(UnknownHostException e1)
+		catch(Exception exc)
 		{
-			e1.printStackTrace();
+			System.out.println("UEControlInterface: Error in sending: " + exc.getMessage());			
 		}
-
-		byte [] sendData = new byte[1024];
-
-		sendData = command.getBytes();
-
-		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9877);
 		
 		try
 		{
-			clientSocket.send(sendPacket);
+			pdnipv4 = (String) OIS.readObject();
 		}
 		
-		catch(IOException e)
+		catch(Exception e)
 		{
-			e.printStackTrace();
-		}
-
-		byte [] receiveData = new byte[1024];
-		
-		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-		try
-		{
-			clientSocket.receive(receivePacket);
+			System.out.println("UEControlInterface: Error in receiving: " + e.getMessage());			
 		}
 		
-		catch(IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		byte [] data = new byte[receivePacket.getLength()];
-		System.arraycopy(receivePacket.getData(), receivePacket.getOffset(), data, 0, receivePacket.getLength());
-		String pdnipv4 = new String(data);
-
-		clientSocket.close();
-
 		return pdnipv4;
+	}
+	
+	public String sendControlCommand(String command)
+	{		
+		try
+		{
+			OOS.writeObject(command);
+		}
+		
+		catch(Exception exc)
+		{
+			System.out.println("UEControlInterface: Error in sending: " + exc.getMessage());			
+		}
+		
+		try
+		{
+			//Get reply here
+		}
+		
+		catch(Exception e)
+		{
+			System.out.println("UEControlInterface: Error in receiving: " + e.getMessage());			
+		}
+
+		return null;
 	}
 }

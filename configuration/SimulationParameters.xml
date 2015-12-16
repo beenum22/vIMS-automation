@@ -10,7 +10,7 @@
 		<UECount>1</UECount>
 		<eNBCount>0</eNBCount>
 		
-		<MMEIP>127.0.0.1</MMEIP>
+		<MMEIP>172.17.1.20</MMEIP>
 		<MMEPort>36412</MMEPort>
 	</SimulationParams>
 	
@@ -35,6 +35,7 @@
 	
 	<eNBParams>
 		<eNBIP>10.20.30.3</eNBIP>
+		<eNBPort>9877</eNBPort>
 	</eNBParams>
 	
 	

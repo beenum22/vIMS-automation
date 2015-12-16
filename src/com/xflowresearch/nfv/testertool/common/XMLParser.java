@@ -52,6 +52,7 @@ public class XMLParser
 	private int eNBCount;
 	
 	private String eNBIP;
+	private String eNBPort;
 
 	public String geteNBUES1APID()
 	{
@@ -61,6 +62,11 @@ public class XMLParser
 	public String geteNBIP()
 	{
 		return eNBIP;
+	}
+	
+	public String geteNBPort()
+	{
+		return eNBPort;
 	}
 
 	public String getTAI()
@@ -234,6 +240,7 @@ public class XMLParser
 				if(item.getName().equals("eNBParams"))
 				{
 					eNBIP = item.getChild("eNBIP").getText();
+					eNBPort = item.getChild("eNBPort").getText();
 				}
 
 				if(item.getName().equals("S1SignallingParams"))
