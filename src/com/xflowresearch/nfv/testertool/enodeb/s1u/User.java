@@ -5,6 +5,17 @@ public class User
 	private String TEID;
 	private String IP;
 	private Integer ports[];
+	private String eNBUES1APID;
+
+	public String geteNBUES1APID()
+	{
+		return eNBUES1APID;
+	}
+
+	public void seteNBUES1APID(String eNBUES1APID)
+	{
+		this.eNBUES1APID = eNBUES1APID;
+	}
 
 	public String getTEID()
 	{

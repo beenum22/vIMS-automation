@@ -49,11 +49,18 @@ public class XMLParser
 	private String MMEPort;
 
 	private int UECount;
-	private int eNBCount;
+	private int UEThreadSpawnDelay;
+	private String APN;
 	
+	private int eNBCount;
 	private String eNBIP;
 	private String eNBPort;
 
+	public int getUEThreadSpawnDelay()
+	{
+		return UEThreadSpawnDelay;
+	}
+	
 	public String geteNBUES1APID()
 	{
 		return eNBUES1APID;
@@ -186,6 +193,11 @@ public class XMLParser
 		return null;
 	}	
 	
+	public String getAPN()
+	{
+		return APN;
+	}
+	
 	public void readSimulationParameters()
 	{
 		try
@@ -217,6 +229,7 @@ public class XMLParser
 				if(item.getName().equals("SimulationParams"))
 				{
 					UECount = Integer.parseInt(item.getChild("UECount").getText());
+					//UEThreadSpawnDelay = Integer.parseInt(item.getChild("UEThreadSpawnDelay").getText());
 					eNBCount = Integer.parseInt(item.getChild("eNBCount").getText());
 					MMEIP = item.getChild("MMEIP").getText();
 					MMEPort = item.getChild("MMEPort").getText();
@@ -235,6 +248,9 @@ public class XMLParser
 					//System.out.println("EUTRANCGI: " + EUTRANCGI);
 					
 					RRCEstablishmentCause = item.getChild("RRCEstablishmentCause").getText();
+					
+					APN = item.getChild("APN").getText();
+					System.out.println(APN);
 				}
 
 				if(item.getName().equals("eNBParams"))
@@ -247,7 +263,7 @@ public class XMLParser
 				{
 					s1signallingParams.GlobalENBID = item.getChild("GlobalENBID").getText();
 					s1signallingParams.GlobalENBID = new StringBuilder(s1signallingParams.GlobalENBID).insert(2, getPLMN()).toString();
-					System.out.println("GlobalENBID: " + s1signallingParams.GlobalENBID);
+					//System.out.println("GlobalENBID: " + s1signallingParams.GlobalENBID);
 					
 					s1signallingParams.eNBname = item.getChild("eNBname").getText();
 					

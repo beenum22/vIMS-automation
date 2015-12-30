@@ -8,6 +8,7 @@
 
 	<SimulationParams>
 		<UECount>1</UECount>
+		<UEThreadSpawnDelay>300</UEThreadSpawnDelay>
 		<eNBCount>0</eNBCount>
 		
 		<MMEIP>172.17.1.20</MMEIP>
@@ -31,6 +32,7 @@
 		<TAI>001011</TAI>
 		<EUTRANCGI>4001388010000000010004ac110128</EUTRANCGI>
 		<RRCEstablishmentCause>30</RRCEstablishmentCause>
+		<APN>apn-1.ixiacom.com</APN>
 	</UEParams>
 	
 	<eNBParams>

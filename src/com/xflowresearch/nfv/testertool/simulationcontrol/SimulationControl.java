@@ -101,7 +101,7 @@ public class SimulationControl
 				
 				try
 				{
-					Thread.sleep(300);
+					//Thread.sleep(300);
 				}
 				
 				catch(Exception exc)

@@ -19,14 +19,17 @@ public class UserCommandHandler implements Runnable
 	private AttachSimulator attachSimulator;
 	
 	private SctpClient sctpClient;
+	
+	private Object syncObject;
 
-	public UserCommandHandler(Socket socket, eNodeB enodeb, XMLParser xmlparser, SctpClient sctpClient)
+	public UserCommandHandler(Socket socket, eNodeB enodeb, XMLParser xmlparser, SctpClient sctpClient, Object syncObject)
 	{
 		super();
 		this.socket = socket;
 		this.enodeb = enodeb;
 		this.xmlparser = xmlparser;
 		this.sctpClient = sctpClient;
+		this.syncObject = syncObject;
 	}
 
 	private ObjectInputStream OIS = null;
@@ -65,43 +68,49 @@ public class UserCommandHandler implements Runnable
 
 	public void executeAttachSequence(XMLParser xmlparser, eNodeB enodeb, String ueparams)
 	{
-		// Assign eNBUES1SP id here/..
-		int id = enodeb.getSizeOfUsers() + 1;
-		String eNBUES1APID = Integer.toHexString(id);
-		
-		if(eNBUES1APID.length() == 3)
-			eNBUES1APID = "0" + eNBUES1APID;
-		if(eNBUES1APID.length() == 2)
-			eNBUES1APID = "00" + eNBUES1APID;
-		if(eNBUES1APID.length() == 1)
-			eNBUES1APID = "000" + eNBUES1APID;
-
-		attachSimulator = new AttachSimulator(xmlparser, sctpClient);
-		
-		try
+		// Assign eNBUES1SP id here/..	
+		synchronized(syncObject)
 		{
-			/** Test Attach Sequence initiation **/
-			if(attachSimulator.initiateAttachSequence(xmlparser, ueparams, eNBUES1APID))
+			int id;	
+			id = enodeb.getSizeOfUsers() + 1;
+		
+			String eNBUES1APID = Integer.toString(id);// = Integer.toHexString(id);
+			
+			if(eNBUES1APID.length() == 3)
+				eNBUES1APID = "0" + eNBUES1APID;
+			if(eNBUES1APID.length() == 2)
+				eNBUES1APID = "00" + eNBUES1APID;
+			if(eNBUES1APID.length() == 1)
+				eNBUES1APID = "000" + eNBUES1APID;
+	
+			attachSimulator = new AttachSimulator(xmlparser, sctpClient, syncObject);
+			
+			try
 			{
-				User user = new User();
-				user.setTEID(attachSimulator.getTEID());
-				user.setIP(attachSimulator.getPDNIpv4().toString().substring(1, attachSimulator.getPDNIpv4().toString().length()));
-				enodeb.setTransportLayerAddressInUserControlInterface(attachSimulator.getTransportLayerAddress());
+				/** Test Attach Sequence initiation **/
+				if(attachSimulator.initiateAttachSequence(xmlparser, ueparams, eNBUES1APID))
+				{
+					User user = new User();
+					user.setTEID(attachSimulator.getTEID());
+					user.setIP(attachSimulator.getPDNIpv4().toString().substring(1, attachSimulator.getPDNIpv4().toString().length()));
+					user.seteNBUES1APID(eNBUES1APID);
+					enodeb.setTransportLayerAddressInUserControlInterface(attachSimulator.getTransportLayerAddress());
+					
+					enodeb.addNewUser(user);
+					
+					OOS.writeObject(user.getIP());
+				}
 				
-				enodeb.addNewUser(user);
-				
-				OOS.writeObject(user.getIP());
+				else
+				{
+					OOS.writeObject(new String("attachfailure"));
+				}
 			}
 			
-			else
+			catch(Exception exc)
 			{
-				OOS.writeObject(new String("attachfailure"));
+				exc.printStackTrace();
 			}
-		}
-		
-		catch(Exception exc)
-		{
-			exc.printStackTrace();
 		}
 	}
 }

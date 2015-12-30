@@ -8,6 +8,8 @@ import com.xflowresearch.nfv.testertool.enodeb.eNodeB;
 
 public class UserControlInterface
 {
+	public Object syncObject;
+	
 	public void listenForUserControlCommands(XMLParser xmlparser, eNodeB enodeb, SctpClient sctpClient)
 	{
 		new Thread()
@@ -15,10 +17,11 @@ public class UserControlInterface
 			public void run()
 			{
 				ServerSocket serverSocket = null;
+				syncObject = new Object();
 				
 				try
 				{
-					serverSocket = new ServerSocket(9877, 20, InetAddress.getByName(xmlparser.geteNBIP()));
+					serverSocket = new ServerSocket(Integer.parseInt(xmlparser.geteNBPort()), 1000, InetAddress.getByName(xmlparser.geteNBIP()));
 				}
 				
 				catch(Exception exc)
@@ -31,7 +34,7 @@ public class UserControlInterface
 				{
 					try
 					{
-						new Thread(new UserCommandHandler(serverSocket.accept(), enodeb, xmlparser, sctpClient)).start();					
+						new Thread(new UserCommandHandler(serverSocket.accept(), enodeb, xmlparser, sctpClient, syncObject)).start();					
 					}
 					
 					catch(Exception exc)

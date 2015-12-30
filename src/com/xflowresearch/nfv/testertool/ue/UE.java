@@ -17,6 +17,7 @@ import com.xflowresearch.nfv.testertool.common.XMLParser;
  *
  * @author ahmadarslan
  */
+
 public class UE implements Runnable
 {
 	private static final Logger logger = LoggerFactory.getLogger("UELogger");
@@ -50,7 +51,7 @@ public class UE implements Runnable
 
 		try
 		{
-			if( !pdnipv4.equals("attachfailure"))
+			if(!pdnipv4.equals("attachfailure"))
 			{
 				Thread.sleep(3000);
 				httpClient.sendRequest(pdnipv4);

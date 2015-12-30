@@ -116,14 +116,18 @@ public class eNodeB implements Runnable
 	public synchronized void addNewUser(User user)
 	{
 		users.add(user);
-		System.out.println("New User Added - TEID:" + user.getTEID());
+		System.out.println("eNBUES1APID: " + user.geteNBUES1APID() + " New User Added - TEID:" + user.getTEID());
 	}
 
 	public synchronized User getUser(int index)
 	{
 		return users.get(index);
 	}
-	public synchronized int getSizeOfUsers(){
-		return users.size();
+	public int getSizeOfUsers()
+	{
+		synchronized (S1AS)
+		{
+			return users.size();
+		}
 	}
 }

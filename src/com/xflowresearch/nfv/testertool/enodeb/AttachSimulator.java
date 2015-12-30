@@ -1,8 +1,10 @@
 package com.xflowresearch.nfv.testertool.enodeb;
 
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -32,12 +34,19 @@ public class AttachSimulator
 	private SctpClient sctpClient;
 	private XMLParser xmlparser;
 	
+	private Object syncObject;
+	
+	public AttachSimulator(XMLParser xmlparser, SctpClient sctpClient, Object syncObject)
+	{
+		this.xmlparser = xmlparser;
+		this.sctpClient = sctpClient;
+		this.syncObject = syncObject;
+	}
 	
 	public AttachSimulator(XMLParser xmlparser, SctpClient sctpClient)
 	{
 		this.xmlparser = xmlparser;
-		this.sctpClient = sctpClient;
-	}
+		this.sctpClient = sctpClient;	}
 
 	/**
 	 * Getters
@@ -65,34 +74,36 @@ public class AttachSimulator
 	public boolean initiateAttachSequence(XMLParser xmlparser, String ueparams, String eNBUES1APID)
 	{
 		logger.info("Initiating Attach Sequence");
-
-		S1APPacket reply1 = sendAttachRequest(ueparams, eNBUES1APID);
-		if(reply1.getProcCode().equals("downlinkNASTransport"))
+		//synchronized(syncObject)
 		{
-			S1APPacket reply2 = sendAuthenticationResponse(reply1, eNBUES1APID);
-			if(reply2!=null && reply2.getProcCode().equals("downlinkNASTransport"))
+			S1APPacket reply1 = sendAttachRequest(ueparams, eNBUES1APID);
+			if(reply1.getProcCode().equals("downlinkNASTransport"))
 			{
-				S1APPacket reply3 = sendSecurityModeComplete(reply2);
-				if(reply3.getProcCode().equals("downlinkNASTransport"))
+				S1APPacket reply2 = sendAuthenticationResponse(reply1, eNBUES1APID);
+				if(reply2!=null && reply2.getProcCode().equals("downlinkNASTransport"))
 				{
-					S1APPacket reply4 = sendESMInformationResponse(reply3);
-					if(reply4.getProcCode().equals("InitialContextSetup"))
+					S1APPacket reply3 = sendSecurityModeComplete(reply2);
+					if(reply3.getProcCode().equals("downlinkNASTransport"))
 					{
-						sendInitialContextSetupResponse(reply4);
-						sendAttachComplete(reply4);
-						return true;
+						S1APPacket reply4 = sendESMInformationResponse(reply3);
+						if(reply4.getProcCode().equals("InitialContextSetup"))
+						{
+							sendInitialContextSetupResponse(reply4);
+							sendAttachComplete(reply4);
+							return true;
+						}
+						else System.out.println("Attach(4) failure");
 					}
-					else System.out.println("Attach(4) failure");
+					else System.out.println("Attach(3) failure");
 				}
-				else System.out.println("Attach(3) failure");
+				else System.out.println("Attach(2) failure");
 			}
-			else System.out.println("Attach(2) failure");
+			else
+			{
+				System.out.println("Attach(1) failure");
+			}
+			return false;
 		}
-		else
-		{
-			System.out.println("Attach(1) failure");
-		}
-		return false;
 	}
 
 	/**
@@ -214,22 +225,65 @@ public class AttachSimulator
 	 * 
 	 * @param xmlparser
 	 */
+	
+	public String getAPNString(String APN)
+	{
+		String [] tokens = APN.split(Pattern.quote("."));
+		
+		String temp = "";
+		
+		for(int i = 0; i < tokens.length; i++)
+		{
+			temp += getLength(tokens[i]);
+			temp += convert(tokens[i]);
+		}
+		
+		//System.out.println(temp);		
+		
+		return temp;
+	}
+	
+	private String getLength(String token)
+	{
+		String length = Integer.toHexString(token.length());
+		if(length.length() == 1)
+		{
+			length = "0" + length;
+		}
+		
+		return length;
+	}
+	
+	public String convert(String string)
+	{
+		String hex = String.format("%x", new BigInteger(1, string.getBytes()));
+		return hex;
+	}
+	
 	public S1APPacket sendESMInformationResponse(S1APPacket esmInformationRequest)
 	{
 		// NAS PDU GENERATION
 		String NASPDUInESMInformationRequest = esmInformationRequest.getValue("NASPDU");
 
 		// get the NAS response from the NAS classes!!
-		String NASPDU = "1d270f6cfb77010202da28120561706e2d310769786961636f6d03636f6d";
+		String NASPDU = "1d270f6cfb77010202da28";
+		
+		String hexAPN = getAPNString(xmlparser.getAPN());
+				
+		String hexAPNLength = Integer.toHexString(hexAPN.length()/2);
+		
+		if(hexAPNLength.length() == 1)
+		{
+			hexAPNLength = "0" + hexAPNLength;
+		}
+		
+		NASPDU += hexAPNLength + hexAPN;
+		System.out.println(hexAPNLength + hexAPN);
 		//////////////////////////////////
 
 		ArrayList <Value> values = new ArrayList <Value>();
 		values.add(new Value("MMEUES1APID", "reject", esmInformationRequest.getValue("MMEUES1APID")));
-		values.add(new Value("eNBUES1APID", "reject", esmInformationRequest.getValue("eNBUES1APID"))); // TODO
-																									   // change
-																									   // it
-																									   // to
-																									   // Dynamic!!!
+		values.add(new Value("eNBUES1APID", "reject", esmInformationRequest.getValue("eNBUES1APID")));
 		values.add(new Value("NASPDU", "reject", NASPDU));
 		values.add(new Value("EUTRANCGI", "ignore", xmlparser.getAuthenticationResponseParams().EUTRANCGI));
 		values.add(new Value("TAI", "ignore", xmlparser.getAuthenticationResponseParams().TAI));
@@ -239,7 +293,7 @@ public class AttachSimulator
 
 		return recievedPacket;
 	}
-
+	
 	/**
 	 * The fifth packet of the attach sequence, the InitialContextSetupResponse
 	 * is sent to the MME in this function..
