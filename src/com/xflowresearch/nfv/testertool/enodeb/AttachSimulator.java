@@ -77,17 +77,18 @@ public class AttachSimulator
 		//synchronized(syncObject)
 		{
 			S1APPacket reply1 = sendAttachRequest(ueparams, eNBUES1APID);
-			if(reply1.getProcCode().equals("downlinkNASTransport"))
+			if(reply1.getProcCode().equals("downlinkNASTransport") && reply1.getValues().size() == 3)
 			{
 				S1APPacket reply2 = sendAuthenticationResponse(reply1, eNBUES1APID);
-				if(reply2!=null && reply2.getProcCode().equals("downlinkNASTransport"))
+				if(reply2!=null && reply2.getProcCode().equals("downlinkNASTransport") && reply2.getValues().size() == 3)
 				{
 					S1APPacket reply3 = sendSecurityModeComplete(reply2);
-					if(reply3.getProcCode().equals("downlinkNASTransport"))
+					if(reply3.getProcCode().equals("downlinkNASTransport") && reply3.getValues().size() == 3)
 					{
 						S1APPacket reply4 = sendESMInformationResponse(reply3);
-						if(reply4.getProcCode().equals("InitialContextSetup"))
+						if(reply4.getProcCode().equals("InitialContextSetup") && reply4.getValues().size() == 6)
 						{
+							extractGTPData(reply4);
 							sendInitialContextSetupResponse(reply4);
 							sendAttachComplete(reply4);
 							return true;
@@ -289,7 +290,6 @@ public class AttachSimulator
 		values.add(new Value("TAI", "ignore", xmlparser.getAuthenticationResponseParams().TAI));
 
 		S1APPacket recievedPacket = sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, true);
-		extractGTPData(recievedPacket);
 
 		return recievedPacket;
 	}
