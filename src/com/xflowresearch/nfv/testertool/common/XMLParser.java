@@ -182,7 +182,8 @@ public class XMLParser
 		
 		catch(NullPointerException npe)
 		{
-			System.out.println("Null Pointer Exception while computing PLMN. Check if MCC/MNC are null.");
+			npe.printStackTrace();
+			//System.out.println("Null Pointer Exception while computing PLMN. Check if MCC/MNC are null.");
 		}
 		
 		catch(Exception exc)
@@ -250,7 +251,7 @@ public class XMLParser
 					RRCEstablishmentCause = item.getChild("RRCEstablishmentCause").getText();
 					
 					APN = item.getChild("APN").getText();
-					System.out.println(APN);
+					//System.out.println(APN);
 				}
 
 				if(item.getName().equals("eNBParams"))

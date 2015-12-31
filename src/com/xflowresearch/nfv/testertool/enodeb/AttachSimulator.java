@@ -279,7 +279,7 @@ public class AttachSimulator
 		}
 		
 		NASPDU += hexAPNLength + hexAPN;
-		System.out.println(hexAPNLength + hexAPN);
+		//System.out.println(hexAPNLength + hexAPN);
 		//////////////////////////////////
 
 		ArrayList <Value> values = new ArrayList <Value>();

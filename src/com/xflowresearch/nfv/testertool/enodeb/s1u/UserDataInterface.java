@@ -48,36 +48,31 @@ public class UserDataInterface
 				while (true) 
 				{
 					// Wait to receive a datagram
+					try 
+					{
+						serverSocket.receive(packet);
+					}
+					
+					catch (IOException e) {
+						e.printStackTrace();
+					}
 
+					// Convert the contents to a string, and display them
+					byte[] data = new byte[packet.getLength()];
+					System.arraycopy(packet.getData(), packet.getOffset(), data, 0, packet.getLength());
 
-						try 
-						{
-							serverSocket.receive(packet);
-						}
-						catch (IOException e) {
-							e.printStackTrace();
-						}
+					String stringData = bytesToHex(data);
 
-						// Convert the contents to a string, and display them
-						byte[] data = new byte[packet.getLength()];
-						System.arraycopy(packet.getData(), packet.getOffset(), data, 0, packet.getLength());
+					System.out.println("Data Received:"+ stringData);
 
-						String stringData = bytesToHex(data);
+					//simulateGTPEchoRequest(enodeb);
+					handleUserData(stringData, enodeb);
 
-						System.out.println("Data Recieved:"+ stringData);
-
-						//simulateGTPEchoRequest(enodeb);
-						handleUserData(stringData, enodeb);
-
-						// Reset the length of the packet before reusing it.
-						packet.setLength(buffer.length); 
-			
+					// Reset the length of the packet before reusing it.
+					packet.setLength(buffer.length); 
 				}
-
 			}//public void run..
-
 		}.start();   //new Thread..
-
 	}
 
 	///GTP Echo////////////////////////////////////////////////////////////////////////
@@ -169,7 +164,7 @@ public class UserDataInterface
 
 				//send data to the sniffer
 				try {
-					DatagramPacket packet1 = new DatagramPacket(data, data.length, InetAddress.getByName("127.0.0.1"), 9798);
+					DatagramPacket packet1 = new DatagramPacket(data, data.length, InetAddress.getByName("127.0.0.1"), 9999);
 					serverSocket.send(packet1);
 
 				} catch (IOException e) {

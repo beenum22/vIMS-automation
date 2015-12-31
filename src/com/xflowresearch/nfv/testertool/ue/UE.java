@@ -1,6 +1,10 @@
 package com.xflowresearch.nfv.testertool.ue;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 
@@ -10,10 +14,8 @@ import org.slf4j.LoggerFactory;
 import com.xflowresearch.nfv.testertool.common.XMLParser;
 
 /**
- * UE
- * 
- * UE class that executes on the eNodeB thread and initiates the UE
- * functionality.
+ * UE Class that is used to simulate User Equipment. Attaches to 
+ * the eNodeB and simulated HTTP send/receive
  *
  * @author ahmadarslan
  */
@@ -23,7 +25,6 @@ public class UE implements Runnable
 	private static final Logger logger = LoggerFactory.getLogger("UELogger");
 
 	private UEControlInterface ueControlInterface;
-	private HTTPClient httpClient;
 	UEParameter UEParameters;
 	private XMLParser xmlparser;
 
@@ -31,8 +32,7 @@ public class UE implements Runnable
 	{
 		UEParameters = UEParams;
 		ueControlInterface = new UEControlInterface();
-		httpClient = new HTTPClient();
-		
+
 		this.xmlparser = xmlparser;
 	}
 
@@ -46,33 +46,35 @@ public class UE implements Runnable
 	{
 		logger.info("UE started");
 
-		/* Send Attach command to eNB for attaching to the MME!! to the MME */
+		/* Send Attach command to eNB for attaching to the MME */
 		String pdnipv4 = ueControlInterface.sendAttachRequest("Attach;" + UEParameters.toString(), xmlparser.geteNBIP(), xmlparser.geteNBPort());
 
 		try
 		{
 			if(!pdnipv4.equals("attachfailure"))
 			{
-				Thread.sleep(3000);
-				httpClient.sendRequest(pdnipv4);
+				Thread.sleep(2000);
+
+				//for(int i=0;i<10;i++)		//Uncomment this line if you want to test N number of HTTP connections from a single UE
+				{
+					new Thread()
+					{
+						public void run()
+						{
+							HTTPClient httpClient = new HTTPClient();;
+							try {
+								httpClient.sendRequest(pdnipv4);
+							} 
+							catch (URISyntaxException | IOException e) {
+								e.printStackTrace();
+							}
+
+						}
+					}.start();
+				}
 			}
 		}
-
-		catch(UnknownHostException e)
-		{
-			e.printStackTrace();
-		}
-
-		catch(URISyntaxException e)
-		{
-			e.printStackTrace();
-		}
-
-		catch(IOException e)
-		{
-			e.printStackTrace();
-		}
-
+		
 		catch(InterruptedException e)
 		{
 			e.printStackTrace();

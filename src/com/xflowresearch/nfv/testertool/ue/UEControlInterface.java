@@ -7,6 +7,7 @@ import java.net.Socket;
 public class UEControlInterface
 {
 	Socket clientSocket = null;
+	
 	ObjectOutputStream OOS = null;
 	ObjectInputStream OIS = null;
 	

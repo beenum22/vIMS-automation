@@ -7,10 +7,9 @@ import com.xflowresearch.nfv.testertool.simulationcontrol.SimulationControl;
 
 public class main
 {
-
 	public static void main(String [] args)
 	{
-		/** Delete logs from previous launches **/
+		/* Delete logs from previous launches **/
 		File index = new File("logs");
 		String [] entries = index.list();
 		

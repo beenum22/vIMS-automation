@@ -16,7 +16,6 @@ import java.util.Enumeration;
 
 public class HTTPClient
 {
-
 	public void sendRequest(String srcIP) throws URISyntaxException, UnknownHostException, IOException
 	{
 		addAliasIP(srcIP);
@@ -25,11 +24,12 @@ public class HTTPClient
 		 * host, path, port, and protocol (i.e., HTTP, HTTPS, and so on). For
 		 * example, let's parse the host and path first:
 		 */
-		String urlStr = "http://172.100.15.19/ResponseServlet/HttpResponse"; // some
-																		  // URL
+		String urlStr = "http://172.17.2.8/ResponseServlet/HttpResponse"; //some URL
+																		 
 		URI uri = new URI(urlStr);
 		String host = uri.getHost();
 		String path = uri.getRawPath();
+		
 		if(path == null || path.length() == 0)
 		{
 			path = "/";
@@ -91,6 +91,7 @@ public class HTTPClient
 		StringBuffer output = new StringBuffer();
 
 		Process p;
+		
 		try
 		{
 			p = Runtime.getRuntime().exec(command);
@@ -103,15 +104,13 @@ public class HTTPClient
 			{
 				output.append(line + "\n");
 			}
-
 		}
+		
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
 
 		// /System.out.println(output.toString());
-
 	}
-
 }
