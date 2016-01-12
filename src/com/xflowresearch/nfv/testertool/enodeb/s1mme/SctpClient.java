@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 
 import com.sun.nio.sctp.MessageInfo;
 import com.sun.nio.sctp.SctpChannel;
+import com.sun.nio.sctp.SctpMultiChannel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +24,15 @@ import org.slf4j.LoggerFactory;
  */
 public class SctpClient
 {
+	private Object lock;
+	
 	private Boolean isConnected;
+	
 	private SocketAddress socketAddress;
+	
 	private SctpChannel sctpChannel;
+	
+	//private SctpMultiChannel sctpMultiChannel;
 
 	/** Logger to log the messages and Errors **/
 	private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
@@ -33,6 +40,7 @@ public class SctpClient
 	public SctpClient()
 	{
 		isConnected = false;
+		lock = new Object();
 	}
 
 	public Boolean isConnected()
@@ -46,34 +54,39 @@ public class SctpClient
 	public boolean connectToHost(String ip, int port)
 	{
 		InetAddress address = null;
+		
 		try
 		{
 			address = InetAddress.getByName(ip);
 		}
+		
 		catch(UnknownHostException e)
 		{
 			logger.error("Could not build SCTP Server address {}!", ip);
 			e.printStackTrace();
+			return false;
 		}
+		
 		socketAddress = new InetSocketAddress(address, port);
 
 		try
 		{
 			sctpChannel = SctpChannel.open();
-			// sctpChannel.bind(new InetSocketAddress(36412));
-			sctpChannel.bind(new InetSocketAddress(0));// '0' instead of user
-													   // defined port to get an
-													   // available port
-													   // assigned by the OS!!
+			//sctpChannel.bind(new InetSocketAddress(36412));
+			sctpChannel.bind(new InetSocketAddress(0)); // '0' instead of user defined port to get an available port assigned by the OS!
 			sctpChannel.connect(socketAddress, 1, 1);
 		}
+		
 		catch(IOException e)
 		{
 			logger.error("SCTP connection to server was refused!");
 			return false;
 		}
+		
 		logger.info("SCTP Connection Established ip:{} port:{}", ip, port);
+		
 		isConnected = true;
+		
 		return true;
 	}
 
@@ -97,29 +110,34 @@ public class SctpClient
 	/**
 	 * Send protocol payload specified by the protocol id over open SCTP Channel
 	 */
-	public synchronized void sendProtocolPayload(byte [] payload, int protocolID)
+	public void sendProtocolPayload(byte [] payload, int protocolID)
 	{
-		if(isConnected)
+		synchronized(lock)
 		{
-			final ByteBuffer byteBuffer = ByteBuffer.allocate(64000);
-			MessageInfo messageInfo = MessageInfo.createOutgoing(null, 0);
-
-			byteBuffer.put(payload);
-			byteBuffer.flip();
-
-			messageInfo.payloadProtocolID(protocolID);
-
-			try
+			if(isConnected)
 			{
-				sctpChannel.send(byteBuffer, messageInfo);
+				final ByteBuffer byteBuffer = ByteBuffer.allocate(64000);
+				MessageInfo messageInfo = MessageInfo.createOutgoing(null, 0);
+	
+				byteBuffer.put(payload);
+				byteBuffer.flip();
+	
+				messageInfo.payloadProtocolID(protocolID);
+	
+				try
+				{
+					sctpChannel.send(byteBuffer, messageInfo);
+				}
+				
+				catch(Exception e)
+				{
+					logger.error("SCTP channel closed - could not send data");
+					// e.printStackTrace();
+				}
 			}
-			catch(Exception e)
-			{
-				logger.error("SCTP channel closed - could not send data");
-				// e.printStackTrace();
-			}
+			
+			else logger.error("SCTP connection not active!");
 		}
-		else logger.error("SCTP connection not active!");
 	}
 
 	/**
@@ -215,28 +233,29 @@ public class SctpClient
 	//////////////////// new method to recieve synchronous messages/////////////
 	public String recieveSCTPMessage()
 	{
-		final ByteBuffer byteBuffer = ByteBuffer.allocate(64000);
-		MessageInfo messageInfo = null;
-
-		try
+		synchronized(lock)
 		{
-			messageInfo = sctpChannel.receive(byteBuffer, null, null);
+			final ByteBuffer byteBuffer = ByteBuffer.allocate(64000);
+			MessageInfo messageInfo = null;
+	
+			try
+			{
+				messageInfo = sctpChannel.receive(byteBuffer, null, null);
+			}
+			catch(IOException e)
+			{
+				logger.error("SCTP Message read error!");
+				e.printStackTrace();
+			}
+	
+			byteBuffer.flip();
+	
+			byte [] data = new byte[byteBuffer.remaining()];
+			byteBuffer.get(data);
+	
+			String hexPayload = bytesToHex(data);
+			return hexPayload;
+			// handleMessageFromHost(messageInfo, hexPayload);
 		}
-		catch(IOException e)
-		{
-			logger.error("SCTP Message read error!");
-			e.printStackTrace();
-		}
-
-		byteBuffer.flip();
-
-		byte [] data = new byte[byteBuffer.remaining()];
-		byteBuffer.get(data);
-
-		String hexPayload = bytesToHex(data);
-		return hexPayload;
-		// handleMessageFromHost(messageInfo, hexPayload);
-
 	}
-
 }
