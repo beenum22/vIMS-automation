@@ -62,26 +62,34 @@ public class eNodeB implements Runnable
 	public Boolean establishS1Signalling()
 	{
 		if(sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort())))
-		{
-			//System.exit(1);
-			logger.error("Failed to connect with MME");
+		{			
+			S1AS = new AttachSimulator(xmlparser, sctpClient);
+			
+			ArrayList <Value> values = new ArrayList <Value>();
+			values.add(new Value("GlobalENBID", "reject", xmlparser.getS1signallingParams().GlobalENBID));
+			values.add(new Value("eNBname", "ignore", xmlparser.getS1signallingParams().eNBname));
+			values.add(new Value("SupportedTAs", "reject", xmlparser.getS1signallingParams().SupportedTAs));
+			values.add(new Value("DefaultPagingDRX", "ignore", xmlparser.getS1signallingParams().DefaultPagingDRX));
+	
+			S1APPacket recievedPacket = S1AS.sendS1APacket("InitiatingMessage", "S1Setup", "reject", values, true);
+	
+			if(recievedPacket.getType().equals("SuccessfulOutcome"))
+			{
+				return true;
+			}
+			
+			else
+			{
+				logger.error("Failed to connect with MME");
+				return false;
+			}
 		}
 		
-		S1AS = new AttachSimulator(xmlparser, sctpClient);
-
-		ArrayList <Value> values = new ArrayList <Value>();
-		values.add(new Value("GlobalENBID", "reject", xmlparser.getS1signallingParams().GlobalENBID));
-		values.add(new Value("eNBname", "ignore", xmlparser.getS1signallingParams().eNBname));
-		values.add(new Value("SupportedTAs", "reject", xmlparser.getS1signallingParams().SupportedTAs));
-		values.add(new Value("DefaultPagingDRX", "ignore", xmlparser.getS1signallingParams().DefaultPagingDRX));
-
-		S1APPacket recievedPacket = S1AS.sendS1APacket("InitiatingMessage", "S1Setup", "reject", values, true);
-
-		if(recievedPacket.getType().equals("SuccessfulOutcome"))
+		else
 		{
-			return true;
+			logger.error("Failed to connect with MME");
+			return false;
 		}
-		else return false;
 	}
 	
 	@Override
@@ -96,12 +104,13 @@ public class eNodeB implements Runnable
 		{
 			logger.info("S1 Signaling Successfully Established");
 
-			/** Listen for UE Commands for Control Plane Signaling **/
+			/* Listen for UE Commands for Control Plane Signaling */
 			userControlInterface.listenForUserControlCommands(xmlparser, this, sctpClient);
 
-			/** Listen for UE Data for User Plane **/
+			/* Listen for UE Data for User Plane */
 			userDataInterface.listenForUserDataTraffic(this);
 		}
+		
 		else
 		{
 			logger.error("Unable to establish S1Signalling with MME");
@@ -123,6 +132,7 @@ public class eNodeB implements Runnable
 	{
 		return users.get(index);
 	}
+	
 	public int getSizeOfUsers()
 	{
 		synchronized (S1AS)
