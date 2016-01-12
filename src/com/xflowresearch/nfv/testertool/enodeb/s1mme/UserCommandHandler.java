@@ -21,8 +21,9 @@ public class UserCommandHandler implements Runnable
 	private SctpClient sctpClient;
 	
 	private Object syncObject;
+	private int count;
 
-	public UserCommandHandler(Socket socket, eNodeB enodeb, XMLParser xmlparser, SctpClient sctpClient, Object syncObject)
+	public UserCommandHandler(Socket socket, eNodeB enodeb, XMLParser xmlparser, SctpClient sctpClient, Object syncObject, int count)
 	{
 		super();
 		this.socket = socket;
@@ -30,6 +31,7 @@ public class UserCommandHandler implements Runnable
 		this.xmlparser = xmlparser;
 		this.sctpClient = sctpClient;
 		this.syncObject = syncObject;
+		this.count = count;
 	}
 
 	private ObjectInputStream OIS = null;
@@ -69,11 +71,12 @@ public class UserCommandHandler implements Runnable
 	public void executeAttachSequence(XMLParser xmlparser, eNodeB enodeb, String ueparams)
 	{
 		// Assign eNBUES1SP id here/..	
-		synchronized(syncObject)
+		int id;
+		//synchronized(syncObject)
 		{
-			int id;	
-			id = enodeb.getSizeOfUsers() + 1;
-		
+			//id = enodeb.getSizeOfUsers() + 1;
+			id = count;
+		//}
 			String eNBUES1APID = Integer.toString(id);// = Integer.toHexString(id);
 			
 			if(eNBUES1APID.length() == 3)
@@ -94,6 +97,7 @@ public class UserCommandHandler implements Runnable
 					user.setTEID(attachSimulator.getTEID());
 					user.setIP(attachSimulator.getPDNIpv4().toString().substring(1, attachSimulator.getPDNIpv4().toString().length()));
 					user.seteNBUES1APID(eNBUES1APID);
+					
 					enodeb.setTransportLayerAddressInUserControlInterface(attachSimulator.getTransportLayerAddress());
 					
 					enodeb.addNewUser(user);

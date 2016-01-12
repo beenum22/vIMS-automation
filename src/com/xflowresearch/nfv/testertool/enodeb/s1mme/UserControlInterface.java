@@ -16,6 +16,7 @@ public class UserControlInterface
 		{
 			public void run()
 			{
+				int count = 0;
 				ServerSocket serverSocket = null;
 				syncObject = new Object();
 				
@@ -32,9 +33,11 @@ public class UserControlInterface
 				
 				while(true)
 				{
+					count++;
+					
 					try
 					{
-						new Thread(new UserCommandHandler(serverSocket.accept(), enodeb, xmlparser, sctpClient, syncObject)).start();					
+						new Thread(new UserCommandHandler(serverSocket.accept(), enodeb, xmlparser, sctpClient, syncObject, count)).start();					
 					}
 					
 					catch(Exception exc)

@@ -21,10 +21,10 @@ public class UserDataInterface
 	private DatagramSocket socket = null;
 
 
-	public void setTransportLayerAddress(InetAddress transportLayerAddress) {
+	public void setTransportLayerAddress(InetAddress transportLayerAddress)
+	{
 		this.transportLayerAddress = transportLayerAddress;
 	}
-
 
 	public void listenForUserDataTraffic(eNodeB enodeb)
 	{
@@ -95,7 +95,6 @@ public class UserDataInterface
 	}
 	///GTP Echo////////////////////////////////////////////////////////////////////////
 
-
 	/** Received User Data, Apply GTP Tunnel and send to S-GW **/
 	public void handleUserData(String ipPdu, eNodeB enodeb)
 	{
@@ -111,7 +110,6 @@ public class UserDataInterface
 
 		sendGTPacketToSGW(byteGTPacket);
 	}
-
 
 	public void sendGTPacketToSGW(byte[] byteGTPacket)
 	{

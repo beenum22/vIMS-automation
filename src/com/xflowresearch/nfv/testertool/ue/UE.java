@@ -49,7 +49,7 @@ public class UE implements Runnable
 		/* Send Attach command to eNB for attaching to the MME */
 		String pdnipv4 = ueControlInterface.sendAttachRequest("Attach;" + UEParameters.toString(), xmlparser.geteNBIP(), xmlparser.geteNBPort());
 
-		try
+		/*try
 		{
 			if(!pdnipv4.equals("attachfailure"))
 			{
@@ -78,6 +78,6 @@ public class UE implements Runnable
 		catch(InterruptedException e)
 		{
 			e.printStackTrace();
-		}
+		}*/
 	}
 }

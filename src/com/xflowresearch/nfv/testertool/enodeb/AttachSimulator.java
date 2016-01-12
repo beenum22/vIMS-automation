@@ -46,7 +46,8 @@ public class AttachSimulator
 	public AttachSimulator(XMLParser xmlparser, SctpClient sctpClient)
 	{
 		this.xmlparser = xmlparser;
-		this.sctpClient = sctpClient;	}
+		this.sctpClient = sctpClient;	
+	}
 
 	/**
 	 * Getters
@@ -142,10 +143,8 @@ public class AttachSimulator
 	 * 
 	 * @param xmlparser
 	 */
-	public S1APPacket sendAuthenticationResponse(S1APPacket authenticationRequest, 
-			String eNBUES1APID)
+	public S1APPacket sendAuthenticationResponse(S1APPacket authenticationRequest, String eNBUES1APID)
 	{
-
 		AttachSeqDemo obj = new AttachSeqDemo();
 		// NAS PDU GENERATION
 		String k = "465B5CE8B199B49FAA5F0A2EE238A6BC"; // key
@@ -154,27 +153,18 @@ public class AttachSimulator
 		String NASPDUInAuthentication = authenticationRequest.getValue("NASPDU");
 
 		String NASPDUInAuthenticationRequest = NASPDUInAuthentication.substring(2);
-		String r = obj.ParseAuthRequest(NASPDUInAuthenticationRequest); // Parse
-																		// Authentication
-																		// Request
-																		// Message
-																		// and
-																		// obtain
-																		// Rand
-																		// value
+		String r = obj.ParseAuthRequest(NASPDUInAuthenticationRequest); // Parse Authentication Request Message and obtain Rand value
 
 		if(r == null)
 			return null;
 		
-		//
 		//System.out.println("R Value:"+r);
 		//
 		// get the NAS response from the NAS classes!!
 		String NASPDU = obj.SendAuthResp(r, k, op);
 		// NASPDU=(NASPDU.length()/2) + NASPDU ;
 		// System.out.println(NASPDU);
-		//////////////////////////////////
-
+		
 		ArrayList <Value> values = new ArrayList <Value>();
 		values.add(new Value("MMEUES1APID", "reject", authenticationRequest.getValue("MMEUES1APID")));
 		values.add(new Value("eNBUES1APID", "reject", eNBUES1APID));
@@ -185,7 +175,6 @@ public class AttachSimulator
 		S1APPacket recievedPacket = sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, true);
 
 		return recievedPacket;
-
 	}
 
 	/**
@@ -196,7 +185,6 @@ public class AttachSimulator
 	 */
 	public S1APPacket sendSecurityModeComplete(S1APPacket securityModeCommand)
 	{
-
 		// NAS PDU GENERATION
 		String NASPDUInSecurityModeCommand = securityModeCommand.getValue("NASPDU");
 
@@ -380,11 +368,12 @@ public class AttachSimulator
 
 			return recievedPacket;
 		}
+		
 		return null;
 	}
 
 	public void extractGTPData(S1APPacket attachComplete)
-	{
+	{		
 		String value = attachComplete.getValue("ERABToBeSetupListCtxtSUReq");
 		value = value.substring(24, value.length());
 
@@ -397,6 +386,7 @@ public class AttachSimulator
 			transportLayerAddress = InetAddress.getByAddress(DatatypeConverter.parseHexBinary(ip1));
 			PDNIpv4 = InetAddress.getByAddress(DatatypeConverter.parseHexBinary(ip2));
 		}
+		
 		catch(UnknownHostException e)
 		{
 			// TODO Auto-generated catch block

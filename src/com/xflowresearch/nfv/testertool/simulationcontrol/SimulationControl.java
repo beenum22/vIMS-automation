@@ -70,6 +70,7 @@ public class SimulationControl
 		if(xmlparser.geteNBCount() != 0)
 		{
 			int eNBCount = xmlparser.geteNBCount();
+			
 			for(int i = 0; i <eNBCount; i++)
 			{
 				eNodeB temp = new eNodeB();
@@ -80,12 +81,6 @@ public class SimulationControl
 				eNBs.get(i).start();
 				logger.info("eNodeB" + i + " Thread Spawned");
 			}
-			
-			/*enodeb.setXMLParser(xmlparser);
-			Thread eNBThread = new Thread(enodeb);
-			eNBThread.setName("eNBThread1");
-			eNBThread.start();
-			logger.info("eNodeB Thread Spawned");*/
 		}
 
 		if(xmlparser.getUECount() != 0)
@@ -101,7 +96,7 @@ public class SimulationControl
 				
 				try
 				{
-					//Thread.sleep(300);
+					//Thread.sleep(1000);
 				}
 				
 				catch(Exception exc)
@@ -109,11 +104,6 @@ public class SimulationControl
 					exc.printStackTrace();
 				}
 			}
-			
-			/*Thread UEThread = new Thread(ue);
-			UEThread.setName("UEThread1");
-			UEThread.start();
-			logger.info("UE Thread Spawned");*/
 		}
 	}
 }
