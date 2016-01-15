@@ -14,7 +14,7 @@ public class main
 		String [] entries = index.list();
 		
 		/*IMSIParser parser = new IMSIParser();
-		parser.createIMSIFile("data.txt", "configuration/IMSIParameters.xml");*/
+		parser.createIMSIFile("../data.txt", "configuration/IMSIParameters.xml");*/
 		
 		if(entries != null)
 		{
@@ -24,7 +24,17 @@ public class main
 				currentFile.delete();
 			}
 		}
-
-		SimulationControl.getInstance().startSimulation();
+		
+		SimulationControl inst = SimulationControl.getInstance();
+		
+		if(inst != null)
+		{
+			inst.startSimulation();
+		}
+		
+		else
+		{
+			System.out.println("Failed to initialize Simulation Control Instance");
+		}
 	}
 }

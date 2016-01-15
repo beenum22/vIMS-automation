@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xflowresearch.nfv.testertool.common.XMLParser;
+import com.xflowresearch.nfv.testertool.enodeb.s1mme.MMEController;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.S1APPacket;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.SctpClient;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.UserControlInterface;
@@ -34,19 +35,17 @@ public class eNodeB implements Runnable
 	private UserControlInterface userControlInterface;
 	
 	private AttachSimulator S1AS;
+	
+	private MMEController mMeController;
 
-	public eNodeB()
+	public eNodeB(XMLParser xmlParser)
 	{
 		users = new ArrayList <User>();
-
-		sctpClient = new SctpClient();
+		this.xmlparser = xmlParser;
+		sctpClient = new SctpClient(xmlparser);
 		userDataInterface = new UserDataInterface();
 		userControlInterface = new UserControlInterface();
-	}
-
-	public void setXMLParser(XMLParser xmlparser)
-	{
-		this.xmlparser = xmlparser;
+		mMeController = new MMEController(userControlInterface);
 	}
 
 	public Logger getLogger()
@@ -63,18 +62,19 @@ public class eNodeB implements Runnable
 	{
 		if(sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort())))
 		{			
-			S1AS = new AttachSimulator(xmlparser, sctpClient);
-			
+			mMeController.setSctpClient(sctpClient);
+
 			ArrayList <Value> values = new ArrayList <Value>();
 			values.add(new Value("GlobalENBID", "reject", xmlparser.getS1signallingParams().GlobalENBID));
 			values.add(new Value("eNBname", "ignore", xmlparser.getS1signallingParams().eNBname));
 			values.add(new Value("SupportedTAs", "reject", xmlparser.getS1signallingParams().SupportedTAs));
 			values.add(new Value("DefaultPagingDRX", "ignore", xmlparser.getS1signallingParams().DefaultPagingDRX));
-	
-			S1APPacket recievedPacket = S1AS.sendS1APacket("InitiatingMessage", "S1Setup", "reject", values, true);
-	
+
+			S1APPacket recievedPacket = mMeController.initS1Signalling("InitiatingMessage", "S1Setup", "reject", values, true);
+
 			if(recievedPacket.getType().equals("SuccessfulOutcome"))
 			{
+				mMeController.spawnReceiverThread();
 				return true;
 			}
 			
@@ -117,27 +117,24 @@ public class eNodeB implements Runnable
 		}
 	}
 
-	public synchronized void setTransportLayerAddressInUserControlInterface(InetAddress transportLayerAddress)
+	public void setTransportLayerAddressInUserControlInterface(InetAddress transportLayerAddress)
 	{
 		userDataInterface.setTransportLayerAddress(transportLayerAddress);
 	}
 
-	public synchronized void addNewUser(User user)
+	public void addNewUser(User user)
 	{
 		users.add(user);
 		System.out.println("eNBUES1APID: " + user.geteNBUES1APID() + " New User Added - TEID:" + user.getTEID());
 	}
 
-	public synchronized User getUser(int index)
+	public User getUser(int index)
 	{
 		return users.get(index);
 	}
 	
 	public int getSizeOfUsers()
 	{
-		synchronized (S1AS)
-		{
-			return users.size();
-		}
+		return users.size();
 	}
 }

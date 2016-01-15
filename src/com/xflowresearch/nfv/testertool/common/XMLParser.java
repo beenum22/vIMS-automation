@@ -11,7 +11,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
 import com.xflowresearch.nfv.testertool.simulationcontrol.SimulationControl;
-import com.xflowresearch.nfv.testertool.ue.UEParameter;
+import com.xflowresearch.nfv.testertool.ue.UEParameters;
 
 /**
  * XMLParser
@@ -49,16 +49,17 @@ public class XMLParser
 	private String MMEPort;
 
 	private int UECount;
-	private int UEThreadSpawnDelay;
 	private String APN;
 	
 	private int eNBCount;
 	private String eNBIP;
 	private String eNBPort;
-
-	public int getUEThreadSpawnDelay()
+	
+	private int spawnDelay;
+	
+	public int getSpawnDelay()
 	{
-		return UEThreadSpawnDelay;
+		return spawnDelay;
 	}
 	
 	public String geteNBUES1APID()
@@ -121,8 +122,8 @@ public class XMLParser
 		return eNBCount;
 	}
 
-	private ArrayList <UEParameter>  mUEParameters = new ArrayList <UEParameter> ();
-	public UEParameter getUEParameters(int index)
+	private ArrayList <UEParameters>  mUEParameters = new ArrayList <UEParameters> ();
+	public UEParameters getUEParameters(int index)
 	{
 		return mUEParameters.get(index);
 	}
@@ -145,7 +146,7 @@ public class XMLParser
     		{
     			//System.out.println(item.getName());
     			if(item.getName().equals("Value"))
-    				mUEParameters.add(new UEParameter(item.getChild("IMSI").getText(), item.getChild("K").getText()));
+    				mUEParameters.add(new UEParameters(item.getChild("IMSI").getText(), item.getChild("K").getText()));
     		}
 		}
 		
@@ -230,10 +231,10 @@ public class XMLParser
 				if(item.getName().equals("SimulationParams"))
 				{
 					UECount = Integer.parseInt(item.getChild("UECount").getText());
-					//UEThreadSpawnDelay = Integer.parseInt(item.getChild("UEThreadSpawnDelay").getText());
 					eNBCount = Integer.parseInt(item.getChild("eNBCount").getText());
 					MMEIP = item.getChild("MMEIP").getText();
 					MMEPort = item.getChild("MMEPort").getText();
+					spawnDelay = Integer.parseInt(item.getChild("SpawnDelay").getText());
 				}
 
 				if(item.getName().equals("UEParams"))
@@ -303,5 +304,4 @@ public class XMLParser
 			SimulationControl.getInstance().getLogger().error(ioe.toString());
 		}
 	}
-
 }

@@ -8,11 +8,10 @@
 
 	<SimulationParams>
 		<UECount>1</UECount>
-		<UEThreadSpawnDelay>300</UEThreadSpawnDelay>
-		<eNBCount>0</eNBCount>
-		
+		<eNBCount>0</eNBCount>		
 		<MMEIP>172.17.1.20</MMEIP>
 		<MMEPort>36412</MMEPort>
+		<SpawnDelay>4000</SpawnDelay>
 	</SimulationParams>
 	
 	<S1SignallingParams>

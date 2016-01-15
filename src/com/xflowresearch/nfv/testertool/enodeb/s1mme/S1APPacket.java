@@ -67,6 +67,19 @@ public class S1APPacket
 
 	private ArrayList <Value> values = new ArrayList <Value>();
 
+	public String geteNBUES1APID()
+	{
+		for(Value v:values)
+		{
+			if(v.protocolIE.equals("eNBUES1APID"))
+			{
+				return v.value;
+			}
+		}
+		
+		return null;
+	}
+	
 	public void addValue(String protocolIE, String criticality, int lengthOfValue, String value)
 	{
 		Value temp = new Value(protocolIE, criticality, lengthOfValue, value);
@@ -240,6 +253,7 @@ public class S1APPacket
 				a = b;
 				b += 2;
 			}
+			
 			temp.lengthOfValue = Integer.parseInt(value.substring(a, b), 16);
 			a = b;
 			b += (2 * temp.lengthOfValue);

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.xflowresearch.nfv.testertool.common.XMLParser;
 import com.xflowresearch.nfv.testertool.enodeb.eNodeB;
 import com.xflowresearch.nfv.testertool.ue.UE;
+import com.xflowresearch.nfv.testertool.ue.UEController;
 
 /**
  * SimulationControl
@@ -22,12 +23,14 @@ import com.xflowresearch.nfv.testertool.ue.UE;
 
 public class SimulationControl
 {	
-	private static SimulationControl instance = new SimulationControl();
+	private static SimulationControl instance = null;// = new SimulationControl();
 
 	//private eNodeB enodeb;
 	//private UE ue;
 	private ArrayList <Thread> UEs;
 	private ArrayList <Thread> eNBs;
+	
+	private UEController uEController;
 
 	private XMLParser xmlparser;
 
@@ -43,12 +46,31 @@ public class SimulationControl
 		eNBs = new ArrayList<Thread>();
 		
 		xmlparser = new XMLParser();
+		uEController = new UEController(xmlparser);
 	}
 	
 	/** Get the Simulation Controller instance */
 	public static SimulationControl getInstance()
 	{
-		return instance;
+		try
+		{
+			if(instance == null)
+			{
+				instance = new SimulationControl();
+				return instance;
+			}
+			
+			else
+			{		
+				return instance;
+			}
+		}
+		
+		catch(Exception exc)
+		{
+			exc.printStackTrace();
+			return null;
+		}
 	}
 
 	/** Get the logger instance */
@@ -73,8 +95,7 @@ public class SimulationControl
 			
 			for(int i = 0; i <eNBCount; i++)
 			{
-				eNodeB temp = new eNodeB();
-				temp.setXMLParser(xmlparser);
+				eNodeB temp = new eNodeB(xmlparser);
 				
 				eNBs.add(new Thread(temp));
 				eNBs.get(i).setName("eNodeB" + i);
@@ -82,27 +103,33 @@ public class SimulationControl
 				logger.info("eNodeB" + i + " Thread Spawned");
 			}
 		}
-
+		
 		if(xmlparser.getUECount() != 0)
 		{
+			uEController.initENBConnection();			
+			uEController.spawnReceiverThread();
+			
 			int UECount = xmlparser.getUECount();
 			
 			for(int i = 0; i < UECount; i++)
 			{
-				UEs.add(new Thread(new UE(xmlparser.getUEParameters(i), xmlparser)));
-				UEs.get(i).setName("UEThread"+i);
-				logger.info("UE Thread " + i + " Spawned");
+				if(i != 0 && i % 200 == 0)
+				{
+					try
+					{
+						Thread.sleep(xmlparser.getSpawnDelay());
+					}
+					
+					catch(Exception exc)
+					{
+						exc.printStackTrace();
+					}
+				}
+				
+				UEs.add(new Thread(new UE(i, xmlparser.getUEParameters(i), xmlparser, uEController)));
+				UEs.get(i).setName("UEThread" + i);
+				logger.info("UE Thread" + i + " Spawned");
 				UEs.get(i).start();
-				
-				try
-				{
-					//Thread.sleep(1000);
-				}
-				
-				catch(Exception exc)
-				{
-					exc.printStackTrace();
-				}
 			}
 		}
 	}
