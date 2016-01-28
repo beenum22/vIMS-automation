@@ -1,12 +1,7 @@
 package com.xflowresearch.nfv.testertool.ue;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +19,7 @@ public class UE implements Runnable
 {
 	private static final Logger logger = LoggerFactory.getLogger("UELogger");
 
-	private UEControlInterface ueControlInterface;
+//	private UEControlInterface ueControlInterface;
 	UEParameters UEParameters;
 	private XMLParser xmlparser;
 	
@@ -39,7 +34,7 @@ public class UE implements Runnable
 	public UE(int id, UEParameters UEParams, XMLParser xmlparser, UEController uEController)
 	{
 		UEParameters = UEParams;
-		ueControlInterface = new UEControlInterface();
+//		ueControlInterface = new UEControlInterface();
 	
 		this.eNBUES1APID = Integer.toHexString(id);
 		//this.eNBUES1APID = Integer.toString(id);
@@ -65,26 +60,28 @@ public class UE implements Runnable
 		
 		/* HTTP Request code to go here */
 		
-		/*try
+		try
 		{
-			if(!pdnipv4.equals("attachfailure"))
+			//if(!pdnipv4.equals("attachfailure"))
 			{
 				Thread.sleep(2000);
 
-				//for(int i=0;i<10;i++)		//Uncomment this line if you want to test N number of HTTP connections from a single UE
+				for(int i = 0; i < xmlparser.getNumberOfHttpRequests(); i++)		//Uncomment this line if you want to test N number of HTTP connections from a single UE
 				{
 					new Thread()
 					{
 						public void run()
 						{
 							HTTPClient httpClient = new HTTPClient();;
-							try {
-								httpClient.sendRequest(pdnipv4);
+							try 
+							{
+								httpClient.sendRequest(pdnipv4, xmlparser.getHttpUrl());
 							} 
-							catch (URISyntaxException | IOException e) {
+							
+							catch (URISyntaxException | IOException e ) 
+							{
 								e.printStackTrace();
 							}
-
 						}
 					}.start();
 				}
@@ -94,7 +91,7 @@ public class UE implements Runnable
 		catch(InterruptedException e)
 		{
 			e.printStackTrace();
-		}*/
+		}
 	}
 	
 	public Logger getLogger()

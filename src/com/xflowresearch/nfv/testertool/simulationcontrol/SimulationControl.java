@@ -112,20 +112,7 @@ public class SimulationControl
 			int UECount = xmlparser.getUECount();
 			
 			for(int i = 0; i < UECount; i++)
-			{
-				if(i != 0 && i % 200 == 0)
-				{
-					try
-					{
-						Thread.sleep(xmlparser.getSpawnDelay());
-					}
-					
-					catch(Exception exc)
-					{
-						exc.printStackTrace();
-					}
-				}
-				
+			{				
 				UEs.add(new Thread(new UE(i, xmlparser.getUEParameters(i), xmlparser, uEController)));
 				UEs.get(i).setName("UEThread" + i);
 				logger.info("UE Thread" + i + " Spawned");

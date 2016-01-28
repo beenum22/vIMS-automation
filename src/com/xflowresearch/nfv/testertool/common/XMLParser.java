@@ -37,7 +37,7 @@ public class XMLParser
 		public String EUTRANCGI;
 		public String TAI;
 	}
-
+	
 	private AuthenticationResponseParams authenticationResponseParams = new AuthenticationResponseParams();
 
 	private String eNBUES1APID;
@@ -55,11 +55,18 @@ public class XMLParser
 	private String eNBIP;
 	private String eNBPort;
 	
-	private int spawnDelay;
+	private String HttpUrl;
 	
-	public int getSpawnDelay()
+	private int numberOfHttpRequests = 0;
+	
+	public int getNumberOfHttpRequests()
 	{
-		return spawnDelay;
+		return numberOfHttpRequests;
+	}
+
+	public String getHttpUrl()
+	{
+		return HttpUrl;
 	}
 	
 	public String geteNBUES1APID()
@@ -234,7 +241,6 @@ public class XMLParser
 					eNBCount = Integer.parseInt(item.getChild("eNBCount").getText());
 					MMEIP = item.getChild("MMEIP").getText();
 					MMEPort = item.getChild("MMEPort").getText();
-					spawnDelay = Integer.parseInt(item.getChild("SpawnDelay").getText());
 				}
 
 				if(item.getName().equals("UEParams"))
@@ -252,6 +258,9 @@ public class XMLParser
 					RRCEstablishmentCause = item.getChild("RRCEstablishmentCause").getText();
 					
 					APN = item.getChild("APN").getText();
+					
+					HttpUrl = item.getChildText("HttpUrl");
+					numberOfHttpRequests = Integer.parseInt(item.getChildText("HttpRequests"));
 					//System.out.println(APN);
 				}
 

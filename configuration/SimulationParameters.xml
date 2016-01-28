@@ -11,7 +11,6 @@
 		<eNBCount>0</eNBCount>		
 		<MMEIP>172.17.1.20</MMEIP>
 		<MMEPort>36412</MMEPort>
-		<SpawnDelay>4000</SpawnDelay>
 	</SimulationParams>
 	
 	<S1SignallingParams>
@@ -32,6 +31,8 @@
 		<EUTRANCGI>4001388010000000010004ac110128</EUTRANCGI>
 		<RRCEstablishmentCause>30</RRCEstablishmentCause>
 		<APN>apn-1.ixiacom.com</APN>
+		<HttpUrl>http://172.17.2.8/ResponseServlet/HttpResponse</HttpUrl>
+		<HttpRequests>5</HttpRequests> <!-- The number of HTTP requests to make from the UE after attach -->
 	</UEParams>
 	
 	<eNBParams>

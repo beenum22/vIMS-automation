@@ -59,8 +59,6 @@ public class UserCommandHandler implements Runnable
 	{
 		return eNBUES1APID;
 	}
-
-	PrintWriter logWriter;
 	
 	public UserCommandHandler(String eNBUES1APID, String command, eNodeB enodeb, XMLParser xmlparser, SctpClient sctpClient, Object eNodeBLock, ObjectOutputStream OOS, Object outputStreamLock)
 	{		
@@ -72,18 +70,6 @@ public class UserCommandHandler implements Runnable
 		this.OOS = OOS;
 		this.outputStreamLock= outputStreamLock;
 		this.eNBUES1APID = eNBUES1APID;
-		
-		//System.out.println(eNBUES1APID + "spawned");
-		
-		try
-		{
-			logWriter = new PrintWriter(new File("./logging/" + eNBUES1APID + ".txt"));
-		}
-		
-		catch(Exception exc)
-		{
-			exc.printStackTrace();
-		}
 	}
 	
 	public void onPacketReceived(S1APPacket receivedPacket)

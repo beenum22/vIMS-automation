@@ -5,7 +5,7 @@ import java.io.File;
 import com.xflowresearch.nfv.testertool.common.IMSIParser;
 import com.xflowresearch.nfv.testertool.simulationcontrol.SimulationControl;
 
-public class main
+public class Run
 {
 	public static void main(String [] args)
 	{

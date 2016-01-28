@@ -80,6 +80,7 @@ public class eNodeB implements Runnable
 			
 			else
 			{
+				System.out.println("Failed to connect with MME");
 				logger.error("Failed to connect with MME");
 				return false;
 			}
@@ -87,6 +88,7 @@ public class eNodeB implements Runnable
 		
 		else
 		{
+			System.out.println("Failed to connect with MME");
 			logger.error("Failed to connect with MME");
 			return false;
 		}
@@ -113,6 +115,7 @@ public class eNodeB implements Runnable
 		
 		else
 		{
+			System.out.println("Unable to establish S1Signalling with MME");
 			logger.error("Unable to establish S1Signalling with MME");
 		}
 	}

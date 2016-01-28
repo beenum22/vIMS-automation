@@ -50,7 +50,7 @@ public class UEController
 				OOS.writeObject("Attach;" + ue.geteNBUES1APID() + ";" + ue.UEParameters.toString());
 			}
 			
-			System.out.println("Sent: " + "Attach;" + ue.geteNBUES1APID() + ";" + ue.UEParameters.toString());
+			//System.out.println("Sent: " + "Attach;" + ue.geteNBUES1APID() + ";" + ue.UEParameters.toString());
 		}
 		
 		catch(Exception exc)
@@ -131,7 +131,13 @@ public class UEController
 				
 				if(temp != null)
 				{
+					System.out.println("Successfully attached - eNBUES1APID = " + response.split(";")[0]);
 					temp.processAttachResponse(response.split(";")[1]);
+				}
+				
+				else
+				{
+					//System.out.println("UE not found");
 				}
 			}
 			

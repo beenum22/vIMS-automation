@@ -14,7 +14,7 @@ import java.net.UnknownHostException;
 
 public class HTTPClient
 {
-	public void sendRequest(String srcIP) throws URISyntaxException, UnknownHostException, IOException
+	public void sendRequest(String srcIP, String HttpUrl) throws URISyntaxException, UnknownHostException, IOException
 	{
 		addAliasIP(srcIP);
 		/*
@@ -22,9 +22,9 @@ public class HTTPClient
 		 * host, path, port, and protocol (i.e., HTTP, HTTPS, and so on). For
 		 * example, let's parse the host and path first:
 		 */
-		String urlStr = "http://172.17.2.8/ResponseServlet/HttpResponse"; //some URL
+		//String urlStr = "http://172.17.2.8/ResponseServlet/HttpResponse"; //some URL
 																		 
-		URI uri = new URI(urlStr);
+		URI uri = new URI(HttpUrl);
 		String host = uri.getHost();
 		String path = uri.getRawPath();
 		
@@ -50,10 +50,12 @@ public class HTTPClient
 			{
 				port = 80; // http port
 			}
+			
 			else if(protocol.equals("https"))
 			{
 				port = 443; // https port
 			}
+			
 			else
 			{
 				return;
