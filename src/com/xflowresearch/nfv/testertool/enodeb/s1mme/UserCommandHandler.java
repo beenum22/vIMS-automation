@@ -479,7 +479,7 @@ public class UserCommandHandler implements Runnable
 			ArrayList <Value> values = new ArrayList <Value>();
 			values.add(new Value("MMEUES1APID", "reject", initialContextSetupRequest.getValue("MMEUES1APID")));
 			values.add(new Value("eNBUES1APID", "reject", initialContextSetupRequest.getValue("eNBUES1APID")));
-			values.add(new Value("ERABSetupListCtxtSURes", "ignore", "000032400a0a1fac11012800000021")); // TODO:
+			values.add(new Value("ERABSetupListCtxtSURes", "ignore", "000032400a0a1f" + xmlparser.getReturnIpInHex() + "00000021")); // TODO:
 																										 // make
 																										 // dynamic!!
 	

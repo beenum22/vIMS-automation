@@ -206,6 +206,30 @@ public class XMLParser
 	{
 		return APN;
 	}
+
+	public String convertIpToHex(String IP)
+	{
+		//String IP = "192.168.42.72";
+
+		String[] chunks = IP.split("\\.");
+
+		long sum = 0;
+		for (int i = 0, j = chunks.length - 1; i < chunks.length; i++, j--)
+		{
+			//System.out.println(Integer.parseInt(chunks[i]) + " * 256 ^ " + j);
+			sum += Integer.parseInt(chunks[i]) * (long)Math.pow(256, j);
+			//System.out.println(Integer.parseInt(chunks[i]) + " * " + Math.pow(256, j));
+		}
+
+		return Long.toHexString(sum); //new String(sum); //System.out.println(sum);
+	}
+	
+	private String returnAddress;
+	
+	public String getReturnIpInHex()
+	{
+		return convertIpToHex(returnAddress);
+	}
 	
 	public void readSimulationParameters()
 	{
@@ -253,6 +277,11 @@ public class XMLParser
 					
 					EUTRANCGI = item.getChild("EUTRANCGI").getText();
 					EUTRANCGI = new StringBuilder(EUTRANCGI).insert(2, getPLMN()).toString();
+					EUTRANCGI += convertIpToHex(item.getChildText("returnIP"));
+					
+					returnAddress = item.getChildText("returnIP");
+					
+					//returnIP = item.getChildText("returnIP");
 					//System.out.println("EUTRANCGI: " + EUTRANCGI);
 					
 					RRCEstablishmentCause = item.getChild("RRCEstablishmentCause").getText();

@@ -28,7 +28,8 @@
 	<UEParams>	
 		<eNBUES1APID>0001</eNBUES1APID>
 		<TAI>001011</TAI>
-		<EUTRANCGI>4001388010000000010004ac110128</EUTRANCGI>
+		<EUTRANCGI>4001388010000000010004</EUTRANCGI>
+		<returnIP>172.17.1.40</returnIP>
 		<RRCEstablishmentCause>30</RRCEstablishmentCause>
 		<APN>apn-1.ixiacom.com</APN>
 		<HttpUrl>http://172.17.2.8/ResponseServlet/HttpResponse</HttpUrl>
