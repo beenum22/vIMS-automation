@@ -3,9 +3,6 @@ package com.xflowresearch.nfv.testertool.ue;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.xflowresearch.nfv.testertool.common.XMLParser;
 
 /**
@@ -17,7 +14,7 @@ import com.xflowresearch.nfv.testertool.common.XMLParser;
 
 public class UE implements Runnable
 {
-	private static final Logger logger = LoggerFactory.getLogger("UELogger");
+	//private static final Logger logger = LoggerFactory.getLogger("UELogger");
 
 //	private UEControlInterface ueControlInterface;
 	UEParameters UEParameters;
@@ -94,10 +91,10 @@ public class UE implements Runnable
 		}
 	}
 	
-	public Logger getLogger()
+	/*public Logger getLogger()
 	{
 		return UE.logger;
-	}
+	}*/
 	
 	@Override
 	public void run()

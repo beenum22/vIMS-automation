@@ -8,9 +8,6 @@ import java.util.regex.Pattern;
 
 import javax.xml.bind.DatatypeConverter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.xflowresearch.nfv.testertool.common.XMLParser;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.S1APPacket;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.SctpClient;

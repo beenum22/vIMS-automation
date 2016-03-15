@@ -3,9 +3,6 @@ package com.xflowresearch.nfv.testertool.enodeb;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.xflowresearch.nfv.testertool.common.XMLParser;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.MMEController;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.S1APPacket;
@@ -25,7 +22,7 @@ import com.xflowresearch.nfv.testertool.enodeb.s1u.UserDataInterface;
  */
 public class eNodeB implements Runnable
 {
-	private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
+	//private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
 	private XMLParser xmlparser;
 
 	private ArrayList <User> users;
@@ -48,10 +45,10 @@ public class eNodeB implements Runnable
 		mMeController = new MMEController(userControlInterface);
 	}
 
-	public Logger getLogger()
-	{
-		return eNodeB.logger;
-	}
+//	public Logger getLogger()
+//	{
+//		return eNodeB.logger;
+//	}
 
 	/**
 	 * Establish S1Signalling with MME..
@@ -81,7 +78,7 @@ public class eNodeB implements Runnable
 			else
 			{
 				System.out.println("Failed to connect with MME");
-				logger.error("Failed to connect with MME");
+				//logger.error("Failed to connect with MME");
 				return false;
 			}
 		}
@@ -89,7 +86,7 @@ public class eNodeB implements Runnable
 		else
 		{
 			System.out.println("Failed to connect with MME");
-			logger.error("Failed to connect with MME");
+			//logger.error("Failed to connect with MME");
 			return false;
 		}
 	}
@@ -97,14 +94,14 @@ public class eNodeB implements Runnable
 	@Override
 	public void run()
 	{
-		logger.info("eNodeB started");
+		//logger.info("eNodeB started");
 
 		/*
 		 * establish s1 signalling with the MME
 		 */
 		if(establishS1Signalling())
 		{
-			logger.info("S1 Signaling Successfully Established");
+			//logger.info("S1 Signaling Successfully Established");
 
 			/* Listen for UE Commands for Control Plane Signaling */
 			userControlInterface.listenForUserControlCommands(xmlparser, this, sctpClient);
@@ -116,7 +113,7 @@ public class eNodeB implements Runnable
 		else
 		{
 			System.out.println("Unable to establish S1Signalling with MME");
-			logger.error("Unable to establish S1Signalling with MME");
+			//logger.error("Unable to establish S1Signalling with MME");
 		}
 	}
 

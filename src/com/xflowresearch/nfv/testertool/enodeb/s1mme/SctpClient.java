@@ -12,9 +12,6 @@ import com.sun.nio.sctp.SctpChannel;
 import com.sun.nio.sctp.SctpMultiChannel;
 import com.xflowresearch.nfv.testertool.common.XMLParser;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * SctpClient
  * 
@@ -36,7 +33,7 @@ public class SctpClient
 	//private SctpMultiChannel sctpMultiChannel;
 
 	/** Logger to log the messages and Errors **/
-	private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
+	//private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
 
 	XMLParser xmlParser;
 	
@@ -69,7 +66,7 @@ public class SctpClient
 		
 		catch(UnknownHostException e)
 		{
-			logger.error("Could not build SCTP Server address {}!", ip);
+			//logger.error("Could not build SCTP Server address {}!", ip);
 			e.printStackTrace();
 			return false;
 		}
@@ -86,11 +83,11 @@ public class SctpClient
 		
 		catch(IOException e)
 		{
-			logger.error("SCTP connection to server was refused!");
+			//logger.error("SCTP connection to server was refused!");
 			return false;
 		}
 		
-		logger.info("SCTP Connection Established ip:{} port:{}", ip, port);
+		//logger.info("SCTP Connection Established ip:{} port:{}", ip, port);
 		
 		isConnected = true;
 		
@@ -109,7 +106,7 @@ public class SctpClient
 		}
 		catch(IOException e)
 		{
-			logger.error("Unable to close SCTP channel with Server!");
+			//logger.error("Unable to close SCTP channel with Server!");
 			e.printStackTrace();
 		}
 	}
@@ -137,12 +134,12 @@ public class SctpClient
 					}
 			}
 			
-			else logger.error("SCTP connection not active!");
+			//else logger.error("SCTP connection not active!");
 		}
 		
 		catch(Exception e)
 		{
-			logger.error("SCTP channel closed - could not send data");
+			//logger.error("SCTP channel closed - could not send data");
 			 e.printStackTrace();
 		}
 	}
@@ -253,7 +250,7 @@ public class SctpClient
 				}
 				catch(IOException e)
 				{
-					logger.error("SCTP Message read error!");
+					//logger.error("SCTP Message read error!");
 					e.printStackTrace();
 				}
 		

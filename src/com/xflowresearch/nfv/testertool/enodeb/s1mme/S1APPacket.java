@@ -2,9 +2,6 @@ package com.xflowresearch.nfv.testertool.enodeb.s1mme;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * S1APPacket
  * 
@@ -16,7 +13,7 @@ import org.slf4j.LoggerFactory;
  */
 public class S1APPacket
 {
-	private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
+	//private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
 
 	private String header;
 	private String value;

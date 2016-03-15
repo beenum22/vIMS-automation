@@ -1,4 +1,4 @@
-package testing;
+package com.xflowresearch.nfv.testertool.testing;
 
 import java.io.File;
 

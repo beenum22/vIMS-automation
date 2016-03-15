@@ -332,14 +332,12 @@ public class XMLParser
 		{
 			// print the exception and log it in simulation control logger.
 			e.printStackTrace();
-			SimulationControl.getInstance().getLogger().error("", e.toString());
 		}
 		
 		catch(IOException ioe)
 		{
 			// print the exception and log it in simulation control logger.
 			ioe.printStackTrace();
-			SimulationControl.getInstance().getLogger().error(ioe.toString());
 		}
 	}
 }
