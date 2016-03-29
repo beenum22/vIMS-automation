@@ -40,7 +40,7 @@ public class XMLParser
 	
 	private AuthenticationResponseParams authenticationResponseParams = new AuthenticationResponseParams();
 
-	private String eNBUES1APID;
+	private String MCC, MNC;
 	private String TAI;
 	private String EUTRANCGI;
 	private String RRCEstablishmentCause;
@@ -52,36 +52,19 @@ public class XMLParser
 	private String APN;
 	
 	private int eNBCount;
-	private String eNBIP;
-	private String eNBPort;
 	
-	private String HttpUrl;
+	private String WebServerIP;
+	
+	public String getWebServerIP()
+	{
+		return WebServerIP;
+	}
 	
 	private int numberOfHttpRequests = 0;
 	
 	public int getNumberOfHttpRequests()
 	{
 		return numberOfHttpRequests;
-	}
-
-	public String getHttpUrl()
-	{
-		return HttpUrl;
-	}
-	
-	public String geteNBUES1APID()
-	{
-		return eNBUES1APID;
-	}
-	
-	public String geteNBIP()
-	{
-		return eNBIP;
-	}
-	
-	public String geteNBPort()
-	{
-		return eNBPort;
 	}
 
 	public String getTAI()
@@ -163,8 +146,6 @@ public class XMLParser
 		}
 	}
 	
-	private String MCC, MNC;
-	
 	public String getPLMN()
 	{
 		try
@@ -191,15 +172,14 @@ public class XMLParser
 		catch(NullPointerException npe)
 		{
 			npe.printStackTrace();
-			//System.out.println("Null Pointer Exception while computing PLMN. Check if MCC/MNC are null.");
+			return null;
 		}
 		
 		catch(Exception exc)
 		{
 			exc.printStackTrace();
+			return null;
 		}
-		
-		return null;
 	}	
 	
 	public String getAPN()
@@ -269,8 +249,6 @@ public class XMLParser
 
 				if(item.getName().equals("UEParams"))
 				{
-					eNBUES1APID = item.getChild("eNBUES1APID").getText();
-					
 					TAI = item.getChild("TAI").getText();
 					TAI = new StringBuilder(TAI).insert(2, getPLMN()).toString();
 					//System.out.println("TAI: " + TAI);
@@ -287,16 +265,7 @@ public class XMLParser
 					RRCEstablishmentCause = item.getChild("RRCEstablishmentCause").getText();
 					
 					APN = item.getChild("APN").getText();
-					
-					HttpUrl = item.getChildText("HttpUrl");
-					numberOfHttpRequests = Integer.parseInt(item.getChildText("HttpRequests"));
-					//System.out.println(APN);
-				}
-
-				if(item.getName().equals("eNBParams"))
-				{
-					eNBIP = item.getChild("eNBIP").getText();
-					eNBPort = item.getChild("eNBPort").getText();
+					WebServerIP = item.getChildText("WebServerIP");
 				}
 
 				if(item.getName().equals("S1SignallingParams"))
@@ -319,7 +288,6 @@ public class XMLParser
 					authenticationResponseParams.EUTRANCGI = item.getChild("EUTRANCGI").getText();
 					authenticationResponseParams.EUTRANCGI = new StringBuilder(authenticationResponseParams.EUTRANCGI).insert(2, getPLMN()).toString();
 					//System.out.println("EUTRANCGI: " + authenticationResponseParams.EUTRANCGI);
-
 					
 					authenticationResponseParams.TAI = item.getChild("TAI").getText();
 					authenticationResponseParams.TAI= new StringBuilder(authenticationResponseParams.TAI).insert(2, getPLMN()).toString();

@@ -24,14 +24,14 @@ public class Run
 				currentFile.delete();
 			}
 		}
-		
+
 		SimulationControl inst = SimulationControl.getInstance();
-		
+
 		if(inst != null)
 		{
 			inst.startSimulation();
 		}
-		
+
 		else
 		{
 			System.out.println("Failed to initialize Simulation Control Instance");

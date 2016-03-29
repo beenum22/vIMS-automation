@@ -1,27 +1,21 @@
 package com.xflowresearch.nfv.testertool.enodeb.s1mme;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Random;
-import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 
 import javax.xml.bind.DatatypeConverter;
 
 import com.xflowresearch.nfv.testertool.common.XMLParser;
-import com.xflowresearch.nfv.testertool.enodeb.AttachSimulator;
 import com.xflowresearch.nfv.testertool.enodeb.Value;
 import com.xflowresearch.nfv.testertool.enodeb.eNodeB;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.SctpClient;
 import com.xflowresearch.nfv.testertool.enodeb.s1u.User;
+import com.xflowresearch.nfv.testertool.ue.UEController;
 import com.xflowresearch.nfv.testertool.ue.nas.AttachSeqDemo;
 
 public class UserCommandHandler implements Runnable
@@ -48,34 +42,32 @@ public class UserCommandHandler implements Runnable
 	private SctpClient sctpClient;
 	
 	private Object eNodeBLock;
-	private Object outputStreamLock;
 	
 	private ObjectOutputStream OOS;
 	
 	private String command;
 	private String eNBUES1APID;
 	
+	private UEController ueController;
+	
 	public String geteNBUES1APID()
 	{
 		return eNBUES1APID;
 	}
 	
-	public UserCommandHandler(String eNBUES1APID, String command, eNodeB enodeb, XMLParser xmlparser, SctpClient sctpClient, Object eNodeBLock, ObjectOutputStream OOS, Object outputStreamLock)
+	public UserCommandHandler(String eNBUES1APID, String command, eNodeB enodeb, XMLParser xmlparser, SctpClient sctpClient, Object eNodeBLock, UEController ueController)
 	{		
 		this.enodeb = enodeb;
 		this.xmlparser = xmlparser;
 		this.sctpClient = sctpClient;
 		this.eNodeBLock = eNodeBLock;
 		this.command = command;
-		this.OOS = OOS;
-		this.outputStreamLock= outputStreamLock;
+		this.ueController = ueController;
 		this.eNBUES1APID = eNBUES1APID;
 	}
 	
 	public void onPacketReceived(S1APPacket receivedPacket)
-	{
-		//System.out.println(eNBUES1APID + ": " + receivedPacket.getProcCode());
-		
+	{		
 		try
 		{
 			if(!authentication)
@@ -83,7 +75,6 @@ public class UserCommandHandler implements Runnable
 				//System.out.println(eNBUES1APID + "received");
 				if(receivedPacket.getProcCode().equals("downlinkNASTransport") && receivedPacket.getValues().size() == 3)
 				{
-					//System.out.println("This: " + eNBUES1APID + "Received: " + receivedPacket.geteNBUES1APID());
 					sendAuthenticationResponse(receivedPacket, receivedPacket.geteNBUES1APID());
 					authentication = true;
 				}
@@ -91,7 +82,6 @@ public class UserCommandHandler implements Runnable
 				else
 				{
 					System.out.println(receivedPacket.geteNBUES1APID() + ": Attach(1) failure");
-					//OOS.writeObject(eNBUES1APID + ";attachfailure");
 				}
 			}
 			
@@ -106,7 +96,6 @@ public class UserCommandHandler implements Runnable
 				else
 				{
 					System.out.println(receivedPacket.geteNBUES1APID() + ": Attach(2) failure");
-					//OOS.writeObject(eNBUES1APID + ";attachfailure");
 				}
 			}
 			
@@ -121,7 +110,7 @@ public class UserCommandHandler implements Runnable
 				else
 				{
 					System.out.println(receivedPacket.geteNBUES1APID() + ": Attach(3) failure");
-					//OOS.writeObject(eNBUES1APID + ";attachfailure");
+					ueController.processAttachResponse(eNBUES1APID + ";attachfailure");
 				}
 			}
 			
@@ -137,29 +126,24 @@ public class UserCommandHandler implements Runnable
 					user.setTEID(TEID);
 					user.setIP(PDNIpv4.toString().substring(1, PDNIpv4.toString().length()));
 					user.seteNBUES1APID(receivedPacket.geteNBUES1APID());
+					user.setTransportLayerAddress(transportLayerAddress);
 					initialContextSetup = true;
 					
 					synchronized(eNodeBLock)
 					{
-						enodeb.setTransportLayerAddressInUserControlInterface(transportLayerAddress);				
+						enodeb.setTransportLayerAddressInUserControlInterface(transportLayerAddress);	
+						enodeb.setTransportLayerAddress(transportLayerAddress);
 						enodeb.addNewUser(user);
-						//System.out.println(enodeb.getSizeOfUsers());
 					}
 					
-					synchronized(outputStreamLock)
-					{
-						OOS.writeObject(eNBUES1APID + ";" + user.getIP());
-					}
+					ueController.processAttachResponse(eNBUES1APID + ";" + user.getIP());
 				}
 
 				else
 				{
 					System.out.println(receivedPacket.geteNBUES1APID() + ": Attach(4) failure");
 					
-					synchronized(outputStreamLock)
-					{
-						OOS.writeObject(eNBUES1APID + ";attachfailure");
-					}
+					ueController.processAttachResponse(eNBUES1APID + ";attachfailure");
 				}
 			}
 			
@@ -167,10 +151,7 @@ public class UserCommandHandler implements Runnable
 			{
 				System.out.println("Attach failure");
 				
-				synchronized(outputStreamLock)
-				{
-					OOS.writeObject(eNBUES1APID + ";attachfailure");
-				}
+				ueController.processAttachResponse(eNBUES1APID + ";attachfailure");
 			}
 		}
 		
@@ -185,26 +166,20 @@ public class UserCommandHandler implements Runnable
 	{		
 		try
 		{
-			//System.out.println(command);
 			executeUECommand();
 		}
 		
 		catch(Exception e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
 	}
 	
 	public void executeUECommand()
 	{
-		//System.out.println("execute UE command");
 		if(command.split(";")[0].equals("Attach"))
 		{
-			//System.out.println("Received IMSI: " + command.split(";")[1]);
 			String ueparams = command.split(";")[2] + ";" + command.split(";")[3];
-			//int id = Integer.parseInt(command.split(";")[1]);
-			//System.out.println("Executing attach");
 			initAttachSequence(ueparams);
 		}
 		
@@ -212,54 +187,8 @@ public class UserCommandHandler implements Runnable
 	}
 
 	public void initAttachSequence(String ueparams)
-	{
-		// Assign eNBUES1AP id here/..	
-		//synchronized(syncObject)
-		{
-			//id = enodeb.getSizeOfUsers() + 1;
-		//}
-//			String eNBUES1APID = Integer.toString(id);// = Integer.toHexString(id);
-//			
-//			if(eNBUES1APID.length() == 3)
-//				eNBUES1APID = "0" + eNBUES1APID;
-//			if(eNBUES1APID.length() == 2)
-//				eNBUES1APID = "00" + eNBUES1APID;
-//			if(eNBUES1APID.length() == 1)
-//				eNBUES1APID = "000" + eNBUES1APID;
-	
-			//attachSimulator = new AttachSimulator(xmlparser, sctpClient, syncObject);
-			
-			sendAttachRequest(ueparams);
-			//System.out.println(eNBUES1APID + "sent");
-			
-//			/*try
-//			{
-//				/** Test Attach Sequence initiation **/
-//				if(attachSimulator.initiateAttachSequence(xmlparser, ueparams, eNBUES1APID))
-//				{
-//					User user = new User();
-//					user.setTEID(attachSimulator.getTEID());
-//					user.setIP(attachSimulator.getPDNIpv4().toString().substring(1, attachSimulator.getPDNIpv4().toString().length()));
-//					user.seteNBUES1APID(eNBUES1APID);
-//					
-//					enodeb.setTransportLayerAddressInUserControlInterface(attachSimulator.getTransportLayerAddress());
-//					
-//					enodeb.addNewUser(user);
-//					
-//					OOS.writeObject(user.getIP());
-//				}
-//				
-//				else
-//				{
-//					OOS.writeObject(new String("attachfailure"));
-//				}
-//			}
-//			
-//			catch(Exception exc)
-//			{
-//				exc.printStackTrace();
-//			}*/
-		}
+	{			
+		sendAttachRequest(ueparams);
 	}
 	
 	public void sendAttachRequest(String ueparams)
@@ -304,7 +233,7 @@ public class UserCommandHandler implements Runnable
 		{
 			AttachSeqDemo obj = new AttachSeqDemo();
 			// NAS PDU GENERATION
-			String k = "465B5CE8B199B49FAA5F0A2EE238A6BC"; // key
+			String k  = "465B5CE8B199B49FAA5F0A2EE238A6BC"; // key
 			String op = "1918b840195c97017228127009ca194e"; // op values
 	
 			String NASPDUInAuthentication = authenticationRequest.getValue("NASPDU");
@@ -401,12 +330,12 @@ public class UserCommandHandler implements Runnable
 			temp += getLength(tokens[i]);
 			temp += convert(tokens[i]);
 		}
-		
+
 		//System.out.println(temp);		
-		
+
 		return temp;
 	}
-	
+
 	private String getLength(String token)
 	{
 		String length = Integer.toHexString(token.length());
@@ -417,13 +346,13 @@ public class UserCommandHandler implements Runnable
 		
 		return length;
 	}
-	
+
 	public String convert(String string)
 	{
 		String hex = String.format("%x", new BigInteger(1, string.getBytes()));
 		return hex;
 	}
-	
+
 	public void sendESMInformationResponse(S1APPacket esmInformationRequest)
 	{
 		try
@@ -479,9 +408,7 @@ public class UserCommandHandler implements Runnable
 			ArrayList <Value> values = new ArrayList <Value>();
 			values.add(new Value("MMEUES1APID", "reject", initialContextSetupRequest.getValue("MMEUES1APID")));
 			values.add(new Value("eNBUES1APID", "reject", initialContextSetupRequest.getValue("eNBUES1APID")));
-			values.add(new Value("ERABSetupListCtxtSURes", "ignore", "000032400a0a1f" + xmlparser.getReturnIpInHex() + "00000021")); // TODO:
-																										 // make
-																										 // dynamic!!
+			values.add(new Value("ERABSetupListCtxtSURes", "ignore", "000032400a0a1f" + xmlparser.getReturnIpInHex() + TEID));
 	
 			sendS1APacket("SuccessfulOutcome", "InitialContextSetup", "reject", values, false);
 		}
@@ -552,23 +479,7 @@ public class UserCommandHandler implements Runnable
 			pac.createPacket();
 			byte [] message = pac.getBytePacket();
 	
-			//logger.info("Sending Packet -- " + pac.toString());
-	
 			sctpClient.sendProtocolPayload(message, 18);
-	
-			/*if(recieve == true)
-			{
-				String reply = sctpClient.recieveSCTPMessage();
-	
-				S1APPacket recievedPacket = new S1APPacket();
-				recievedPacket.parsePacket(reply);
-	
-				//logger.info("Received Packet -- " + recievedPacket.toString());
-	
-				return recievedPacket;
-			}
-			
-			return null;*/
 		}
 		
 		catch(Exception exc)

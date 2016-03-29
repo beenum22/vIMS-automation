@@ -10,6 +10,7 @@ import com.xflowresearch.nfv.testertool.enodeb.s1mme.SctpClient;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.UserControlInterface;
 import com.xflowresearch.nfv.testertool.enodeb.s1u.User;
 import com.xflowresearch.nfv.testertool.enodeb.s1u.UserDataInterface;
+import com.xflowresearch.nfv.testertool.ue.UEController;
 
 /**
  * eNodeB
@@ -26,25 +27,38 @@ public class eNodeB implements Runnable
 	private XMLParser xmlparser;
 
 	private ArrayList <User> users;
+	private Object userListLock;
 
 	private SctpClient sctpClient;
 	private UserDataInterface userDataInterface;
 	private UserControlInterface userControlInterface;
 	
-	private AttachSimulator S1AS;
-	
 	private MMEController mMeController;
-
-	public eNodeB(XMLParser xmlParser)
+	private UEController ueController;
+	
+	public eNodeB(XMLParser xmlParser, UEController ueController)
 	{
 		users = new ArrayList <User>();
 		this.xmlparser = xmlParser;
 		sctpClient = new SctpClient(xmlparser);
 		userDataInterface = new UserDataInterface();
-		userControlInterface = new UserControlInterface();
+		userControlInterface = new UserControlInterface(xmlParser, this, sctpClient, ueController);
 		mMeController = new MMEController(userControlInterface);
+		
+		this.ueController = ueController;
+		
+		userListLock = new Object();
 	}
 
+	/** Return this eNodeB's UserControlInterface */
+	public UserControlInterface getUserControlInterface()
+	{
+		if(this.userControlInterface != null)
+			return userControlInterface;
+		
+		else return null;
+	}
+	
 //	public Logger getLogger()
 //	{
 //		return eNodeB.logger;
@@ -104,12 +118,12 @@ public class eNodeB implements Runnable
 			//logger.info("S1 Signaling Successfully Established");
 
 			/* Listen for UE Commands for Control Plane Signaling */
-			userControlInterface.listenForUserControlCommands(xmlparser, this, sctpClient);
+			//userControlInterface.listenForUserControlCommands(xmlparser, this, sctpClient);
 
 			/* Listen for UE Data for User Plane */
-			userDataInterface.listenForUserDataTraffic(this);
+			//userDataInterface.listenForUserDataTraffic(this);
 		}
-		
+
 		else
 		{
 			System.out.println("Unable to establish S1Signalling with MME");
@@ -117,17 +131,54 @@ public class eNodeB implements Runnable
 		}
 	}
 
+	public void setTransportLayerAddress(InetAddress tla)
+	{
+		this.transportLayerAddress = tla;
+	}
+	
 	public void setTransportLayerAddressInUserControlInterface(InetAddress transportLayerAddress)
 	{
 		userDataInterface.setTransportLayerAddress(transportLayerAddress);
 	}
 
+	private InetAddress transportLayerAddress;
+	
+	public InetAddress getTransportLayerAddress()
+	{
+		return this.transportLayerAddress;
+	}
+	
 	public void addNewUser(User user)
 	{
-		users.add(user);
+		synchronized(userListLock)
+		{
+			users.add(user);
+		}
+		
 		System.out.println("eNBUES1APID: " + user.geteNBUES1APID() + " New User Added - TEID:" + user.getTEID());
 	}
 
+	public User getUser(String enbUES1APID)
+	{
+		String id = enbUES1APID.toUpperCase();
+		
+		synchronized (userListLock)
+		{
+			for(User u:users)
+			{
+				//System.out.println("searching: " + enbUES1APID + " " + u.geteNBUES1APID());
+				
+				if(u.geteNBUES1APID().equals(id))
+				{
+					return u;
+				}
+			}
+		}
+		
+		System.out.println("not found");
+		return null;
+	}
+	
 	public User getUser(int index)
 	{
 		return users.get(index);

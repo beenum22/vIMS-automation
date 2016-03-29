@@ -1,199 +1,206 @@
 package com.xflowresearch.nfv.testertool.ue;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.util.TreeMap;
-import com.xflowresearch.nfv.testertool.common.XMLParser;
 
-public class UEController
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.pcap4j.packet.IpV4Packet;
+
+import com.xflowresearch.nfv.testertool.common.XMLParser;
+import com.xflowresearch.nfv.testertool.enodeb.eNodeB;
+
+class GTPResponseListener implements Runnable
 {
-	boolean debugOnScreen = true;
+	private DatagramSocket socket;
+	private UEController ueController;
 	
-	private TreeMap<String, UE> UEs;
-	
-	private Object uEListLock;
-	private Object socketLock;
-	Object counterLock;
-	
-	private XMLParser xmlparser;
-	
-	public UEController(XMLParser xmlparser)
+	public GTPResponseListener(UEController ueController)
 	{
-		UEs = new TreeMap<>();
-		
-		uEListLock = new Object();
-		socketLock = new Object();
-		counterLock = new Object();
-		
-		this.xmlparser = xmlparser;
+		this.ueController = ueController;
 	}
 	
+	class Processor implements Runnable
+	{
+		DatagramPacket p;
+		
+		public Processor(DatagramPacket p)
+		{
+			this.p = p;
+		}
+		
+		public void run()
+		{
+			try
+			{
+				byte [] data = p.getData();
+				IpV4Packet recvdPacket = IpV4Packet.newPacket(data, 8, data.length-8);			
+				ueController.processPacket(recvdPacket);
+			}
+			
+			catch(Exception exc)
+			{
+				exc.printStackTrace();
+			}
+		}
+	}
+	
+	public void run()
+	{
+		try
+		{
+			socket = new DatagramSocket(2152);
+			
+			while(true)
+			{
+				byte [] receiveData = new byte[1024];
+				DatagramPacket p = new DatagramPacket(receiveData, receiveData.length);
+				
+				socket.receive(p);
+				new Thread(new Processor(p)).start();
+			}
+		}
+		
+		catch(Exception exc)
+		{
+			exc.printStackTrace();
+		}
+	}
+}
+
+public class UEController
+{	
+	boolean debugOnScreen = true;
+
+	private TreeMap<String, UE> UEs;
+
+	private Object uEListLock;
+	private Object socketLock;
+
+	private XMLParser xmlparser;
+	private ArrayList<eNodeB> eNodeBs;
+
+	public void startGtpListener()
+	{
+		new Thread(new GTPResponseListener(this)).start();
+	}
+	
+	public void processPacket(IpV4Packet p)
+	{
+		try
+		{
+			String addr = p.getHeader().getDstAddr().getHostAddress();
+			
+			UE temp = null;
+			
+			synchronized(uEListLock)
+			{
+				for(Map.Entry<String, UE> entry : UEs.entrySet())
+				{
+					if(entry.getValue().getPdnipv4().equals(addr))
+					{
+						temp = entry.getValue();
+						break;
+					}	
+				}
+			}
+			
+			temp.processPacket(p);
+		}
+		
+		catch(NullPointerException npe)
+		{
+			
+		}
+	}
+	
+	public UEController(XMLParser xmlparser, ArrayList<eNodeB> eNodeBs)
+	{
+		UEs = new TreeMap<>();
+
+		uEListLock = new Object();
+		socketLock = new Object();
+		
+		this.eNodeBs = eNodeBs;
+
+		this.xmlparser = xmlparser;
+	}
+
 	public void addUE(UE ue)
 	{
-		synchronized(uEListLock)
+		synchronized (uEListLock)
 		{
 			UEs.put(ue.geteNBUES1APID(), ue);
 		}
 	}
-		
+	
 	public void sendAttachRequest(UE ue)
-	{		
-		addUE(ue);
-		
-		try
-		{
-			synchronized(socketLock)
-			{
-				OOS.writeObject("Attach;" + ue.geteNBUES1APID() + ";" + ue.UEParameters.toString());
-			}
-			
-			//System.out.println("Sent: " + "Attach;" + ue.geteNBUES1APID() + ";" + ue.UEParameters.toString());
-		}
-		
-		catch(Exception exc)
-		{
-			exc.printStackTrace();
-		}
-	}
-	
-	Socket connectionSocket = null;
-	ObjectOutputStream OOS = null;
-	ObjectInputStream OIS = null;
-	
-	public void initENBConnection()
 	{
+		addUE(ue);
+
 		try
 		{
-			connectionSocket = new Socket(xmlparser.geteNBIP(), Integer.parseInt(xmlparser.geteNBPort()));
+			eNodeBs.get(0).getUserControlInterface().sendAttachRequest("Attach;" + ue.geteNBUES1APID() + ";" + ue.UEParameters.toString());
 		}
-		
-		catch(Exception exc)
+
+		catch (Exception exc)
 		{
-			if(debugOnScreen)
-			{
-				System.out.println("UEController failed to connect to eNB: " + exc.getMessage());
-			}
-			
-			exc.printStackTrace();
-		}
-		
-		try
-		{
-			OOS = new ObjectOutputStream(connectionSocket.getOutputStream());
-			OIS = new ObjectInputStream(connectionSocket.getInputStream());
-		}
-		
-		catch(Exception exc)
-		{
-			if(debugOnScreen)
-			{
-				System.out.println("UEController failed to open streams: " + exc.getMessage());
-			}
-			
 			exc.printStackTrace();
 		}
 	}
-	
-	//private volatile boolean isConnected = false;
-	
-	int successfulAttaches = 0;
-	int failedAttaches = 0;
 	
 	class ResponseProcessor implements Runnable
 	{
 		String response;
-		
+
 		public ResponseProcessor(String response)
 		{
 			this.response = response;
 		}
-		
+
 		@Override
 		public void run()
 		{
-			UE temp;
-			
-			if(!response.split(";")[1].equals("attachfailure"))
+			UE temp = null;
+
+			try
 			{
-				
-				synchronized(uEListLock)
+				if(!response.split(";")[1].equals("attachfailure"))
 				{
-					temp = UEs.get((response.split(";")[0]));
+					synchronized (uEListLock)
+					{
+						temp = UEs.get((response.split(";")[0]));
+					}
+	
+					if(temp != null)
+					{
+						//Thread.sleep(1000);
+						temp.simulateHttpRequest(eNodeBs.get(0).getUser(response.split(";")[0]));
+					}
+	
+					else
+					{
+						System.out.println("UE not found");
+					}
 				}
-				
-				synchronized(counterLock)
-				{
-					successfulAttaches++;
-				}
-				
-				if(temp != null)
-				{
-					System.out.println("Successfully attached - eNBUES1APID = " + response.split(";")[0]);
-					temp.processAttachResponse(response.split(";")[1]);
-				}
-				
+	
 				else
 				{
-					//System.out.println("UE not found");
+					System.out.println(response.split(";")[0] + " failed");
 				}
 			}
 			
-			else
+			catch(Exception exc)
 			{
-				System.out.println(response.split(";")[0] + " failed");
-				synchronized(counterLock)
-				{
-					failedAttaches++;
-				}
+				exc.printStackTrace();
 			}
 		}
 	}
-	
-	public void spawnReceiverThread()
-	{		
-		new Thread(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				//System.out.println("Now listening...");
-				
-				while(true)
-				{	
-					try
-					{
-						String response = (String) OIS.readObject();
-						new Thread(new ResponseProcessor(response)).start();
-					}
-					
-					catch(EOFException eofExc)
-					{
-						try
-						{
-							connectionSocket.close();
-							System.out.println("Connection to eNB closed");
-							
-							System.out.println("Successful attaches: " + successfulAttaches);
-							System.out.println("Failed attaches: " + failedAttaches);
-							
-							break;
-						}
-						
-						catch(IOException ioExc)
-						{
-							
-						}
-					}
-					
-					catch(Exception exc)
-					{
-						exc.printStackTrace();
-					}
-				}
-			}
-		}).start();
+
+	public void processAttachResponse(String response)
+	{
+		new Thread(new ResponseProcessor(response)).start();
 	}
 }

@@ -11,38 +11,39 @@ import java.util.TreeMap;
 
 import com.xflowresearch.nfv.testertool.common.XMLParser;
 import com.xflowresearch.nfv.testertool.enodeb.eNodeB;
+import com.xflowresearch.nfv.testertool.ue.UEController;
 
 public class UserControlInterface
 {
 	TreeMap<String, UserCommandHandler>list;
-	//ArrayList<UserCommandHandler> list;
 	
-	private Object eNodeBLock;
-	private Object outputStreamLock;
+	private Object eNodeBLock, listLock;
+	private UEController ueController;
 	
-	private ObjectInputStream OIS;
-	private ObjectOutputStream OOS;
-	
-	public UserControlInterface()
+	public UserControlInterface(XMLParser xmlparser, eNodeB enodeb, SctpClient sctpClient, UEController ueController)
 	{
 		list = new TreeMap<>();
-		//list = new ArrayList<>();
 		
 		listLock = new Object();
 		eNodeBLock = new Object();
-		outputStreamLock = new Object();
+		
+		this.enodeb = enodeb;
+		this.sctpClient = sctpClient;
+		this.xmlparser = xmlparser;
+		
+		this.ueController = ueController;
 	}
 	
-	boolean exit = false;
+	private eNodeB enodeb;
+	private SctpClient sctpClient;
+	private XMLParser xmlparser;
 	
-	public Object listLock;
+	boolean exit = false;
 	
 	private Socket socket;
 	
 	public void onPacketReceived(S1APPacket receivedPacket)
-	{		
-		//System.out.println(receivedPacket.geteNBUES1APID());
-		
+	{				
 		try
 		{
 			String eNBUES1APID;
@@ -79,7 +80,28 @@ public class UserControlInterface
 		}
 	}
 	
-	public void listenForUserControlCommands(XMLParser xmlparser, eNodeB enodeb, SctpClient sctpClient)
+	public void sendAttachRequest(String command)
+	{
+		new Thread(new Runnable()
+		{							
+			@Override
+			public void run()
+			{
+				String eNBUES1APID = command.split(";")[1];
+				
+				UserCommandHandler temp = new UserCommandHandler(eNBUES1APID, command, enodeb, xmlparser, sctpClient, eNodeBLock, ueController);
+				
+				synchronized(listLock)
+				{
+					list.put(eNBUES1APID, temp);
+				}
+				
+				new Thread(temp).start();
+			}
+		}).start();
+	}
+	
+	/*public void listenForUserControlCommands(XMLParser xmlparser, eNodeB enodeb, SctpClient sctpClient)
 	{
 		new Thread()
 		{
@@ -87,6 +109,7 @@ public class UserControlInterface
 			{
 				ServerSocket serverSocket = null;
 				
+				//System.out.println("socket up...");
 				try
 				{
 					serverSocket = new ServerSocket(Integer.parseInt(xmlparser.geteNBPort()), 100000000, InetAddress.getByName(xmlparser.geteNBIP()));
@@ -111,7 +134,7 @@ public class UserControlInterface
 						String command = (String) OIS.readObject();
 						//System.out.println(command.split(";")[1]);
 						
-						new Thread(new Runnable()
+						/*new Thread(new Runnable()
 						{							
 							@Override
 							public void run()
@@ -156,5 +179,5 @@ public class UserControlInterface
 				}
 			}
 		}.start();
-	}
+	}*/
 }

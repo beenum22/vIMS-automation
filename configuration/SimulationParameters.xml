@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <TesterToolConfig>
 
 	<MCC>011</MCC>
@@ -26,20 +25,13 @@
 	</AuthenticationResponseParams>
 	
 	<UEParams>	
-		<eNBUES1APID>0001</eNBUES1APID>
 		<TAI>001011</TAI>
 		<EUTRANCGI>4001388010000000010004</EUTRANCGI>
 		<returnIP>172.17.1.40</returnIP>
 		<RRCEstablishmentCause>30</RRCEstablishmentCause>
 		<APN>apn-1.ixiacom.com</APN>
-		<HttpUrl>http://172.17.2.8/ResponseServlet/HttpResponse</HttpUrl>
-		<HttpRequests>5</HttpRequests> <!-- The number of HTTP requests to make from the UE after attach -->
+		<WebServerIP>172.17.2.2</WebServerIP>
+		<HttpRequests>1</HttpRequests> <!-- The number of HTTP requests to make from the UE after attach -->
 	</UEParams>
-	
-	<eNBParams>
-		<eNBIP>10.20.30.3</eNBIP>
-		<eNBPort>9877</eNBPort>
-	</eNBParams>
-	
-	
+
 </TesterToolConfig>

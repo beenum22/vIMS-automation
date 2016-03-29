@@ -15,37 +15,36 @@ import com.xflowresearch.nfv.testertool.ue.UEController;
  * and eNodeB threads.
  *
  * 
- * @author ahmadarslan
+ * @author ahmadarslan, Aamir Khan
  */
 
 public class SimulationControl
-{	
-	private static SimulationControl instance = null;// = new SimulationControl();
-
-	//private eNodeB enodeb;
-	//private UE ue;
-	private ArrayList <Thread> UEs;
-	private ArrayList <Thread> eNBs;
+{
+	private static SimulationControl instance = null;
 	
+	private ArrayList<Thread> UEs;
+	private ArrayList<Thread> eNBs;
+	private ArrayList<eNodeB> enodeBs;
+
 	private UEController uEController;
 
 	private XMLParser xmlparser;
 
 	/** Logger to log the messages and Errors **/
-	//private static final Logger logger = LoggerFactory.getLogger("SimulationControlLogger");
+	// private static final Logger logger =
+	// LoggerFactory.getLogger("SimulationControlLogger");
 
 	private SimulationControl()
 	{
-		//enodeb = new eNodeB();
-		//ue = new UE();
-		
 		UEs = new ArrayList<Thread>();
 		eNBs = new ArrayList<Thread>();
-		
+		enodeBs = new ArrayList<eNodeB>();
+
 		xmlparser = new XMLParser();
-		uEController = new UEController(xmlparser);
+		uEController = new UEController(xmlparser, enodeBs);
+		uEController.startGtpListener();
 	}
-	
+
 	/** Get the Simulation Controller instance */
 	public static SimulationControl getInstance()
 	{
@@ -56,14 +55,14 @@ public class SimulationControl
 				instance = new SimulationControl();
 				return instance;
 			}
-			
+
 			else
-			{		
+			{
 				return instance;
 			}
 		}
-		
-		catch(Exception exc)
+
+		catch (Exception exc)
 		{
 			exc.printStackTrace();
 			return null;
@@ -71,50 +70,51 @@ public class SimulationControl
 	}
 
 	/** Get the logger instance */
-	/*public Logger getLogger()
-	{
-		return SimulationControl.logger;
-	}*/
-	
-	/** Start the simulation */	
+	/*
+	 * public Logger getLogger() { return SimulationControl.logger; }
+	 */
+
+	/** Start the simulation */
 	public void startSimulation()
 	{
-		//logger.info("Simulation started");
-
-		/* Parse/Read the input parameters from 'XML' files here!! */
-		xmlparser.readSimulationParameters();
-		xmlparser.readIMSIParamters();
-
-		/* Initialize UE and eNodeB instances' data and start their threads */
-		if(xmlparser.geteNBCount() != 0)
+		try
 		{
+			// logger.info("Simulation started");
+
+			/* Parse/Read the input parameters from 'XML' files here!! */
+			xmlparser.readSimulationParameters();
+			xmlparser.readIMSIParamters();
+
+			/*
+			 * Initialize UE and eNodeB instances' data and start their threads
+			 */
+
 			int eNBCount = xmlparser.geteNBCount();
-			
-			for(int i = 0; i <eNBCount; i++)
+
+			for (int i = 0; i < eNBCount; i++)
 			{
-				eNodeB temp = new eNodeB(xmlparser);
+				eNodeB temp = new eNodeB(xmlparser, uEController);
 				
-				eNBs.add(new Thread(temp));
-				eNBs.get(i).setName("eNodeB" + i);
-				eNBs.get(i).start();
-				//logger.info("eNodeB" + i + " Thread Spawned");
+				enodeBs.add(temp);
+				new Thread(enodeBs.get(i)).start();
 			}
-		}
-		
-		if(xmlparser.getUECount() != 0)
-		{
-			uEController.initENBConnection();			
-			uEController.spawnReceiverThread();
-			
+
+			Thread.sleep(1000);
+
 			int UECount = xmlparser.getUECount();
-			
-			for(int i = 0; i < UECount; i++)
-			{				
+
+			for (int i = 0; i < UECount; i++)
+			{
 				UEs.add(new Thread(new UE(i, xmlparser.getUEParameters(i), xmlparser, uEController)));
 				UEs.get(i).setName("UEThread" + i);
-				//logger.info("UE Thread" + i + " Spawned");
+				// logger.info("UE Thread" + i + " Spawned");
 				UEs.get(i).start();
 			}
+		}
+
+		catch (Exception exc)
+		{
+			exc.printStackTrace();
 		}
 	}
 }
