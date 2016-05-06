@@ -2,6 +2,10 @@ package com.xflowresearch.nfv.testertool.common;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +14,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
+import java.sql.Statement;
 import com.xflowresearch.nfv.testertool.simulationcontrol.SimulationControl;
 import com.xflowresearch.nfv.testertool.ue.UEParameters;
 
@@ -20,7 +25,7 @@ import com.xflowresearch.nfv.testertool.ue.UEParameters;
  * 
  * @author ahmadarslan
  */
-public class XMLParser
+public class ConfigHandler
 {		
 	public class S1SignallingParams
 	{
@@ -112,38 +117,12 @@ public class XMLParser
 		return eNBCount;
 	}
 
+	private Connection conn;
 	private ArrayList <UEParameters>  mUEParameters = new ArrayList <UEParameters> ();
+	
 	public UEParameters getUEParameters(int index)
 	{
 		return mUEParameters.get(index);
-	}
-	
-	public void readIMSIParamters()
-	{
-		try
-		{
-    		File inputFile = new File("configuration/IMSIParameters.xml");
-    		
-    		SAXBuilder saxBuilder = new SAXBuilder();
-    		
-    		Document document = saxBuilder.build(inputFile);
-    		
-    		Element rootElement = document.getRootElement();
-    		
-    		List <Element> items = rootElement.getChildren();
-    		
-    		for(Element item:items)
-    		{
-    			//System.out.println(item.getName());
-    			if(item.getName().equals("Value"))
-    				mUEParameters.add(new UEParameters(item.getChild("IMSI").getText(), item.getChild("K").getText()));
-    		}
-		}
-		
-		catch(Exception exc)
-		{
-			exc.printStackTrace();
-		}
 	}
 	
 	public String getPLMN()
@@ -209,6 +188,59 @@ public class XMLParser
 	public String getReturnIpInHex()
 	{
 		return convertIpToHex(returnAddress);
+	}
+		
+	public boolean connectToDB()
+	{
+		try
+		{
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/testertool", "tt_admin", "testertool");
+			return true;
+		}
+		
+		catch(Exception exc)
+		{
+			exc.printStackTrace();
+			return false;
+		}
+	}
+	
+	public void readIMSIParamters(int N)
+	{
+		try
+		{
+			PreparedStatement prepStmnt = conn.prepareStatement("select * from imsi LIMIT 0, ?");
+			prepStmnt.setInt(1, N);
+			
+			ResultSet rs = prepStmnt.executeQuery();
+			
+			while(rs.next())
+			{
+				mUEParameters.add(new UEParameters(rs.getString("imsi"), rs.getString("K")));
+			}
+			
+    		/*File inputFile = new File("configuration/IMSIParameters.xml");
+    		
+    		SAXBuilder saxBuilder = new SAXBuilder();
+    		
+    		Document document = saxBuilder.build(inputFile);
+    		
+    		Element rootElement = document.getRootElement();
+    		
+    		List <Element> items = rootElement.getChildren();
+    		
+    		for(Element item:items)
+    		{
+    			//System.out.println(item.getName());
+    			if(item.getName().equals("Value"))
+    				mUEParameters.add(new UEParameters(item.getChild("IMSI").getText(), item.getChild("K").getText()));
+    		}*/
+		}
+		
+		catch(Exception exc)
+		{
+			exc.printStackTrace();
+		}
 	}
 	
 	public void readSimulationParameters()
@@ -306,6 +338,51 @@ public class XMLParser
 		{
 			// print the exception and log it in simulation control logger.
 			ioe.printStackTrace();
+		}
+	}
+	
+	public boolean getConfigFromDB(String nameOfConfig)
+	{		
+		try
+		{			
+			PreparedStatement prepStmnt = conn.prepareStatement("select * from testertool.configurations where name= ?");
+			prepStmnt.setString(1, nameOfConfig);
+			ResultSet rs = prepStmnt.executeQuery();
+			
+			while(rs.next())
+			{
+				MCC = rs.getString("mcc");
+				MNC = rs.getString("mnc");
+				MMEIP = rs.getString("mme_ip");
+				MMEPort = rs.getString("mme_port");
+				
+				s1signallingParams.GlobalENBID = rs.getString("global_enbid");
+				s1signallingParams.GlobalENBID = new StringBuilder(s1signallingParams.GlobalENBID).insert(2, getPLMN()).toString();
+				
+				s1signallingParams.eNBname = rs.getString("enb_name");
+
+				s1signallingParams.SupportedTAs = rs.getString("supported_tas");
+				s1signallingParams.SupportedTAs = new StringBuilder(s1signallingParams.SupportedTAs).insert(8, getPLMN()).toString();
+
+				s1signallingParams.DefaultPagingDRX = rs.getString("default_pagingdrx");
+				
+				//System.out.println(s1signallingParams.GlobalENBID + " " + s1signallingParams.eNBname + " " + s1signallingParams.SupportedTAs + " " + s1signallingParams.DefaultPagingDRX);
+				
+				TAI = rs.getString("tai");
+				EUTRANCGI = rs.getString("eutrancgi");
+				returnAddress = rs.getString("returnIP");
+				RRCEstablishmentCause = rs.getString("rrc_estb_cause");
+				APN = rs.getString("apn_name");
+				WebServerIP = rs.getString("webserver_ip");
+			}
+			
+			return true;
+		}
+		
+		catch(Exception exc)
+		{
+			exc.printStackTrace();
+			return false;
 		}
 	}
 }

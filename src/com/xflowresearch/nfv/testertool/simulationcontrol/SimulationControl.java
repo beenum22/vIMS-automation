@@ -2,7 +2,7 @@ package com.xflowresearch.nfv.testertool.simulationcontrol;
 
 import java.util.ArrayList;
 
-import com.xflowresearch.nfv.testertool.common.XMLParser;
+import com.xflowresearch.nfv.testertool.common.ConfigHandler;
 import com.xflowresearch.nfv.testertool.enodeb.eNodeB;
 import com.xflowresearch.nfv.testertool.ue.UE;
 import com.xflowresearch.nfv.testertool.ue.UEController;
@@ -28,19 +28,19 @@ public class SimulationControl
 
 	private UEController uEController;
 
-	private XMLParser xmlparser;
+	private ConfigHandler xmlparser;
 
 	/** Logger to log the messages and Errors **/
 	// private static final Logger logger =
 	// LoggerFactory.getLogger("SimulationControlLogger");
-
+	
 	private SimulationControl()
 	{
 		UEs = new ArrayList<Thread>();
 		eNBs = new ArrayList<Thread>();
 		enodeBs = new ArrayList<eNodeB>();
 
-		xmlparser = new XMLParser();
+		xmlparser = new ConfigHandler();
 		uEController = new UEController(xmlparser, enodeBs);
 		uEController.startGtpListener();
 	}
@@ -83,7 +83,7 @@ public class SimulationControl
 
 			/* Parse/Read the input parameters from 'XML' files here!! */
 			xmlparser.readSimulationParameters();
-			xmlparser.readIMSIParamters();
+			//xmlparser.readIMSIParamters();
 
 			/*
 			 * Initialize UE and eNodeB instances' data and start their threads
@@ -96,7 +96,7 @@ public class SimulationControl
 				eNodeB temp = new eNodeB(xmlparser, uEController);
 				
 				enodeBs.add(temp);
-				new Thread(enodeBs.get(i)).start();
+				//new Thread(enodeBs.get(i)).start();
 			}
 
 			Thread.sleep(1000);
@@ -105,7 +105,7 @@ public class SimulationControl
 
 			for (int i = 0; i < UECount; i++)
 			{
-				UEs.add(new Thread(new UE(i, xmlparser.getUEParameters(i), xmlparser, uEController)));
+				//UEs.add(new Thread(new UE(i, xmlparser.getUEParameters(i), xmlparser, uEController)));
 				UEs.get(i).setName("UEThread" + i);
 				// logger.info("UE Thread" + i + " Spawned");
 				UEs.get(i).start();

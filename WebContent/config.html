@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<title>Configurations</title>
+	
+	<script src="_js/jquery.min.js"></script>
+	<script src="_js/jquery.form.js"></script>
+	<script src="_js/bootstrap.min.js"></script>
+	<script src="_js/main.js"></script>
+	<link rel="stylesheet" type="text/css" href="_css/styles.css">
+	<link rel="stylesheet" type="text/css" href="_css/bootstrap.min.css">
+</head>
+<body onload="getConfig ()">
+	<section id="body" class="width">
+		<aside id="sidebar" class="column-left">
+			<header>
+				<h1><a href="#">Tester Tool</a></h1>
+				<!-- h2>Insert one-liner about Tester tool here</h2-->
+			</header>
+			<nav id="mainnav">
+				<ul>
+					<li><a href="index.html">Testing</a></li>
+					<li class="selected-item"><a href="config.html">Configurations</a></li>
+				</ul>
+			</nav>
+		</aside>
+		
+		<section id="content" class="column-right">
+			<article>
+				<h2>Configurations</h2>
+				<br />
+				
+				<label id="config_label" class="left">Select configuration to load: </label>
+				<select id="config_name_list" class="form-control left" onchange="configChange()">
+				</select>
+				<button class="btn btn-primary left" id="delete_config_button" disabled="disabled" onclick="deleteConfig()" type=button">Delete Config</button>
+				<button id="add_new_config" class="btn btn-primary right" data-toggle="modal" data-target="#modal_add_new_config">Add New Config</button>
+				
+				<br /><br />
+				<h3>Configuration Details</h3>
+				
+				
+				<div id="config_details">
+				</div>
+				
+				<div class="modal fade" id="modal_add_new_config" role="dialog">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title">Create New Configuration</h4>
+							</div>
+							<div class="modal-body">
+								<form id="config-add-form" class="form-horizontal" role="form">
+									<div class="form-group">
+										<label class="control-label col-sm-4" for="c_name">Name:</label>
+										<div class="col-sm-6">
+											<input name="name" type="text" class="form-control" id="c_name" placeholder="Enter config name">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-4" for="c_mcc">MCC:</label>
+										<div class="col-sm-6">
+											<input name="mcc" type="text" class="form-control" id="c_mcc" placeholder="Enter MCC">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-4" for="c_mcc">MNC:</label>
+										<div class="col-sm-6">
+											<input name="mnc" type="text" class="form-control" id="c_mnc" placeholder="Enter MNC">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-4" for="c_mme_ip">MME IP:</label>
+										<div class="col-sm-6">
+											<input name="mme_ip" type="text" class="form-control" id="c_mme_ip" placeholder="Enter MME IP">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-4" for="c_mme_port">MME Port:</label>
+										<div class="col-sm-6">
+											<input name="mme_port" type="text" class="form-control" id="c_mme_port" placeholder="Enter MME Port">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-4" for="c_global_enbid">Global ENB ID:</label>
+										<div class="col-sm-6">
+											<input name="global_enbid" type="text" class="form-control" id="c_global_enbid" placeholder="Enter ENB ID">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-4" for="c_enb_name">ENB Name:</label>
+										<div class="col-sm-6">
+											<input name="enb_name" type="text" class="form-control" id="c_enb_name" placeholder="Enter ENB Name">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-4" for="c_supported_tas">Supported TAs:</label>
+										<div class="col-sm-6">
+											<input name="supported_tas" type="text" class="form-control" id="c_supported_tas" placeholder="Enter Supported TAs">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-4" for="c_default_pagingdrx">Default PagingDRX:</label>
+										<div class="col-sm-6">
+											<input name="default_pagingdrx" type="text" class="form-control" id="c_default_pagingdrx" placeholder="Enter Default PagingDRX">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-4" for="c_tai">TAI:</label>
+										<div class="col-sm-6">
+											<input name="tai" type="text" class="form-control" id="c_tai" placeholder="Enter TAI">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-4" for="c_eutrancgi">E-UTRAN CGI:</label>
+										<div class="col-sm-6">
+											<input name="eutrancgi" type="text" class="form-control" id="c_eutrancgi" placeholder="Enter E-UTRAN CGI">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-4" for="c_returnIP">Return IP:</label>
+										<div class="col-sm-6">
+											<input name="returnIP" type="text" class="form-control" id="c_returnIP" placeholder="Enter Return IP">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-4" for="c_rrc_estb_cause">RRC Establishment Cause:</label>
+										<div class="col-sm-6">
+											<input name="rrc_estb_cause" type="text" class="form-control" id="c_rrc_estb_cause" placeholder="Enter RRC Establishment Cause">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-4" for="c_apn_name">APN Name:</label>
+										<div class="col-sm-6">
+											<input name="apn_name" type="text" class="form-control" id="c_apn_name" placeholder="Enter APN Name">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-4" for="c_webserver_ip">Webserver IP:</label>
+										<div class="col-sm-6">
+											<input name="webserver_ip" type="text" class="form-control" id="c_webserver_ip" placeholder="Enter Webserver IP">
+										</div>
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								<button type="button" class="btn btn-info" onclick="addNewConfig()" data-dismiss="modal">Submit</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="all_modals">
+				</div>
+			</article>
+		</section>
+	</section>
+</body>

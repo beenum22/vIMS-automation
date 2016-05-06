@@ -9,7 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.TreeMap;
 
-import com.xflowresearch.nfv.testertool.common.XMLParser;
+import com.xflowresearch.nfv.testertool.common.ConfigHandler;
 import com.xflowresearch.nfv.testertool.enodeb.eNodeB;
 import com.xflowresearch.nfv.testertool.ue.UEController;
 
@@ -20,7 +20,7 @@ public class UserControlInterface
 	private Object eNodeBLock, listLock;
 	private UEController ueController;
 	
-	public UserControlInterface(XMLParser xmlparser, eNodeB enodeb, SctpClient sctpClient, UEController ueController)
+	public UserControlInterface(ConfigHandler xmlparser, eNodeB enodeb, SctpClient sctpClient, UEController ueController)
 	{
 		list = new TreeMap<>();
 		
@@ -36,7 +36,7 @@ public class UserControlInterface
 	
 	private eNodeB enodeb;
 	private SctpClient sctpClient;
-	private XMLParser xmlparser;
+	private ConfigHandler xmlparser;
 	
 	boolean exit = false;
 	

@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import javax.xml.bind.DatatypeConverter;
 
-import com.xflowresearch.nfv.testertool.common.XMLParser;
+import com.xflowresearch.nfv.testertool.common.ConfigHandler;
 import com.xflowresearch.nfv.testertool.enodeb.Value;
 import com.xflowresearch.nfv.testertool.enodeb.eNodeB;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.SctpClient;
@@ -35,7 +35,7 @@ public class UserCommandHandler implements Runnable
 	
 	private Socket socket;
 	private eNodeB enodeb;
-	private XMLParser xmlparser;
+	private ConfigHandler xmlparser;
 	
 	//private AttachSimulator attachSimulator;
 	
@@ -55,7 +55,7 @@ public class UserCommandHandler implements Runnable
 		return eNBUES1APID;
 	}
 	
-	public UserCommandHandler(String eNBUES1APID, String command, eNodeB enodeb, XMLParser xmlparser, SctpClient sctpClient, Object eNodeBLock, UEController ueController)
+	public UserCommandHandler(String eNBUES1APID, String command, eNodeB enodeb, ConfigHandler xmlparser, SctpClient sctpClient, Object eNodeBLock, UEController ueController)
 	{		
 		this.enodeb = enodeb;
 		this.xmlparser = xmlparser;
@@ -225,7 +225,7 @@ public class UserCommandHandler implements Runnable
 	 * The second packet of the attach sequence, the Authentication Response is
 	 * sent to the MME in this function..
 	 * 
-	 * @param xmlparser
+	 * @param configHandler
 	 */
 	public void sendAuthenticationResponse(S1APPacket authenticationRequest, String eNBUES1APID)
 	{
@@ -256,8 +256,9 @@ public class UserCommandHandler implements Runnable
 				values.add(new Value("MMEUES1APID", "reject", authenticationRequest.getValue("MMEUES1APID")));
 				values.add(new Value("eNBUES1APID", "reject", eNBUES1APID));
 				values.add(new Value("NASPDU", "reject", NASPDU));
-				values.add(new Value("EUTRANCGI", "ignore", xmlparser.getAuthenticationResponseParams().EUTRANCGI));
-				values.add(new Value("TAI", "ignore", xmlparser.getAuthenticationResponseParams().TAI));
+				//values.add(new Value("EUTRANCGI", "ignore", xmlparser.getAuthenticationResponseParams().EUTRANCGI));
+				values.add(new Value("EUTRANCGI", "ignore", xmlparser.getEUTRANCGI()));
+				values.add(new Value("TAI", "ignore", xmlparser.getTAI()));
 		
 				//S1APPacket recievedPacket = 
 				sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, false);
@@ -276,7 +277,7 @@ public class UserCommandHandler implements Runnable
 	 * The third packet of the attach sequence, the SecurityModeComplete packet
 	 * is sent to the MME in this function..
 	 * 
-	 * @param xmlparser
+	 * @param configHandler
 	 */
 	public void sendSecurityModeComplete(S1APPacket securityModeCommand)
 	{
@@ -297,8 +298,9 @@ public class UserCommandHandler implements Runnable
 																										 // to
 																										 // Dynamic!!!
 			values.add(new Value("NASPDU", "reject", NASPDU));
-			values.add(new Value("EUTRANCGI", "ignore", xmlparser.getAuthenticationResponseParams().EUTRANCGI));
-			values.add(new Value("TAI", "ignore", xmlparser.getAuthenticationResponseParams().TAI));
+			//values.add(new Value("EUTRANCGI", "ignore", xmlparser.getAuthenticationResponseParams().EUTRANCGI));
+			values.add(new Value("EUTRANCGI", "ignore", xmlparser.getEUTRANCGI()));
+			values.add(new Value("TAI", "ignore", xmlparser.getTAI()));
 	
 			//S1APPacket recievedPacket = 
 			sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, false);
@@ -316,7 +318,7 @@ public class UserCommandHandler implements Runnable
 	 * The fourth packet of the attach sequence, the ESMInformationResponse is
 	 * sent to the MME in this function..
 	 * 
-	 * @param xmlparser
+	 * @param configHandler
 	 */
 	
 	public String getAPNString(String APN)
@@ -380,8 +382,9 @@ public class UserCommandHandler implements Runnable
 			values.add(new Value("MMEUES1APID", "reject", esmInformationRequest.getValue("MMEUES1APID")));
 			values.add(new Value("eNBUES1APID", "reject", esmInformationRequest.getValue("eNBUES1APID")));
 			values.add(new Value("NASPDU", "reject", NASPDU));
-			values.add(new Value("EUTRANCGI", "ignore", xmlparser.getAuthenticationResponseParams().EUTRANCGI));
-			values.add(new Value("TAI", "ignore", xmlparser.getAuthenticationResponseParams().TAI));
+			//values.add(new Value("EUTRANCGI", "ignore", xmlparser.getAuthenticationResponseParams().EUTRANCGI));
+			values.add(new Value("EUTRANCGI", "ignore", xmlparser.getEUTRANCGI()));
+			values.add(new Value("TAI", "ignore", xmlparser.getTAI()));
 	
 			//S1APPacket recievedPacket = sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, false);
 			sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, false);
@@ -399,7 +402,7 @@ public class UserCommandHandler implements Runnable
 	 * The fifth packet of the attach sequence, the InitialContextSetupResponse
 	 * is sent to the MME in this function..
 	 * 
-	 * @param xmlparser
+	 * @param configHandler
 	 */
 	public void sendInitialContextSetupResponse(S1APPacket initialContextSetupRequest)
 	{
@@ -423,7 +426,7 @@ public class UserCommandHandler implements Runnable
 	 * The sixth packet of the attach sequence, the AttachComplete packet is
 	 * sent to the MME in this function..
 	 * 
-	 * @param xmlparser
+	 * @param configHandler
 	 */
 	public void sendAttachComplete(S1APPacket initialContextSetupRequest)
 	{
@@ -441,8 +444,9 @@ public class UserCommandHandler implements Runnable
 			values.add(new Value("MMEUES1APID", "reject", initialContextSetupRequest.getValue("MMEUES1APID")));
 			values.add(new Value("eNBUES1APID", "reject", initialContextSetupRequest.getValue("eNBUES1APID")));
 			values.add(new Value("NASPDU", "reject", NASPDU));
-			values.add(new Value("EUTRANCGI", "ignore", xmlparser.getAuthenticationResponseParams().EUTRANCGI));
-			values.add(new Value("TAI", "ignore", xmlparser.getAuthenticationResponseParams().TAI));
+			//values.add(new Value("EUTRANCGI", "ignore", xmlparser.getAuthenticationResponseParams().EUTRANCGI));
+			values.add(new Value("EUTRANCGI", "ignore", xmlparser.getEUTRANCGI()));
+			values.add(new Value("TAI", "ignore", xmlparser.getTAI()));
 	
 			sendS1APacket("InitiatingMessage", "uplinkNASTransport", "ignore", values, false);
 		}

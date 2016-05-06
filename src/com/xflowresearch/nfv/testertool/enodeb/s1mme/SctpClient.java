@@ -10,7 +10,7 @@ import java.nio.ByteBuffer;
 import com.sun.nio.sctp.MessageInfo;
 import com.sun.nio.sctp.SctpChannel;
 import com.sun.nio.sctp.SctpMultiChannel;
-import com.xflowresearch.nfv.testertool.common.XMLParser;
+import com.xflowresearch.nfv.testertool.common.ConfigHandler;
 
 /**
  * SctpClient
@@ -35,9 +35,9 @@ public class SctpClient
 	/** Logger to log the messages and Errors **/
 	//private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
 
-	XMLParser xmlParser;
+	ConfigHandler xmlParser;
 	
-	public SctpClient(XMLParser XMLParser)
+	public SctpClient(ConfigHandler XMLParser)
 	{
 		isConnected = false;
 		

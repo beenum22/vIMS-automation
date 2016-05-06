@@ -1,6 +1,6 @@
 package com.xflowresearch.nfv.testertool.ue;
 
-import java.io.ByteArrayInputStream;
+import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
@@ -19,7 +19,7 @@ import org.pcap4j.packet.namednumber.IpNumber;
 import org.pcap4j.packet.namednumber.IpVersion;
 import org.pcap4j.packet.namednumber.TcpPort;
 
-import com.xflowresearch.nfv.testertool.common.XMLParser;
+import com.xflowresearch.nfv.testertool.common.ConfigHandler;
 import com.xflowresearch.nfv.testertool.enodeb.s1u.GTPacket;
 import com.xflowresearch.nfv.testertool.enodeb.s1u.User;
 import com.xflowresearch.nfv.testertool.utils.Ipv4Packet;
@@ -32,12 +32,12 @@ import com.xflowresearch.nfv.testertool.utils.TCPPacket;
  * @author Aamir Khan
  */
 
-public class UE implements Runnable
+public class UE 
 {
 	//private static final Logger logger = LoggerFactory.getLogger("UELogger");
 
 	UEParameters UEParameters;
-	private XMLParser xmlparser;
+	private ConfigHandler xmlparser;
 	private String pdnipv4;
 	private User user;
 	private UEController uEController;
@@ -46,7 +46,7 @@ public class UE implements Runnable
 	/*State variables */
 	boolean syn, httpResponse, finAck, okAck;
 	
-	public UE(int id, UEParameters UEParams, XMLParser xmlparser, UEController uEController)
+	public UE(int id, UEParameters UEParams, ConfigHandler xmlparser, UEController uEController)
 	{
 		UEParameters = UEParams;	
 		this.eNBUES1APID = StringUtils.leftPad(Integer.toHexString(id), 4, "0");
@@ -54,6 +54,7 @@ public class UE implements Runnable
 		this.xmlparser = xmlparser;
 		
 		syn = httpResponse = finAck = okAck = false;
+		sync = new Object();
 	}
 	
 	public String geteNBUES1APID()
@@ -64,6 +65,13 @@ public class UE implements Runnable
 	public String getPdnipv4()
 	{
 		return pdnipv4;
+	}
+	
+	private String response;
+	
+	public String getResponse()
+	{
+		return response;
 	}
 	
 	public void processPacket(IpV4Packet p)
@@ -151,7 +159,13 @@ public class UE implements Runnable
 			{				
 				try
 				{
-					System.out.println(new String(tcpPacket.getPayload().getRawData()));					
+					/*PrintWriter writer = new PrintWriter("http_log.txt");
+					writer.write(new String(tcpPacket.getPayload().getRawData()) + "<br>");
+					writer.flush();*/
+					
+					System.out.println(new String(tcpPacket.getPayload().getRawData()));
+					
+					response = new String(tcpPacket.getPayload().getRawData());
 
 					TcpPacket.Builder tcpBuilder = new TcpPacket.Builder();
 					IpV4Packet.Builder ipv4Builder = new IpV4Packet.Builder();
@@ -183,6 +197,11 @@ public class UE implements Runnable
 						payloadBuilder(tcpBuilder);
 					
 					sendGTPPacket(DatatypeConverter.printHexBinary(ipv4Builder.build().getRawData()));
+					
+					synchronized(sync)
+					{
+						sync.notify();
+					}
 				}
 				
 				catch(Exception exc)
@@ -195,9 +214,14 @@ public class UE implements Runnable
 		}
 	}
 		
+	public void setPdinpv4(String ip)
+	{
+		this.pdnipv4 = ip;
+	}
+	
 	public void simulateHttpRequest(User user)
 	{
-		this.pdnipv4 = user.getIP();
+		//this.pdnipv4 = user.getIP();
 		this.user = user;
 		
 		sendSyn();
@@ -273,9 +297,57 @@ public class UE implements Runnable
 		}
 	}
 	
-	@Override
-	public void run()
+	public void registerWithUEController()
 	{
-		uEController.sendAttachRequest(this);
+		
+	}
+	
+	private Object sync;
+	private boolean status = false;
+	private String Id;
+	
+	public void setId(String Id)
+	{
+		this.Id = Id;
+	}
+	
+	public void setStatus(boolean status)
+	{
+		this.status = status;
+	}
+
+	public Object getLock()
+	{
+		return sync;
+	}
+	
+	//@Override
+	public String attach()
+	{
+		try
+		{			
+			synchronized(sync)
+			{
+				UE self = this;
+				
+				new Thread(new Runnable()
+				{
+					public void run()
+					{
+						uEController.sendAttachRequest(self);
+					}
+				}).start();
+				
+				sync.wait();			
+			}
+			
+			return Id;
+		}
+		
+		catch(Exception exc)
+		{
+			exc.printStackTrace();
+			return "failed";
+		}
 	}
 }

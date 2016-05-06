@@ -1,6 +1,5 @@
 package com.xflowresearch.nfv.testertool.ue;
 
-
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.ArrayList;
@@ -9,7 +8,7 @@ import java.util.TreeMap;
 
 import org.pcap4j.packet.IpV4Packet;
 
-import com.xflowresearch.nfv.testertool.common.XMLParser;
+import com.xflowresearch.nfv.testertool.common.ConfigHandler;
 import com.xflowresearch.nfv.testertool.enodeb.eNodeB;
 
 class GTPResponseListener implements Runnable
@@ -20,6 +19,28 @@ class GTPResponseListener implements Runnable
 	public GTPResponseListener(UEController ueController)
 	{
 		this.ueController = ueController;
+	}
+	
+	public void run()
+	{
+		try
+		{
+			socket = new DatagramSocket(2152);
+			
+			while(true)
+			{
+				byte [] receiveData = new byte[1024];
+				DatagramPacket p = new DatagramPacket(receiveData, receiveData.length);
+				
+				socket.receive(p);
+				new Thread(new Processor(p)).start();
+			}
+		}
+		
+		catch(Exception exc)
+		{
+			exc.printStackTrace();
+		}
 	}
 	
 	class Processor implements Runnable
@@ -46,28 +67,6 @@ class GTPResponseListener implements Runnable
 			}
 		}
 	}
-	
-	public void run()
-	{
-		try
-		{
-			socket = new DatagramSocket(2152);
-			
-			while(true)
-			{
-				byte [] receiveData = new byte[1024];
-				DatagramPacket p = new DatagramPacket(receiveData, receiveData.length);
-				
-				socket.receive(p);
-				new Thread(new Processor(p)).start();
-			}
-		}
-		
-		catch(Exception exc)
-		{
-			exc.printStackTrace();
-		}
-	}
 }
 
 public class UEController
@@ -77,10 +76,12 @@ public class UEController
 	private TreeMap<String, UE> UEs;
 
 	private Object uEListLock;
-	private Object socketLock;
+	//private Object socketLock;
 
-	private XMLParser xmlparser;
+	//private XMLParser xmlparser;
 	private ArrayList<eNodeB> eNodeBs;
+	
+	//private PrintWriter attachLogWriter;
 
 	public void startGtpListener()
 	{
@@ -92,18 +93,23 @@ public class UEController
 		try
 		{
 			String addr = p.getHeader().getDstAddr().getHostAddress();
-			
+			System.out.println("Received: " + addr);
 			UE temp = null;
+			
+			//UEs.entrySet();
 			
 			synchronized(uEListLock)
 			{
 				for(Map.Entry<String, UE> entry : UEs.entrySet())
 				{
+					//System.out.println(entry.getValue().getPdnipv4());
+					//System.out.println("comparing " + entry.getValue().getPdnipv4() + " " + addr);
+					
 					if(entry.getValue().getPdnipv4().equals(addr))
 					{
 						temp = entry.getValue();
 						break;
-					}	
+					}
 				}
 			}
 			
@@ -112,20 +118,30 @@ public class UEController
 		
 		catch(NullPointerException npe)
 		{
-			
+			System.out.println(npe);
 		}
 	}
 	
-	public UEController(XMLParser xmlparser, ArrayList<eNodeB> eNodeBs)
+	public UEController(ConfigHandler xmlparser, ArrayList<eNodeB> eNodeBs)
 	{
-		UEs = new TreeMap<>();
-
-		uEListLock = new Object();
-		socketLock = new Object();
+		try
+		{
+			UEs = new TreeMap<>();
+	
+			uEListLock = new Object();
+			//socketLock = new Object();
+			
+			this.eNodeBs = eNodeBs;
+	
+			//this.xmlparser = xmlparser;
 		
-		this.eNodeBs = eNodeBs;
-
-		this.xmlparser = xmlparser;
+			//attachLogWriter = new PrintWriter(new File("attach_log.txt"));
+		}
+		
+		catch(Exception exc)
+		{
+			exc.printStackTrace();
+		}
 	}
 
 	public void addUE(UE ue)
@@ -169,6 +185,9 @@ public class UEController
 			{
 				if(!response.split(";")[1].equals("attachfailure"))
 				{
+					//attachLogWriter.write("Successfuly attached: " + response.split(";")[0] + "<br>");
+					//attachLogWriter.flush();
+					
 					synchronized (uEListLock)
 					{
 						temp = UEs.get((response.split(";")[0]));
@@ -176,8 +195,17 @@ public class UEController
 	
 					if(temp != null)
 					{
+						temp.setStatus(true);
+						temp.setId(response.split(";")[0]);
+						temp.setPdinpv4(eNodeBs.get(0).getUser(response.split(";")[0]).getIP());
+						
+						synchronized(temp.getLock())
+						{
+							temp.getLock().notify();
+						}
+						
 						//Thread.sleep(1000);
-						temp.simulateHttpRequest(eNodeBs.get(0).getUser(response.split(";")[0]));
+						//temp.simulateHttpRequest(eNodeBs.get(0).getUser(response.split(";")[0]));
 					}
 	
 					else
@@ -196,6 +224,37 @@ public class UEController
 			{
 				exc.printStackTrace();
 			}
+		}
+	}
+
+	public String doHttp(String id)
+	{
+		try
+		{
+			UE temp = UEs.get(id);
+			
+			new Thread(new Runnable()
+			{
+				public void run()
+				{
+					temp.simulateHttpRequest(eNodeBs.get(0).getUser(id));
+				}
+			}).start();
+
+			System.out.println("waiting...");
+			synchronized(temp.getLock())
+			{
+				temp.getLock().wait();
+			}
+			System.out.println("resumed...");
+			
+			return temp.getResponse();
+		}
+
+		catch(Exception exc)
+		{
+			exc.printStackTrace();
+			return "failed";
 		}
 	}
 

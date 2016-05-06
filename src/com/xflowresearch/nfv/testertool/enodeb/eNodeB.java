@@ -3,7 +3,7 @@ package com.xflowresearch.nfv.testertool.enodeb;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
-import com.xflowresearch.nfv.testertool.common.XMLParser;
+import com.xflowresearch.nfv.testertool.common.ConfigHandler;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.MMEController;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.S1APPacket;
 import com.xflowresearch.nfv.testertool.enodeb.s1mme.SctpClient;
@@ -21,10 +21,10 @@ import com.xflowresearch.nfv.testertool.ue.UEController;
  * 
  * @author ahmadarslan
  */
-public class eNodeB implements Runnable
+public class eNodeB// implements Runnable
 {
 	//private static final Logger logger = LoggerFactory.getLogger("eNodeBLogger");
-	private XMLParser xmlparser;
+	private ConfigHandler xmlparser;
 
 	private ArrayList <User> users;
 	private Object userListLock;
@@ -36,7 +36,7 @@ public class eNodeB implements Runnable
 	private MMEController mMeController;
 	private UEController ueController;
 	
-	public eNodeB(XMLParser xmlParser, UEController ueController)
+	public eNodeB(ConfigHandler xmlParser, UEController ueController)
 	{
 		users = new ArrayList <User>();
 		this.xmlparser = xmlParser;
@@ -67,26 +67,36 @@ public class eNodeB implements Runnable
 	/**
 	 * Establish S1Signalling with MME..
 	 * 
-	 * @param xmlparser
+	 * @param configHandler
 	 */
 	public Boolean establishS1Signalling()
 	{
-		if(sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort())))
-		{			
-			mMeController.setSctpClient(sctpClient);
-
-			ArrayList <Value> values = new ArrayList <Value>();
-			values.add(new Value("GlobalENBID", "reject", xmlparser.getS1signallingParams().GlobalENBID));
-			values.add(new Value("eNBname", "ignore", xmlparser.getS1signallingParams().eNBname));
-			values.add(new Value("SupportedTAs", "reject", xmlparser.getS1signallingParams().SupportedTAs));
-			values.add(new Value("DefaultPagingDRX", "ignore", xmlparser.getS1signallingParams().DefaultPagingDRX));
-
-			S1APPacket recievedPacket = mMeController.initS1Signalling("InitiatingMessage", "S1Setup", "reject", values, true);
-
-			if(recievedPacket.getType().equals("SuccessfulOutcome"))
-			{
-				mMeController.spawnReceiverThread();
-				return true;
+		try
+		{
+			if(sctpClient.connectToHost(xmlparser.getMMEIP(), Integer.parseInt(xmlparser.getMMEPort())))
+			{			
+				mMeController.setSctpClient(sctpClient);
+	
+				ArrayList <Value> values = new ArrayList <Value>();
+				values.add(new Value("GlobalENBID", "reject", xmlparser.getS1signallingParams().GlobalENBID));
+				values.add(new Value("eNBname", "ignore", xmlparser.getS1signallingParams().eNBname));
+				values.add(new Value("SupportedTAs", "reject", xmlparser.getS1signallingParams().SupportedTAs));
+				values.add(new Value("DefaultPagingDRX", "ignore", xmlparser.getS1signallingParams().DefaultPagingDRX));
+	
+				S1APPacket recievedPacket = mMeController.initS1Signalling("InitiatingMessage", "S1Setup", "reject", values, true);
+	
+				if(recievedPacket.getType().equals("SuccessfulOutcome"))
+				{
+					mMeController.spawnReceiverThread();
+					return true;
+				}
+				
+				else
+				{
+					System.out.println("Failed to connect with MME");
+					//logger.error("Failed to connect with MME");
+					return false;
+				}
 			}
 			
 			else
@@ -95,17 +105,16 @@ public class eNodeB implements Runnable
 				//logger.error("Failed to connect with MME");
 				return false;
 			}
-		}
-		
-		else
+		}		
+	
+		catch(Exception exc)
 		{
-			System.out.println("Failed to connect with MME");
-			//logger.error("Failed to connect with MME");
+			exc.printStackTrace();
 			return false;
 		}
 	}
 	
-	@Override
+	//@Override
 	public void run()
 	{
 		//logger.info("eNodeB started");
