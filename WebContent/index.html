@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Tester Tool</title>
+
+	<script src="jquery-2.2.3.min.js"></script>
+	<script type="text/javascript">
+	
+		function http(i)
+		{
+			var row = document.getElementById("row_" + i);
+			var childs = row.children;
+			//alert("Here");
+			$.ajax(
+					{
+						type: "POST",
+						url: "/control?param1=launch_http&param2=" + childs[1].innerHTML,
+						success: function(data)
+						{					
+							//alert(data);
+							if(data != "failed")
+							{
+								alert(data);
+								//childs[1].innerHTML = data;
+							}
+							
+							else
+							{
+								alert(data);
+								//childs[1].innerHTML = data;
+							}
+						}
+					});
+		}
+	
+		function attach(i)
+		{
+			//alert(i);
+			var row = document.getElementById("row_" + i);
+			var childs = row.children;
+			
+			//alert(childs[0].innerHTML);
+			$.ajax(
+					{
+						type: "POST",
+						url: "/control?param1=launch_ue&param2=" + childs[0].innerHTML,
+						success: function(data)
+						{			
+							if(data != "failed")
+							{
+								//alert(data);
+								childs[1].innerHTML = data;
+								childs[2].innerHTML = "Attached";
+								childs[3].children[0].disabled = false;
+								
+								//document.getElementById("http_" + childs[0].innerHTML);
+							}
+							
+							else
+							{
+								//alert(data);
+								childs[1].innerHTML = data;
+							}
+						}
+					});
+		}
+		
+		function attachAll()
+		{
+			var table = document.getElementById("ue_table");
+			
+			var rows = table.rows;
+			var no_of_rows = rows.length;
+			//alert(rows.length);
+
+			for(i = 1; i < no_of_rows-1; i++)
+			{	
+				if(rows[i].cells[2].innerHTML != "Attached")
+				{
+					//alert(rows[i].cells[0].innerHTML);
+					attach(rows[i].cells[0].innerHTML);
+				}
+			}
+		}
+	
+		function createUEs()
+		{
+			var N = $("#ue_input").val();
+			
+			$("#ue_input").attr("disabled", true);
+			$("#ue_button").attr("disabled", true);
+			
+			for(i = 0; i < N; i++)
+			{
+				$("#ue_table").append("<tr id=row_" + i + "><td>" + i + "</td><td></td><td><button style=\"width: 100%\" attach_" + i + " onclick=attach(" + i + ")>Attach</button></td> <td><button disabled=true onclick=http("+i+")>Launch</button></td></tr>");
+			}
+			$("#ue_table").append("<tr><td></td><td></td><td><button style=\"width: 100%\" id=attach_all onclick=attachAll()>Attach all</button></td><td></td></tr>");
+			
+			$.ajax(
+			{
+				type: "POST",
+				url: "/control?param1=create_ue&param2=" + $("#ue_input").val(),
+				success: function(data)
+				{					
+					//alert(data);
+					if(data == "success")
+					{
+						//alert("started");
+						$("#enb_status").html('Started');
+						$("#button").attr("disabled", true);
+					}
+					
+					else
+					{
+						//alert("not started");
+					}
+				}
+			});
+		}
+	
+		function launchEnb()
+		{
+			$.ajax(
+			{
+				type: "POST",
+				url: "/control?param1=launch_enb",
+				success: function(data)
+				{					
+					//alert(data);
+					if(data == "success")
+					{
+						//alert("started");
+						$("#enb_status").html('Started');
+						$("#button").attr("disabled", true);
+						
+						$("#ue_input").attr("disabled", false);
+						$("#ue_button").attr("disabled", false);
+					}
+					
+					else
+					{
+						alert("Failed to start enodeb");
+					}
+				}
+			});
+		}
+	</script>
+
+</head>
+
+<body>
+	<h1 align="center">Tester Tool</h1>
+	
+	<div style=" background-color: #ffa; margin: 0px auto; width:75%;">
+	
+		<div style="float: left; width: 30%; ">
+			<table>
+				<tr> <td><h3 align="left"> ENodeB </h3> </td> </tr>
+				<tr> <td><button onclick="launchEnb()" id="button"> Launch </button></td> </tr>
+			</table>
+				
+			<table border="1px" width="100%">
+				<tr><th width="40%">Status</th>	<td id="enb_status">Not running</td></tr>
+				<tr><th>IP</th>	<td id="enb_status">    0.0.0.0</td></tr>
+				<tr><th>Value</th>	<td id="enb_status">0.0.0.0</td></tr>
+				<tr><th>Value</th>	<td id="enb_status">0.0.0.0</td></tr>
+				
+			</table>
+		</div>
+		
+		<div style="float:left; width: 65%; margin-left: 2%;" >
+		
+			<h3 align="left"> UEs </h3>
+			<label>Number of UEs: </label> <input type="text" disabled="disabled" id="ue_input">
+			<button onclick="createUEs()" disabled="disabled" id="ue_button"> Launch </button>
+		
+			<table border="1px" width="100%" style="margin-top: 10px" id="ue_table">
+				<tr>
+					<th width="10%"> No. </th>
+					<th width="20%"> eNBUES1APID </th>
+					<th width="15%"> Attach status </th>
+					<th> HTTP Request </th>
+				</tr>
+			</table>
+		</div>
+	</div>
+		
+</body>
+</html>
