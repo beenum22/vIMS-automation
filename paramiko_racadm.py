@@ -58,11 +58,11 @@ for line in Memory_splitLine:
         size_type = line.split()[3]
 
         if size_type == "PB":
-                memory_array[index]=size* math.pow(1024,3)
+                memorys_array[index]=size* math.pow(1024,3)
         elif size_type == "TB":
                 memorys_array[index]=size* math.pow(1024,2)
         elif size_type == "GB":
-		morys_array[index]=size* math.pow(1024,1)
+		memorys_array[index]=size* math.pow(1024,1)
         elif size_type == "KB":
                 memorys_array[index]=size/1024
         index+=1
