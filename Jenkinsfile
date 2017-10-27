@@ -4,7 +4,7 @@ pipeline {
         stage('build') {
             steps {
 		// sh 'python hugepages_unittesting/test.py'
-		sh 'python hello.py'
+		sh 'python hugepages_unittesting/test.py'
             }
         }
     }
