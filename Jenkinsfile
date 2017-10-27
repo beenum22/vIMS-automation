@@ -6,7 +6,8 @@ pipeline {
 		// sh 'python hugepages_unittesting/test.py'
 		sh 'sudo pip install mock'
 		sh 'sudo pip install openpyxl'  
-		sh 'sudo pip install paramiko'      
+		sh 'sudo pip install paramiko' 
+		sh 'sudo pip install novaclient'    
 		sh 'python hugepages_unittesting/test.py'
             }
         }
