@@ -6,7 +6,7 @@ import units
 import string
 import openpyxl
 from hpsrc.ComputeConfig import ComputeConfig
-from hpsrc.FlavorControl import FlavorControl
+#from hpsrc.FlavorControl import FlavorControl
 from hpsrc.GlobVar import GlobVar
 import paramiko
 #import novaclient
