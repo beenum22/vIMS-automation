@@ -4,7 +4,7 @@ pipeline {
         stage('build') {
             steps {
 		// sh 'python hugepages_unittesting/test.py'
-		sh 'pip install mock'
+		sh 'usr/local/bin/pip install mock'
 		sh 'python hugepages_unittesting/test.py'
             }
         }
