@@ -5,6 +5,7 @@ pipeline {
             steps {
 		// sh 'python hugepages_unittesting/test.py'
 		sh 'sudo pip install mock'
+		sh 'sudo pip install openpyxl'  
 		sh 'python hugepages_unittesting/test.py'
             }
         }
