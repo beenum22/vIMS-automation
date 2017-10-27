@@ -9,9 +9,9 @@ from hpsrc.ComputeConfig import ComputeConfig
 from hpsrc.FlavorControl import FlavorControl
 from hpsrc.GlobVar import GlobVar
 import paramiko
-import novaclient
-from novaclient import client
-from novaclient import client as nvclient
+#import novaclient
+#from novaclient import client
+#from novaclient import client as nvclient
 #import enable_hugepages_director
 import requests
 import json
