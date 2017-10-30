@@ -26,7 +26,7 @@ pipeline {
 		failure {
 			mail body: "View console output at ${BUILD_URL}", subject: " ${JOB_NAME} Build#  ${BUILD_NUMBER} FAILED" , to: 'mahrukh.anwari@xflowresearch.com'
 		sh 'echo cleaning directory'
-		deleteDir()
+		// deleteDir()
 		}
 	}
 }
