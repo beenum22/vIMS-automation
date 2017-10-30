@@ -9,6 +9,7 @@ pipeline {
 		sh 'sudo pip install openpyxl'  
 		sh 'sudo pip install paramiko' 
 		sh 'sudo pip install requests'
+		sh 'sudo pip install openpyxl'
 		// running the hugepages test script
 		sh 'python hugepages_unittesting/test.py'
             }
