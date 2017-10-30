@@ -4,10 +4,12 @@ pipeline {
         stage('build') {
             steps {
 		// sh 'python hugepages_unittesting/test.py'
+		// installing the packages using pip install"
 		sh 'sudo pip install mock'
 		sh 'sudo pip install openpyxl'  
 		sh 'sudo pip install paramiko' 
 		sh 'sudo pip install requests'
+		// running the hugepages test script
 		sh 'python hugepages_unittesting/test.py'
             }
         }
