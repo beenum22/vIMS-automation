@@ -4,7 +4,7 @@ pipeline {
         stage('build') {
             steps {
 		// sh 'python hugepages_unittesting/test.py'
-		sh 'sudo pip install mock'
+		sh 'sudo -n pip install mock'
 		sh 'sudo pip install openpyxl'  
 		sh 'sudo pip install paramiko'    
 		sh 'python hugepages_unittesting/test.py'
