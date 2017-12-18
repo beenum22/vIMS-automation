@@ -1,9 +1,8 @@
 pipeline {
     agent any
-    ansiColor('xterm') {
     stages {
         stage('build') {
-            steps {
+               steps {
 		// sh 'python hugepages_unittesting/test.py'
 		// installing the packages using pip install"
 		sh 'sudo pip install mock'
@@ -14,10 +13,8 @@ pipeline {
 		// running the hugepages test script
 		sh 'python hugepages_unittesting/test.py'
             }
-        }
+         }
     }
-}
-	
 	post {
 		success {
 			mail body: "View console output at ${BUILD_URL}", subject: "${JOB_NAME} Build#  ${BUILD_NUMBER} SUCCESSFUL" , to: 'mahrukh.anwari@xflowresearch.com'

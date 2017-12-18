@@ -20,7 +20,7 @@ import json
 class TestInputArgument(unittest.TestCase):
     
     def setUp(self):
-        self.wb = openpyxl.load_workbook('hugepages_unittesting/test_cases.xlsx')
+        self.wb = openpyxl.load_workbook('test_cases.xlsx')
         
     def test_positive_logfile_name(self):
         positive_sheet = self.wb.get_sheet_by_name('positive')
