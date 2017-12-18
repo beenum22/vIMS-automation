@@ -1,5 +1,6 @@
 pipeline {
     agent any
+	ansiColor('xterm') {
     stages {
         stage('build') {
             steps {
@@ -15,7 +16,7 @@ pipeline {
             }
         }
     }
-	
+	}
 	post {
 		success {
 			mail body: "View console output at ${BUILD_URL}", subject: "${JOB_NAME} Build#  ${BUILD_NUMBER} SUCCESSFUL" , to: 'mahrukh.anwari@xflowresearch.com'
