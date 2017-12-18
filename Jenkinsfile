@@ -1,8 +1,8 @@
 pipeline {
     agent any
-	ansiColor('xterm') {
 
     stages {
+	ansiColor('xterm') {
         stage('build') {
             steps {
 		// sh 'python hugepages_unittesting/test.py'
@@ -17,8 +17,7 @@ pipeline {
             }
         }
     }
-	}
-
+    }
 	post {
 		success {
 			mail body: "View console output at ${BUILD_URL}", subject: "${JOB_NAME} Build#  ${BUILD_NUMBER} SUCCESSFUL" , to: 'mahrukh.anwari@xflowresearch.com'
