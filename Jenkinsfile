@@ -1,5 +1,6 @@
 pipeline {
     agent any
+    ansiColor('xterm') {
     stages {
         stage('build') {
             steps {
@@ -15,6 +16,7 @@ pipeline {
             }
         }
     }
+}
 	
 	post {
 		success {
