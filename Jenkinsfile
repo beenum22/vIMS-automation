@@ -1,10 +1,9 @@
 pipeline {
     agent any
-
     stages {
-	ansiColor('xterm') {
         stage('build') {
-            steps {
+	    ansiColor('xterm') {
+               steps {
 		// sh 'python hugepages_unittesting/test.py'
 		// installing the packages using pip install"
 		sh 'sudo pip install mock'
@@ -15,8 +14,8 @@ pipeline {
 		// running the hugepages test script
 		sh 'python hugepages_unittesting/test.py'
             }
-        }
-    }
+         }
+      }
     }
 	post {
 		success {
