@@ -465,7 +465,7 @@ class Stack(object):
                                                  cores=cores, floating_ips=floating_ips,
                                                  security_groups=security_groups)
             quota_neutron = self.neutron.update_quota(
-                self.project_id, floating_ips=floating_ips, port=port)
+                self.project_id, {'quota': {'port': port, 'floatingips': floating_ips}})
             return True
         except Exception as err:
             raise
