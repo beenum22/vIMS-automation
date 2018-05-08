@@ -61,7 +61,7 @@ class vIMS(Stack):
                                     'image_name'], url=self.settings.universal['image_url'])
             self.create_keypair(self.settings.universal['keypair_name'])
             self.create_flavor(self.settings.universal['flavor_name'], ram=4096, vcpus=2, disk=40)
-            #self.check_quotas()
+            self.check_quotas(security_groups=30)
             public_net_id = self.get_net_id(
                 self.settings.universal['public_network'])
             mgmt_net_pool = Utilities.get_ip_range(self.settings.mgmt_net[

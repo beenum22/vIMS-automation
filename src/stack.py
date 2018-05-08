@@ -39,7 +39,7 @@ class Stack(object):
             raise
 
     def _get_auth_sess(self):
-        #try:
+        # try:
         self.auth = identity.Password(auth_url=self.auth_url,
                                       username=self.username,
                                       password=self.password,
@@ -47,15 +47,15 @@ class Stack(object):
                                       )
         self.sess = self._get_session(self.auth)
         return self.auth, self.sess
-        #except Exception as err:
-            # logger.debug(err)
+        # except Exception as err:
+        # logger.debug(err)
         #    raise
 
     def _get_session(self, auth):
-        #try:
+        # try:
         #sess = session.Session(auth=auth)
         return session.Session(auth=auth)
-        #except Exception as err:
+        # except Exception as err:
         #    logger.debug(err)
         #    raise
 
@@ -80,7 +80,8 @@ class Stack(object):
             return nvclient.Client(version, session=sess)
         except UnsupportedVersion as err:
             logger.debug(err)
-            raise UnsupportedVersion("Invalid Nova client version '%s'" % version)
+            raise UnsupportedVersion(
+                "Invalid Nova client version '%s'" % version)
         except Exception as err:
             logger.debug(err)
             raise
@@ -461,11 +462,13 @@ class Stack(object):
                 self.project_name).id
             logger.info("Updating OpenStack quota for '%s' project",
                         self.project_name)
-            quota_nova = self.nova.quotas.update(self.project_id,
-                                                 cores=cores, floating_ips=floating_ips,
-                                                 security_groups=security_groups)
+            quota_nova = self.nova.quotas.update(self.project_id, cores=cores)
             quota_neutron = self.neutron.update_quota(
-                self.project_id, {'quota': {'port': port, 'floatingips': floating_ips}})
+                self.project_id, {'quota': {
+                                'security_group': security_groups, 
+                                'port': port, 
+                                'floatingip': floating_ips}}
+                                )
             return True
         except Exception as err:
             raise
