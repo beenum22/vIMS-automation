@@ -1,0 +1,11 @@
+resource_registry:
+        "ClearwaterIMS::Network": "./network.yaml"
+        "ClearwaterIMS::SecurityGroups": "./security-groups.yaml"
+        "ClearwaterIMS::Bono": "./bono.yaml"
+        "ClearwaterIMS::Dime": "./dime.yaml"
+        "ClearwaterIMS::Homer": "./homer.yaml"
+        "ClearwaterIMS::Sprout": "./sprout.yaml"
+        "ClearwaterIMS::Ellis": "./ellis.yaml"
+        "ClearwaterIMS::Vellum": "./vellum.yaml"
+        "ClearwaterIMS::DNS": "./dns.yaml"
+

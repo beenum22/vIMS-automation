@@ -1,0 +1,99 @@
+# Copyright (C) Metaswitch Networks 2016
+# If license terms are provided to you in a COPYING file in the root directory
+# of the source code repository by which you are accessing this code, then
+# the license outlined in that COPYING file applies to your use.
+# Otherwise no rights are granted except for those provided to you by
+# Metaswitch Networks in a separate written agreement.
+
+heat_template_version: 2013-05-23
+
+description: >
+  Network for Clearwater to use
+
+parameters:
+  public_net_id:
+    type: string
+    description: ID of public network
+    constraints:
+      - custom_constraint: neutron.network
+        description: Must be a valid network ID
+  private_net_name:
+    type: string
+    description: Name of private network
+    default: clearwater-private
+  private_net_ip_version:
+    type: string
+    description: IP version (4 or 6)
+    constraints:
+      - allowed_values:
+        - "4"
+        - "6"
+        description: Must be 4 (IPv4) or 6 (IPv6)
+    default: "4"
+  private_net_cidr:
+    type: string
+    description: Private network address (CIDR notation)
+    default: 192.168.0.0/24
+  private_net_gateway:
+    type: string
+    description: Private network gateway address
+    default: 192.168.0.254
+  private_net_pool_start:
+    type: string
+    description: Start of private network IP address pool
+    default: 192.168.0.1
+  private_net_pool_end:
+    type: string
+    description: End of private network IP address pool
+    default: 192.168.0.253
+  dns_ip:
+    type: string
+    description: IP address of DNS server
+    default: 8.8.8.8
+
+resources:
+  private_net:
+    type: OS::Neutron::Net
+    properties:
+      name: { get_param: private_net_name }
+
+  private_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      name: { get_param: private_net_name }
+      network_id: { get_resource: private_net }
+      ip_version: { get_param: private_net_ip_version }
+      cidr: { get_param: private_net_cidr }
+      dns_nameservers: [ { get_param: dns_ip } ]
+      gateway_ip: { get_param: private_net_gateway }
+      allocation_pools:
+        - start: { get_param: private_net_pool_start }
+          end: { get_param: private_net_pool_end }
+
+  router:
+    type: OS::Neutron::Router
+    properties:
+      name: { get_param: private_net_name }
+
+  router_gateway:
+    type: OS::Neutron::RouterGateway
+    properties:
+      router_id: { get_resource: router }
+      network_id: { get_param: public_net_id }
+
+  router_interface:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: router }
+      subnet_id: { get_resource: private_subnet }
+
+outputs:
+  private_net:
+    description: ID of private network
+    value: { get_resource: private_net }
+  private_net_cidr:
+    description: Private network address (CIDR notation)
+    value: { get_param: private_net_cidr }
+  private_net_gateway:
+    description: Private network gateway address
+    value: { get_param: private_net_gateway }

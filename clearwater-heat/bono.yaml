@@ -1,0 +1,169 @@
+# Copyright (C) Metaswitch Networks 2017
+# If license terms are provided to you in a COPYING file in the root directory
+# of the source code repository by which you are accessing this code, then
+# the license outlined in that COPYING file applies to your use.
+# Otherwise no rights are granted except for those provided to you by
+# Metaswitch Networks in a separate written agreement.
+
+heat_template_version: 2013-05-23
+
+description: >
+  Clearwater Bono node
+
+parameters:
+  public_mgmt_net_id:
+    type: string
+    description: ID of public management network
+    constraints:
+      - custom_constraint: neutron.network
+        description: Must be a valid network ID
+  private_mgmt_net_id:
+    type: string
+    description: ID of private management network
+    constraints:
+      - custom_constraint: neutron.network
+        description: Must be a valid network ID
+  public_sig_net_id:
+    type: string
+    description: ID of public signaling network
+    constraints:
+      - custom_constraint: neutron.network
+        description: Must be a valid network ID
+  private_sig_net_id:
+    type: string
+    description: ID of private signaling network
+    constraints:
+      - custom_constraint: neutron.network
+        description: Must be a valid network ID
+  private_sig_net_cidr:
+    type: string
+    description: Private signaling network address (CIDR notation)
+    default: 192.168.1.0/24
+  private_sig_net_gateway:
+    type: string
+    description: Private signaling network gateway address
+    default: 192.168.1.254
+  flavor:
+    type: string
+    description: Flavor to use
+    constraints:
+      - custom_constraint: nova.flavor
+        description: Must be a valid flavor name
+  image:
+    type: string
+    description: Name of image to use
+    constraints:
+      - custom_constraint: glance.image
+        description: Must be a valid image name
+  key_name:
+    type: string
+    description: Name of keypair to assign
+    constraints:
+      - custom_constraint: nova.keypair
+        description: Must be a valid keypair name
+  base_mgmt_security_group:
+    type: string
+    description: ID of base security group for all Clearwater nodes (managment)
+  bono_sig_security_group:
+    type: string
+    description: ID of security group for Bono nodes (signaling)
+  repo_url:
+    type: string
+    description: URL for Clearwater repository
+    default: http://repo.cw-ngv.com/stable
+  zone:
+    type: string
+    description: DNS zone
+    default: example.com
+  dns_mgmt_ip:
+    type: string
+    description: IP address for DNS server on management network
+  dns_sig_ip:
+    type: string
+    description: IP address for DNS server on signaling network
+  dnssec_key:
+    type: string
+    description: DNSSEC private key (Base64-encoded)
+    constraints:
+      - allowed_pattern: "[0-9A-Za-z+/=]+"
+        description: Must be Base64-encoded
+  etcd_ip:
+    type: string
+    description: IP address of an existing member of the etcd cluster
+    default: ""
+  index:
+    type: number
+    description: Index of this Bono node in the Bono cluster
+    default: 0
+
+resources:
+  mgmt_port:
+    type: OS::Neutron::Port
+    properties:
+      # Specify the network ID by string to work around OpenStack issues - see https://github.com/Metaswitch/clearwater-heat/issues/18.
+      network_id: { str_replace: { params: { x: { get_param: private_mgmt_net_id } }, template: x } }
+      security_groups:
+        - { get_param: base_mgmt_security_group }
+
+  mgmt_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network_id: { get_param: public_mgmt_net_id }
+      port_id: { get_resource: mgmt_port }
+
+  sig_port:
+    type: OS::Neutron::Port
+    properties:
+      # Specify the network ID by string to work around OpenStack issues - see https://github.com/Metaswitch/clearwater-heat/issues/18.
+      network_id: { str_replace: { params: { x: { get_param: private_sig_net_id } }, template: x } }
+      security_groups:
+        - { get_param: bono_sig_security_group }
+
+  sig_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network_id: { get_param: public_sig_net_id }
+      port_id: { get_resource: sig_port }
+
+  server:
+    type: OS::Nova::Server
+    properties:
+      name: { str_replace: { params: { __index__: { get_param: index }, __zone__: { get_param: zone } }, template: bono-__index__.__zone__ } }
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      key_name: { get_param: key_name }
+      networks:
+        - port: { get_resource: mgmt_port }
+        - port: { get_resource: sig_port }
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          params:
+            __repo_url__: { get_param: repo_url }
+            __zone__: { get_param: zone }
+            __public_mgmt_ip__: { get_attr: [ mgmt_floating_ip, floating_ip_address ] }
+            __private_mgmt_ip__: { get_attr: [ mgmt_port, fixed_ips, 0, ip_address ] }
+            __public_sig_ip__: { get_attr: [ sig_floating_ip, floating_ip_address ] }
+            __private_sig_ip__: { get_attr: [ sig_port, fixed_ips, 0, ip_address ] }
+            __private_sig_cidr__: { get_param: private_sig_net_cidr }
+            __private_sig_gateway__: { get_param: private_sig_net_gateway }
+            __dns_mgmt_ip__: { get_param: dns_mgmt_ip }
+            __dns_sig_ip__: { get_param: dns_sig_ip }
+            __dnssec_key__: { get_param: dnssec_key }
+            __etcd_ip__ : { get_param: etcd_ip }
+            __index__ : { get_param: index }
+          template: {get_file: config_scripts/bono.sh}
+
+outputs:
+  public_mgmt_ip:
+    description: IP address in public management network
+    value: { get_attr: [ mgmt_floating_ip, floating_ip_address ] }
+  private_mgmt_ip:
+    description: IP address in private management network
+    value: { get_attr: [ mgmt_port, fixed_ips, 0, ip_address ] }
+  public_sig_ip:
+    description: IP address in public signaling network
+    value: { get_attr: [ sig_floating_ip, floating_ip_address ] }
+  private_sig_ip:
+    description: IP address in private signaling network
+    value: { get_attr: [ sig_port, fixed_ips, 0, ip_address ] }
