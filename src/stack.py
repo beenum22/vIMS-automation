@@ -35,7 +35,6 @@ class Stack(object):
                 self.auth_url, self.sess, self.auth, 'orchestration')
             self.openstack = self._get_openstacksdk_client(
                 self.auth_url, self.password)
-            raise
         except Exception as err:
             raise
 
