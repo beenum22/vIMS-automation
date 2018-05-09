@@ -95,6 +95,16 @@ parameters:
     type: number
     description: Index of this Bono node in the Bono cluster
     default: 0
+  #cloud_url:
+  #  type: string
+  #  description: OpenStack url
+  #cloud_password:
+  #  type: string
+  #  description: OpenStack password
+  #node:
+  #  type: string
+  #  description: Node name
+  #  default: bono
 
 resources:
   mgmt_port:
@@ -125,10 +135,33 @@ resources:
       floating_network_id: { get_param: public_sig_net_id }
       port_id: { get_resource: sig_port }
 
+  #node_count:
+  #  type: OS::Heat::SoftwareConfig
+  #  properties:
+  #    group: script
+      #inputs:
+      #- node: bono
+      #- password: {get_param: cloud_password}
+      #- url: {get_param: cloud_url}
+  #    outputs:
+  #    - name: result
+  #    config:
+  #      str_replace:
+  #        params:
+  #          $NODE: {get_param: node}
+  #          $PASSWORD: {get_param: cloud_password}
+  #          $URL: {get_param: cloud_url} 
+  #        template: {get_file: ../src/get_nodes.py}
+
+  rand_name:
+    type: OS::Heat::RandomString
+    properties:
+      length: {get_param: index}
+
   server:
     type: OS::Nova::Server
     properties:
-      name: { str_replace: { params: { __index__: { get_param: index }, __zone__: { get_param: zone } }, template: bono-__index__.__zone__ } }
+      name: { str_replace: { params: { __index__: { get_attr: [rand_name, value] }, __zone__: { get_param: zone } }, template: bono-__index__.__zone__ } }
       image: { get_param: image }
       flavor: { get_param: flavor }
       key_name: { get_param: key_name }
@@ -151,7 +184,7 @@ resources:
             __dns_sig_ip__: { get_param: dns_sig_ip }
             __dnssec_key__: { get_param: dnssec_key }
             __etcd_ip__ : { get_param: etcd_ip }
-            __index__ : { get_param: index }
+            __index__ : { get_attr: [rand_name, value] }
           template: {get_file: config_scripts/bono.sh}
 
 outputs:
@@ -167,3 +200,5 @@ outputs:
   private_sig_ip:
     description: IP address in private signaling network
     value: { get_attr: [ sig_port, fixed_ips, 0, ip_address ] }
+  #count:
+  #  value: { get_attr: [node_count, result]}

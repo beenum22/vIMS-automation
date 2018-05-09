@@ -123,10 +123,15 @@ resources:
         - { get_param: vellum_sig_outbound_security_group }
         - { get_param: vellum_sig_inbound_security_group }
 
+  rand_name:
+    type: OS::Heat::RandomString
+    properties:
+      length: 5
+
   server:
     type: OS::Nova::Server
     properties:
-      name: { str_replace: { params: { __index__: { get_param: index }, __zone__: { get_param: zone } }, template: vellum-__index__.__zone__ } }
+      name: { str_replace: { params: { __index__: { get_attr: [rand_name, value] }, __zone__: { get_param: zone } }, template: vellum-__index__.__zone__ } }
       image: { get_param: image }
       flavor: { get_param: flavor }
       key_name: { get_param: key_name }
@@ -148,7 +153,7 @@ resources:
             __dns_sig_ip__: { get_param: dns_sig_ip }
             __dnssec_key__: { get_param: dnssec_key }
             __etcd_ip__ : { get_param: etcd_ip }
-            __index__ : { get_param: index }
+            __index__ : { get_attr: [rand_name, value] }
           template: {get_file: config_scripts/vellum.sh}
 
 outputs:

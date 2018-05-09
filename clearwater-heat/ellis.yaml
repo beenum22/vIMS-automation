@@ -85,7 +85,7 @@ parameters:
   index:
     type: number
     description: Index of this Ellis node in the Ellis cluster
-    default: 0
+    #default: 0
 
 resources:
   mgmt_port:
@@ -103,10 +103,15 @@ resources:
       floating_network_id: { get_param: public_mgmt_net_id }
       port_id: { get_resource: mgmt_port }
 
+  rand_name:
+    type: OS::Heat::RandomString
+    properties:
+      length: {get_param: index}
+
   server:
     type: OS::Nova::Server
     properties:
-      name: { str_replace: { params: { __index__: { get_param: index }, __zone__: { get_param: zone } }, template: ellis-__index__.__zone__ } }
+      name: { str_replace: { params: { __index__: { get_attr: [rand_name, value] }, __zone__: { get_param: zone } }, template: ellis-__index__.__zone__ } }
       image: { get_param: image }
       flavor: { get_param: flavor }
       key_name: { get_param: key_name }
@@ -125,7 +130,7 @@ resources:
             __dns_mgmt_ip__: { get_param: dns_mgmt_ip }
             __dnssec_key__: { get_param: dnssec_key }
             __etcd_ip__ : { get_param: etcd_ip }
-            __index__ : { get_param: index }
+            __index__ : { get_attr: [rand_name, value] }
           template: {get_file: config_scripts/ellis.sh}
 
 outputs:

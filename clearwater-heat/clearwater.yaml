@@ -138,6 +138,27 @@ parameters:
     type: number
     description: Number of Vellum nodes in Vellum cluster
     default: 1
+  cloud_project:
+    type: string
+    description: OpenStack project name
+    default: admin
+  cloud_user:
+    type: string
+    description: OpenStack user name
+    default: admin
+  cloud_url:
+    type: string
+    description: OpenStack user name
+    default: http://100.67.141.190:5000/v2.0
+  cloud_password:
+    type: string
+    description: OpenStack user password
+    default: wVEyXbU3jMNnN9y7dgJsd4xJw
+    hidden: true
+  index:
+    type: number
+    description: Length of unique string for each node
+    default: 6
 
 resources:
   mgmt_network:
@@ -199,6 +220,7 @@ resources:
       dn_range_length: { get_param: dn_range_length }
       dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
       dnssec_key: { get_param: dnssec_key }
+      index: { get_param: index}
 
 
   bono_scaleup_policy:
@@ -208,7 +230,6 @@ resources:
       auto_scaling_group_id: {get_resource: bono}
       cooldown: 60
       scaling_adjustment: 1
-      #type: webhook
 
   bono_scaledown_policy:
     type: OS::Heat::ScalingPolicy
@@ -217,19 +238,13 @@ resources:
       auto_scaling_group_id: {get_resource: bono}
       cooldown: 60
       scaling_adjustment: -1
-      #type: webhook
 
   bono:
-    #type: OS::Heat::ResourceGroup
-    #properties:
     type: OS::Heat::AutoScalingGroup
     properties:
       min_size: 1
       desired_capacity: {get_param: bono_cluster_size}
       max_size: 3
-      #count: { get_param: bono_cluster_size }
-      #index_var: "__index__"
-      #current_size: "__index__"
       resource:
         type: ClearwaterIMS::Bono
         properties:
@@ -249,15 +264,32 @@ resources:
           dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
           dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
           dnssec_key: { get_param: dnssec_key }
-          etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
-          #index: __index__
+          etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }      
+          index: { get_param: index}
+
+  sprout_scaleup_policy:
+    type: OS::Heat::ScalingPolicy
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: {get_resource: sprout}
+      cooldown: 60
+      scaling_adjustment: 1
+
+  sprout_scaledown_policy:
+    type: OS::Heat::ScalingPolicy
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: {get_resource: sprout}
+      cooldown: 60
+      scaling_adjustment: -1
 
   sprout:
-    type: OS::Heat::ResourceGroup
+    type: OS::Heat::AutoScalingGroup
     properties:
-      count: { get_param: sprout_cluster_size }
-      index_var: __index__
-      resource_def:
+      min_size: 1
+      desired_capacity: {get_param: sprout_cluster_size}
+      max_size: 3
+      resource:
         type: ClearwaterIMS::Sprout
         properties:
           public_mgmt_net_id: { get_param: public_mgmt_net_id }
@@ -278,14 +310,31 @@ resources:
           dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
           dnssec_key: { get_param: dnssec_key }
           etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
-          index: __index__
+          index: { get_param: index}
+
+  homer_scaleup_policy:
+    type: OS::Heat::ScalingPolicy
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: {get_resource: homer}
+      cooldown: 60
+      scaling_adjustment: 1
+
+  homer_scaledown_policy:
+    type: OS::Heat::ScalingPolicy
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: {get_resource: homer}
+      cooldown: 60
+      scaling_adjustment: -1
 
   homer:
-    type: OS::Heat::ResourceGroup
+    type: OS::Heat::AutoScalingGroup
     properties:
-      count: { get_param: homer_cluster_size }
-      index_var: __index__
-      resource_def:
+      min_size: 1
+      desired_capacity: {get_param: homer_cluster_size}
+      max_size: 3
+      resource:
         type: ClearwaterIMS::Homer
         properties:
           public_mgmt_net_id: { get_param: public_mgmt_net_id }
@@ -306,14 +355,31 @@ resources:
           dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
           dnssec_key: { get_param: dnssec_key }
           etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
-          index: __index__
+          index: { get_param: index}
+
+  dime_scaleup_policy:
+    type: OS::Heat::ScalingPolicy
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: {get_resource: dime}
+      cooldown: 60
+      scaling_adjustment: 1
+
+  dime_scaledown_policy:
+    type: OS::Heat::ScalingPolicy
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: {get_resource: dime}
+      cooldown: 60
+      scaling_adjustment: -1
 
   dime:
-    type: OS::Heat::ResourceGroup
+    type: OS::Heat::AutoScalingGroup
     properties:
-      count: { get_param: dime_cluster_size }
-      index_var: __index__
-      resource_def:
+      min_size: 1
+      desired_capacity: {get_param: dime_cluster_size}
+      max_size: 3
+      resource:
         type: ClearwaterIMS::Dime
         properties:
           public_mgmt_net_id: { get_param: public_mgmt_net_id }
@@ -334,14 +400,31 @@ resources:
           dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
           dnssec_key: { get_param: dnssec_key }
           etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
-          index: __index__
+          index: { get_param: index}
+
+  vellum_scaleup_policy:
+    type: OS::Heat::ScalingPolicy
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: {get_resource: vellum}
+      cooldown: 60
+      scaling_adjustment: 1
+
+  vellum_scaledown_policy:
+    type: OS::Heat::ScalingPolicy
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: {get_resource: vellum}
+      cooldown: 60
+      scaling_adjustment: -1
 
   vellum:
-    type: OS::Heat::ResourceGroup
+    type: OS::Heat::AutoScalingGroup
     properties:
-      count: { get_param: vellum_cluster_size }
-      index_var: __index__
-      resource_def:
+      min_size: 1
+      desired_capacity: {get_param: vellum_cluster_size}
+      max_size: 3
+      resource:
         type: ClearwaterIMS::Vellum
         properties:
           public_mgmt_net_id: { get_param: public_mgmt_net_id }
@@ -362,7 +445,7 @@ resources:
           dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
           dnssec_key: { get_param: dnssec_key }
           etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
-          index: __index__
+          index: { get_param: index}
 
 outputs:
   zone:
@@ -375,5 +458,29 @@ outputs:
     description: Bono webhook for scale up policy
     value: {get_attr: [bono_scaleup_policy, alarm_url]}
   bono_scaledown_url:
-    description: Bono webhook for scale up policy
+    description: Bono webhook for scale down policy
     value: {get_attr: [bono_scaledown_policy, alarm_url]}
+  sprout_scaleup_url:
+    description: Sprout webhook for scale up policy
+    value: {get_attr: [sprout_scaleup_policy, alarm_url]}
+  sprout_scaledown_url:
+    description: Sprout webhook for scale down policy
+    value: {get_attr: [sprout_scaledown_policy, alarm_url]}
+  homer_scaleup_url:
+    description: Homer webhook for scale up policy
+    value: {get_attr: [homer_scaleup_policy, alarm_url]}
+  homer_scaledown_url:
+    description: Homer webhook for scale down policy
+    value: {get_attr: [homer_scaledown_policy, alarm_url]}
+  dime_scaleup_url:
+    description: Dime webhook for scale up policy
+    value: {get_attr: [dime_scaleup_policy, alarm_url]}
+  dime_scaledown_url:
+    description: Dime webhook for scale down policy
+    value: {get_attr: [dime_scaledown_policy, alarm_url]}
+  vellum_scaleup_url:
+    description: Vellum webhook for scale up policy
+    value: {get_attr: [vellum_scaleup_policy, alarm_url]}
+  vellum_scaledown_url:
+    description: Vellum webhook for scale down policy
+    value: {get_attr: [vellum_scaledown_policy, alarm_url]}
