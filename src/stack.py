@@ -453,9 +453,8 @@ class Stack(object):
             # logger.debug(err)
             raise
 
-    def check_quotas(self, cores=30, floating_ips=20, security_groups=15, port=100):
+    def check_quotas(self, cores=50, floating_ips=30, security_groups=30, port=100):
         try:
-            cores = None
             # check flavor vcpus
             # Update Quota
             self.project_id = self.openstack.identity.find_project(

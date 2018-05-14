@@ -94,7 +94,10 @@ parameters:
   index:
     type: number
     description: Index of this Bono node in the Bono cluster
-    default: 0
+    default: 6
+  affinity_group:
+    type: string
+    default: affinity
   #cloud_url:
   #  type: string
   #  description: OpenStack url
@@ -168,6 +171,8 @@ resources:
       networks:
         - port: { get_resource: mgmt_port }
         - port: { get_resource: sig_port }
+      scheduler_hints:
+        group: { get_param: affinity_group}
       user_data_format: RAW
       user_data:
         str_replace:

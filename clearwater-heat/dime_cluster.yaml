@@ -1,0 +1,145 @@
+heat_template_version: 2013-05-23
+
+description: >
+  Scalable Dime Cluster
+
+parameters:
+  cluster_size:
+    type: number
+    description: "Size of Dime cluster"
+    default: 2
+  public_mgmt_net_id:
+    type: string
+  private_mgmt_net_id:
+    type: string
+  public_sig_net_id:
+    type: string
+  private_sig_net_id: 
+    type: string
+  private_sig_net_cidr: 
+    type: string
+  private_sig_net_gateway: 
+    type: string
+  flavor: 
+    type: string
+  image: 
+    type: string
+  key_name: 
+    type: string
+  base_mgmt_security_group: 
+    type: string
+  dime_mgmt_security_group: 
+    type: string
+  dime_sig_security_group: 
+    type: string
+  repo_url: 
+    type: string
+  zone: 
+    type: string
+  dns_mgmt_ip: 
+    type: string
+  dns_sig_ip: 
+    type: string
+  dnssec_key: 
+    type: string
+  etcd_ip: 
+    type: string
+  #index: 
+  #  type: string
+  #affinity_group:
+  #  type: string
+
+resources:
+  dime_soft_group:
+   type: OS::Nova::ServerGroup
+   properties:
+    name: Dime VMs on separate compute nodes with soft anti-affinity
+    policies:
+     - soft-anti-affinity
+
+  dime_hard_group:
+   type: OS::Nova::ServerGroup
+   properties:
+    name: Dime VMs on separate compute nodes
+    policies:
+     - anti-affinity
+
+  dime_scaleup_policy:
+    type: OS::Heat::ScalingPolicy
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: {get_resource: dime_scale}
+      cooldown: 60
+      scaling_adjustment: 1
+
+  dime_scaledown_policy:
+    type: OS::Heat::ScalingPolicy
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: {get_resource: dime_scale}
+      cooldown: 60
+      scaling_adjustment: -1
+
+  dime_scale:
+    type: OS::Heat::AutoScalingGroup
+    properties:
+      min_size: 0
+      desired_capacity: 0
+      max_size: {get_param: cluster_size}
+      resource:
+        type: ClearwaterIMS::Dime
+        properties:
+          public_mgmt_net_id: { get_param: public_mgmt_net_id }
+          private_mgmt_net_id: { get_param: private_mgmt_net_id }
+          public_sig_net_id: { get_param: public_sig_net_id }
+          private_sig_net_id: { get_param: private_sig_net_id }
+          private_sig_net_cidr: { get_param: private_sig_net_cidr }
+          private_sig_net_gateway: { get_param: private_sig_net_gateway }
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          key_name: { get_param: key_name }
+          base_mgmt_security_group: { get_param: base_mgmt_security_group }
+          dime_mgmt_security_group: { get_param: dime_mgmt_security_group }
+          dime_sig_security_group: { get_param: dime_sig_security_group }
+          repo_url: { get_param: repo_url }
+          zone: { get_param: zone }
+          dns_mgmt_ip: { get_param: dns_mgmt_ip }
+          dns_sig_ip: { get_param: dns_sig_ip }
+          dnssec_key: { get_param: dnssec_key }
+          etcd_ip: { get_param: etcd_ip }
+          affinity_group: { get_resource: dime_soft_group}
+
+  dime_init:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: 2
+      resource_def:
+        type: ClearwaterIMS::Dime
+        properties:
+          public_mgmt_net_id: { get_param: public_mgmt_net_id }
+          private_mgmt_net_id: { get_param: private_mgmt_net_id }
+          public_sig_net_id: { get_param: public_sig_net_id }
+          private_sig_net_id: { get_param: private_sig_net_id }
+          private_sig_net_cidr: { get_param: private_sig_net_cidr }
+          private_sig_net_gateway: { get_param: private_sig_net_gateway }
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          key_name: { get_param: key_name }
+          base_mgmt_security_group: { get_param: base_mgmt_security_group }
+          dime_mgmt_security_group: { get_param: dime_mgmt_security_group }
+          dime_sig_security_group: { get_param: dime_sig_security_group }
+          repo_url: { get_param: repo_url }
+          zone: { get_param: zone }
+          dns_mgmt_ip: { get_param: dns_mgmt_ip }
+          dns_sig_ip: { get_param: dns_sig_ip }
+          dnssec_key: { get_param: dnssec_key }
+          etcd_ip: { get_param: etcd_ip }
+          affinity_group: { get_resource: dime_hard_group}
+
+outputs:
+  scaleup_webhook:
+    description: Dime webhook for scale up policy
+    value: {get_attr: [dime_scaleup_policy, alarm_url]}
+  scaledown_webhook:
+    description: Dime webhook for scale down policy
+    value: {get_attr: [dime_scaledown_policy, alarm_url]}

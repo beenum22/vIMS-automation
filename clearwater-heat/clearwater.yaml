@@ -161,6 +161,27 @@ parameters:
     default: 6
 
 resources:
+  affinity_group:
+   type: OS::Nova::ServerGroup
+   properties:
+    name: hosts on one compute-node
+    policies:
+     - soft-affinity
+
+  anti_affinity_group:
+   type: OS::Nova::ServerGroup
+   properties:
+    name: hosts on separate compute nodes
+    policies:
+     - anti-affinity
+
+  anti_affinity_group2:
+   type: OS::Nova::ServerGroup
+   properties:
+    name: hosts on separate compute nodes
+    policies:
+     - anti-affinity
+
   mgmt_network:
     type: ClearwaterIMS::Network
     properties:
@@ -222,230 +243,129 @@ resources:
       dnssec_key: { get_param: dnssec_key }
       index: { get_param: index}
 
-
-  bono_scaleup_policy:
-    type: OS::Heat::ScalingPolicy
+  bono_cluster:
+    type: ClearwaterIMS::BonoCluster
     properties:
-      adjustment_type: change_in_capacity
-      auto_scaling_group_id: {get_resource: bono}
-      cooldown: 60
-      scaling_adjustment: 1
+      cluster_size: { get_param: bono_cluster_size}
+      public_mgmt_net_id: { get_param: public_mgmt_net_id }
+      private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
+      public_sig_net_id: { get_param: public_sig_net_id }
+      private_sig_net_id: { get_attr: [ sig_network, private_net ] }
+      private_sig_net_cidr: { get_attr: [ sig_network, private_net_cidr ] }
+      private_sig_net_gateway: { get_attr: [ sig_network, private_net_gateway ] }
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_param: key_name }
+      base_mgmt_security_group: { get_attr: [ security_groups, base_mgmt ] }
+      bono_sig_security_group: { get_attr: [ security_groups, bono_sig ] }
+      repo_url: { get_param: repo_url }
+      zone: { get_param: zone }
+      dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
+      dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
+      dnssec_key: { get_param: dnssec_key }
+      etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }      
+      #index: { get_param: index}
+      #affinity_group: {get_resource: anti_affinity_group}
 
-  bono_scaledown_policy:
-    type: OS::Heat::ScalingPolicy
+  sprout_cluster:
+    type: ClearwaterIMS::SproutCluster
     properties:
-      adjustment_type: change_in_capacity
-      auto_scaling_group_id: {get_resource: bono}
-      cooldown: 60
-      scaling_adjustment: -1
+      cluster_size: { get_param: sprout_cluster_size}
+      public_mgmt_net_id: { get_param: public_mgmt_net_id }
+      private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
+      public_sig_net_id: { get_param: public_sig_net_id }
+      private_sig_net_id: { get_attr: [ sig_network, private_net ] }
+      private_sig_net_cidr: { get_attr: [ sig_network, private_net_cidr ] }
+      private_sig_net_gateway: { get_attr: [ sig_network, private_net_gateway ] }
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_param: key_name }
+      base_mgmt_security_group: { get_attr: [ security_groups, base_mgmt ] }
+      sprout_sig_outbound_security_group: { get_attr: [ security_groups, sprout_sig_outbound ] }
+      sprout_sig_inbound_security_group: { get_attr: [ security_groups, sprout_sig_inbound ] }
+      repo_url: { get_param: repo_url }
+      zone: { get_param: zone }
+      dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
+      dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
+      dnssec_key: { get_param: dnssec_key }
+      etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
+      #index: { get_param: index}
+      #affinity_group: {get_resource: anti_affinity_group2}      
 
-  bono:
-    type: OS::Heat::AutoScalingGroup
+  homer_cluster:
+    type: ClearwaterIMS::HomerCluster
     properties:
-      min_size: 1
-      desired_capacity: {get_param: bono_cluster_size}
-      max_size: 3
-      resource:
-        type: ClearwaterIMS::Bono
-        properties:
-          public_mgmt_net_id: { get_param: public_mgmt_net_id }
-          private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
-          public_sig_net_id: { get_param: public_sig_net_id }
-          private_sig_net_id: { get_attr: [ sig_network, private_net ] }
-          private_sig_net_cidr: { get_attr: [ sig_network, private_net_cidr ] }
-          private_sig_net_gateway: { get_attr: [ sig_network, private_net_gateway ] }
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          key_name: { get_param: key_name }
-          base_mgmt_security_group: { get_attr: [ security_groups, base_mgmt ] }
-          bono_sig_security_group: { get_attr: [ security_groups, bono_sig ] }
-          repo_url: { get_param: repo_url }
-          zone: { get_param: zone }
-          dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
-          dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
-          dnssec_key: { get_param: dnssec_key }
-          etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }      
-          index: { get_param: index}
+      cluster_size: { get_param: homer_cluster_size}
+      public_mgmt_net_id: { get_param: public_mgmt_net_id }
+      private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
+      public_sig_net_id: { get_param: public_sig_net_id }
+      private_sig_net_id: { get_attr: [ sig_network, private_net ] }
+      private_sig_net_cidr: { get_attr: [ sig_network, private_net_cidr ] }
+      private_sig_net_gateway: { get_attr: [ sig_network, private_net_gateway ] }
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_param: key_name }
+      base_mgmt_security_group: { get_attr: [ security_groups, base_mgmt ] }
+      homer_mgmt_security_group: { get_attr: [ security_groups, homer_mgmt ] }
+      homer_sig_security_group: { get_attr: [ security_groups, homer_sig ] }
+      repo_url: { get_param: repo_url }
+      zone: { get_param: zone }
+      dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
+      dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
+      dnssec_key: { get_param: dnssec_key }
+      etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
+      #index: { get_param: index}
+      #affinity_group: {get_resource: anti_affinity_group}
 
-  sprout_scaleup_policy:
-    type: OS::Heat::ScalingPolicy
+  dime_cluster:
+    type: ClearwaterIMS::DimeCluster
     properties:
-      adjustment_type: change_in_capacity
-      auto_scaling_group_id: {get_resource: sprout}
-      cooldown: 60
-      scaling_adjustment: 1
+      cluster_size: { get_param: dime_cluster_size}
+      public_mgmt_net_id: { get_param: public_mgmt_net_id }
+      private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
+      public_sig_net_id: { get_param: public_sig_net_id }
+      private_sig_net_id: { get_attr: [ sig_network, private_net ] }
+      private_sig_net_cidr: { get_attr: [ sig_network, private_net_cidr ] }
+      private_sig_net_gateway: { get_attr: [ sig_network, private_net_gateway ] }
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_param: key_name }
+      base_mgmt_security_group: { get_attr: [ security_groups, base_mgmt ] }
+      dime_mgmt_security_group: { get_attr: [ security_groups, dime_mgmt ] }
+      dime_sig_security_group: { get_attr: [ security_groups, dime_sig ] }
+      repo_url: { get_param: repo_url }
+      zone: { get_param: zone }
+      dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
+      dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
+      dnssec_key: { get_param: dnssec_key }
+      etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
+      #index: { get_param: index}
+      #affinity_group: {get_resource: anti_affinity_group}
 
-  sprout_scaledown_policy:
-    type: OS::Heat::ScalingPolicy
+  vellum_cluster:
+    type: ClearwaterIMS::VellumCluster
     properties:
-      adjustment_type: change_in_capacity
-      auto_scaling_group_id: {get_resource: sprout}
-      cooldown: 60
-      scaling_adjustment: -1
-
-  sprout:
-    type: OS::Heat::AutoScalingGroup
-    properties:
-      min_size: 1
-      desired_capacity: {get_param: sprout_cluster_size}
-      max_size: 3
-      resource:
-        type: ClearwaterIMS::Sprout
-        properties:
-          public_mgmt_net_id: { get_param: public_mgmt_net_id }
-          private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
-          public_sig_net_id: { get_param: public_sig_net_id }
-          private_sig_net_id: { get_attr: [ sig_network, private_net ] }
-          private_sig_net_cidr: { get_attr: [ sig_network, private_net_cidr ] }
-          private_sig_net_gateway: { get_attr: [ sig_network, private_net_gateway ] }
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          key_name: { get_param: key_name }
-          base_mgmt_security_group: { get_attr: [ security_groups, base_mgmt ] }
-          sprout_sig_outbound_security_group: { get_attr: [ security_groups, sprout_sig_outbound ] }
-          sprout_sig_inbound_security_group: { get_attr: [ security_groups, sprout_sig_inbound ] }
-          repo_url: { get_param: repo_url }
-          zone: { get_param: zone }
-          dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
-          dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
-          dnssec_key: { get_param: dnssec_key }
-          etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
-          index: { get_param: index}
-
-  homer_scaleup_policy:
-    type: OS::Heat::ScalingPolicy
-    properties:
-      adjustment_type: change_in_capacity
-      auto_scaling_group_id: {get_resource: homer}
-      cooldown: 60
-      scaling_adjustment: 1
-
-  homer_scaledown_policy:
-    type: OS::Heat::ScalingPolicy
-    properties:
-      adjustment_type: change_in_capacity
-      auto_scaling_group_id: {get_resource: homer}
-      cooldown: 60
-      scaling_adjustment: -1
-
-  homer:
-    type: OS::Heat::AutoScalingGroup
-    properties:
-      min_size: 1
-      desired_capacity: {get_param: homer_cluster_size}
-      max_size: 3
-      resource:
-        type: ClearwaterIMS::Homer
-        properties:
-          public_mgmt_net_id: { get_param: public_mgmt_net_id }
-          private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
-          public_sig_net_id: { get_param: public_sig_net_id }
-          private_sig_net_id: { get_attr: [ sig_network, private_net ] }
-          private_sig_net_cidr: { get_attr: [ sig_network, private_net_cidr ] }
-          private_sig_net_gateway: { get_attr: [ sig_network, private_net_gateway ] }
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          key_name: { get_param: key_name }
-          base_mgmt_security_group: { get_attr: [ security_groups, base_mgmt ] }
-          homer_mgmt_security_group: { get_attr: [ security_groups, homer_mgmt ] }
-          homer_sig_security_group: { get_attr: [ security_groups, homer_sig ] }
-          repo_url: { get_param: repo_url }
-          zone: { get_param: zone }
-          dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
-          dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
-          dnssec_key: { get_param: dnssec_key }
-          etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
-          index: { get_param: index}
-
-  dime_scaleup_policy:
-    type: OS::Heat::ScalingPolicy
-    properties:
-      adjustment_type: change_in_capacity
-      auto_scaling_group_id: {get_resource: dime}
-      cooldown: 60
-      scaling_adjustment: 1
-
-  dime_scaledown_policy:
-    type: OS::Heat::ScalingPolicy
-    properties:
-      adjustment_type: change_in_capacity
-      auto_scaling_group_id: {get_resource: dime}
-      cooldown: 60
-      scaling_adjustment: -1
-
-  dime:
-    type: OS::Heat::AutoScalingGroup
-    properties:
-      min_size: 1
-      desired_capacity: {get_param: dime_cluster_size}
-      max_size: 3
-      resource:
-        type: ClearwaterIMS::Dime
-        properties:
-          public_mgmt_net_id: { get_param: public_mgmt_net_id }
-          private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
-          public_sig_net_id: { get_param: public_sig_net_id }
-          private_sig_net_id: { get_attr: [ sig_network, private_net ] }
-          private_sig_net_cidr: { get_attr: [ sig_network, private_net_cidr ] }
-          private_sig_net_gateway: { get_attr: [ sig_network, private_net_gateway ] }
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          key_name: { get_param: key_name }
-          base_mgmt_security_group: { get_attr: [ security_groups, base_mgmt ] }
-          dime_mgmt_security_group: { get_attr: [ security_groups, dime_mgmt ] }
-          dime_sig_security_group: { get_attr: [ security_groups, dime_sig ] }
-          repo_url: { get_param: repo_url }
-          zone: { get_param: zone }
-          dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
-          dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
-          dnssec_key: { get_param: dnssec_key }
-          etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
-          index: { get_param: index}
-
-  vellum_scaleup_policy:
-    type: OS::Heat::ScalingPolicy
-    properties:
-      adjustment_type: change_in_capacity
-      auto_scaling_group_id: {get_resource: vellum}
-      cooldown: 60
-      scaling_adjustment: 1
-
-  vellum_scaledown_policy:
-    type: OS::Heat::ScalingPolicy
-    properties:
-      adjustment_type: change_in_capacity
-      auto_scaling_group_id: {get_resource: vellum}
-      cooldown: 60
-      scaling_adjustment: -1
-
-  vellum:
-    type: OS::Heat::AutoScalingGroup
-    properties:
-      min_size: 1
-      desired_capacity: {get_param: vellum_cluster_size}
-      max_size: 3
-      resource:
-        type: ClearwaterIMS::Vellum
-        properties:
-          public_mgmt_net_id: { get_param: public_mgmt_net_id }
-          private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
-          public_sig_net_id: { get_param: public_sig_net_id }
-          private_sig_net_id: { get_attr: [ sig_network, private_net ] }
-          private_sig_net_cidr: { get_attr: [ sig_network, private_net_cidr ] }
-          private_sig_net_gateway: { get_attr: [ sig_network, private_net_gateway ] }
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          key_name: { get_param: key_name }
-          base_mgmt_security_group: { get_attr: [ security_groups, base_mgmt ] }
-          vellum_sig_outbound_security_group: { get_attr: [ security_groups, vellum_sig_outbound ] }
-          vellum_sig_inbound_security_group: { get_attr: [ security_groups, vellum_sig_inbound ] }
-          repo_url: { get_param: repo_url }
-          zone: { get_param: zone }
-          dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
-          dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
-          dnssec_key: { get_param: dnssec_key }
-          etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
-          index: { get_param: index}
+      cluster_size: { get_param: vellum_cluster_size}
+      public_mgmt_net_id: { get_param: public_mgmt_net_id }
+      private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
+      public_sig_net_id: { get_param: public_sig_net_id }
+      private_sig_net_id: { get_attr: [ sig_network, private_net ] }
+      private_sig_net_cidr: { get_attr: [ sig_network, private_net_cidr ] }
+      private_sig_net_gateway: { get_attr: [ sig_network, private_net_gateway ] }
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_param: key_name }
+      base_mgmt_security_group: { get_attr: [ security_groups, base_mgmt ] }
+      vellum_sig_outbound_security_group: { get_attr: [ security_groups, vellum_sig_outbound ] }
+      vellum_sig_inbound_security_group: { get_attr: [ security_groups, vellum_sig_inbound ] }
+      repo_url: { get_param: repo_url }
+      zone: { get_param: zone }
+      dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
+      dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
+      dnssec_key: { get_param: dnssec_key }
+      etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
+      #index: { get_param: index}
+      #affinity_group: {get_resource: anti_affinity_group}
 
 outputs:
   zone:
@@ -456,31 +376,31 @@ outputs:
     value: { get_attr: [ dns, public_mgmt_ip ] }
   bono_scaleup_url:
     description: Bono webhook for scale up policy
-    value: {get_attr: [bono_scaleup_policy, alarm_url]}
+    value: {get_attr: [bono_cluster, scaleup_webhook]}
   bono_scaledown_url:
     description: Bono webhook for scale down policy
-    value: {get_attr: [bono_scaledown_policy, alarm_url]}
+    value: {get_attr: [bono_cluster, scaledown_webhook]}
   sprout_scaleup_url:
     description: Sprout webhook for scale up policy
-    value: {get_attr: [sprout_scaleup_policy, alarm_url]}
+    value: {get_attr: [sprout_cluster, scaleup_webhook]}
   sprout_scaledown_url:
     description: Sprout webhook for scale down policy
-    value: {get_attr: [sprout_scaledown_policy, alarm_url]}
+    value: {get_attr: [sprout_cluster, scaledown_webhook]}
   homer_scaleup_url:
     description: Homer webhook for scale up policy
-    value: {get_attr: [homer_scaleup_policy, alarm_url]}
+    value: {get_attr: [homer_cluster, scaleup_webhook]}
   homer_scaledown_url:
     description: Homer webhook for scale down policy
-    value: {get_attr: [homer_scaledown_policy, alarm_url]}
+    value: {get_attr: [homer_cluster, scaledown_webhook]}
   dime_scaleup_url:
     description: Dime webhook for scale up policy
-    value: {get_attr: [dime_scaleup_policy, alarm_url]}
+    value: {get_attr: [dime_cluster, scaleup_webhook]}
   dime_scaledown_url:
     description: Dime webhook for scale down policy
-    value: {get_attr: [dime_scaledown_policy, alarm_url]}
+    value: {get_attr: [dime_cluster, scaledown_webhook]}
   vellum_scaleup_url:
     description: Vellum webhook for scale up policy
-    value: {get_attr: [vellum_scaleup_policy, alarm_url]}
+    value: {get_attr: [vellum_cluster, scaleup_webhook]}
   vellum_scaledown_url:
     description: Vellum webhook for scale down policy
-    value: {get_attr: [vellum_scaledown_policy, alarm_url]}
+    value: {get_attr: [vellum_cluster, scaledown_webhook]}

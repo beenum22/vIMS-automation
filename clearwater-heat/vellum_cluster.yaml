@@ -1,0 +1,145 @@
+heat_template_version: 2013-05-23
+
+description: >
+  Scalable Vellum Cluster
+
+parameters:
+  cluster_size:
+    type: number
+    description: "Size of Vellum cluster"
+    default: 2
+  public_mgmt_net_id:
+    type: string
+  private_mgmt_net_id: 
+    type: string
+  public_sig_net_id:
+    type: string
+  private_sig_net_id: 
+    type: string
+  private_sig_net_cidr: 
+    type: string
+  private_sig_net_gateway: 
+    type: string
+  flavor: 
+    type: string
+  image: 
+    type: string
+  key_name: 
+    type: string
+  base_mgmt_security_group: 
+    type: string
+  vellum_sig_outbound_security_group: 
+    type: string
+  vellum_sig_inbound_security_group: 
+    type: string
+  repo_url: 
+    type: string
+  zone:
+    type: string
+  dns_mgmt_ip: 
+    type: string
+  dns_sig_ip: 
+    type: string
+  dnssec_key: 
+    type: string
+  etcd_ip: 
+    type: string
+  #index: 
+  #  type: string
+  #affinity_group: 
+  #  type: string
+
+resources:
+  vellum_soft_group:
+   type: OS::Nova::ServerGroup
+   properties:
+    name: hosts on separate compute nodes with soft anti-affinity
+    policies:
+     - soft-anti-affinity
+
+  vellum_hard_group:
+   type: OS::Nova::ServerGroup
+   properties:
+    name: hosts on separate compute nodes
+    policies:
+     - anti-affinity
+
+  vellum_scaleup_policy:
+    type: OS::Heat::ScalingPolicy
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: {get_resource: vellum_scale}
+      cooldown: 60
+      scaling_adjustment: 1
+
+  vellum_scaledown_policy:
+    type: OS::Heat::ScalingPolicy
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: {get_resource: vellum_scale}
+      cooldown: 60
+      scaling_adjustment: -1
+
+  vellum_scale:
+    type: OS::Heat::AutoScalingGroup
+    properties:
+      min_size: 0
+      desired_capacity: 0
+      max_size: {get_param: cluster_size}
+      resource:
+        type: ClearwaterIMS::Vellum
+        properties:
+          public_mgmt_net_id: { get_param: public_mgmt_net_id }
+          private_mgmt_net_id: { get_param: private_mgmt_net_id }
+          public_sig_net_id: { get_param: public_sig_net_id }
+          private_sig_net_id: { get_param: private_mgmt_net_id }
+          private_sig_net_cidr: { get_param: private_sig_net_cidr }
+          private_sig_net_gateway: { get_param: private_sig_net_gateway }
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          key_name: { get_param: key_name }
+          base_mgmt_security_group: { get_param: base_mgmt_security_group }
+          vellum_sig_outbound_security_group: { get_param: vellum_sig_outbound_security_group }
+          vellum_sig_inbound_security_group: { get_param: vellum_sig_inbound_security_group }
+          repo_url: { get_param: repo_url }
+          zone: { get_param: zone }
+          dns_mgmt_ip: { get_param: dns_mgmt_ip }
+          dns_sig_ip: { get_param: dns_sig_ip }
+          dnssec_key: { get_param: dnssec_key }
+          etcd_ip: { get_param: etcd_ip }
+          affinity_group: { get_resource: vellum_soft_group}
+
+  vellum_init:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: 2
+      resource_def:
+        type: ClearwaterIMS::Vellum
+        properties:
+          public_mgmt_net_id: { get_param: public_mgmt_net_id }
+          private_mgmt_net_id: { get_param: private_mgmt_net_id }
+          public_sig_net_id: { get_param: public_sig_net_id }
+          private_sig_net_id: { get_param: private_mgmt_net_id }
+          private_sig_net_cidr: { get_param: private_sig_net_cidr }
+          private_sig_net_gateway: { get_param: private_sig_net_gateway }
+          flavor: { get_param: flavor }
+          image: { get_param: image }
+          key_name: { get_param: key_name }
+          base_mgmt_security_group: { get_param: base_mgmt_security_group }
+          vellum_sig_outbound_security_group: { get_param: vellum_sig_outbound_security_group }
+          vellum_sig_inbound_security_group: { get_param: vellum_sig_inbound_security_group }
+          repo_url: { get_param: repo_url }
+          zone: { get_param: zone }
+          dns_mgmt_ip: { get_param: dns_mgmt_ip }
+          dns_sig_ip: { get_param: dns_sig_ip }
+          dnssec_key: { get_param: dnssec_key }
+          etcd_ip: { get_param: etcd_ip }
+          affinity_group: { get_resource: vellum_hard_group}
+
+outputs:
+  scaleup_webhook:
+    description: Vellum webhook for scale up policy
+    value: {get_attr: [vellum_scaleup_policy, alarm_url]}
+  scaledown_webhook:
+    description: Vellum webhook for scale down policy
+    value: {get_attr: [vellum_scaledown_policy, alarm_url]}

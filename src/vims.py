@@ -98,5 +98,16 @@ class vIMS(Stack):
         except Exception as err:
             raise
 
-    def check_services(self):
-        pass
+    def verify_quotas(self, instances, flavor):
+        try:
+            find_flavor = self.openstack.compute.find_flavor(flavor)
+            assert find_flavor != None, "Flavor '%s' not found" % flavor
+            get_flavor = self.openstack.compute.get_flavor(find_flavor.id)
+            total_vcpus = int(instances) * get_flavor.vcpus
+            total_ram = int(instances) * get_flavor.ram
+            total_disk = int(instances) * get_flavor.disk
+        except AssertionError as err:
+            raise
+        except Exception as err:
+            logger.debug(err)
+            raise
