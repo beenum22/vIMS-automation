@@ -1,0 +1,29 @@
+heat_template_version: 2013-05-23
+
+description: >
+  Router for Clearwater vIMS
+
+parameters:
+  name:
+    type: string
+    description: Name of the router
+  public_net_id:
+    type: string
+    description: External network for router
+
+resources:
+  router:
+    type: OS::Neutron::Router
+    properties:
+      name: { get_param: name }
+
+  router_gateway:
+    type: OS::Neutron::RouterGateway
+    properties:
+      router_id: { get_resource: router }
+      network_id: { get_param: public_net_id }
+
+outputs:
+  router_id:
+    description: Router ID
+    value: { get_resource: router}

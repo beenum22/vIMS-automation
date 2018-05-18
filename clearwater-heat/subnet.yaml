@@ -1,0 +1,75 @@
+heat_template_version: 2013-05-23
+
+description: >
+  Subnet for vIMS Clearwater
+
+parameters:
+  subnet_name:
+    type: string
+    description: Name of the subnet
+  private_net_id:
+    type: string
+    description: ID of private network
+  private_net_ip_version:
+    type: string
+    description: IP version (4 or 6)
+    constraints:
+      - allowed_values:
+        - "4"
+        - "6"
+        description: Must be 4 (IPv4) or 6 (IPv6)
+    default: "4"
+  private_net_cidr:
+    type: string
+    description: Private network address (CIDR notation)
+    default: 192.168.0.0/24
+  private_net_gateway:
+    type: string
+    description: Private network gateway address
+    default: 192.168.0.254
+  private_net_pool_start:
+    type: string
+    description: Start of private network IP address pool
+    default: 192.168.0.1
+  private_net_pool_end:
+    type: string
+    description: End of private network IP address pool
+    default: 192.168.0.253
+  dns_ip:
+    type: string
+    description: IP address of DNS server
+    default: 8.8.8.8
+  router_id:
+    type: string
+    description: Router ID for the subnet
+
+resources:
+  private_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      name: { get_param: subnet_name }
+      network_id: { get_param: private_net_id }
+      ip_version: { get_param: private_net_ip_version }
+      cidr: { get_param: private_net_cidr }
+      dns_nameservers: [ { get_param: dns_ip } ]
+      gateway_ip: { get_param: private_net_gateway }
+      allocation_pools:
+        - start: { get_param: private_net_pool_start }
+          end: { get_param: private_net_pool_end }
+  router_interface:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_param: router_id }
+      subnet_id: { get_resource: private_subnet }
+
+outputs:
+  pool:
+    value: { get_attr: [private_subnet, allocation_pools] }
+  cidr:
+    value: { get_attr: [private_subnet, cidr] }
+  dns:
+    value: { get_attr: [private_subnet, dns_nameservers] }
+  gateway:
+    value: { get_attr: [private_subnet, gateway_ip] }
+  net_id:
+    value: { get_attr: [private_subnet, network_id] }

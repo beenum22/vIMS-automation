@@ -10,6 +10,8 @@ parameters:
     default: 2
   public_mgmt_net_id:
     type: string
+  private_sig_subnet_id:
+    type: string
   private_mgmt_net_id:
     type: string
   public_sig_net_id:
@@ -90,6 +92,7 @@ resources:
           public_mgmt_net_id: { get_param: public_mgmt_net_id }
           private_mgmt_net_id: { get_param: private_mgmt_net_id }
           public_sig_net_id: { get_param: public_sig_net_id }
+          private_sig_subnet_id: { get_param: private_sig_subnet_id }
           private_sig_net_id: { get_param: private_sig_net_id }
           private_sig_net_cidr: { get_param: private_sig_net_cidr }
           private_sig_net_gateway: { get_param: private_sig_net_gateway }
@@ -105,6 +108,7 @@ resources:
           dnssec_key: { get_param: dnssec_key }
           etcd_ip: { get_param: etcd_ip }      
           affinity_group: {get_resource: bono_soft_group}
+          pool_id: { get_resource: pool}
 
   bono_init:
     type: OS::Heat::ResourceGroup
@@ -116,6 +120,7 @@ resources:
           public_mgmt_net_id: { get_param: public_mgmt_net_id }
           private_mgmt_net_id: { get_param: private_mgmt_net_id }
           public_sig_net_id: { get_param: public_sig_net_id }
+          private_sig_subnet_id: { get_param: private_sig_subnet_id }
           private_sig_net_id: { get_param: private_sig_net_id }
           private_sig_net_cidr: { get_param: private_sig_net_cidr }
           private_sig_net_gateway: { get_param: private_sig_net_gateway }
@@ -131,6 +136,35 @@ resources:
           dnssec_key: { get_param: dnssec_key }
           etcd_ip: { get_param: etcd_ip }      
           affinity_group: {get_resource: bono_hard_group}
+          pool_id: { get_resource: pool}
+
+  monitor:
+    type: OS::Neutron::LBaaS::HealthMonitor
+    properties:
+      delay: 5
+      type: HTTP
+      timeout: 5
+      max_retries: 3
+      pool: { get_resource: pool }
+
+  pool:
+    type: OS::Neutron::LBaaS::Pool
+    properties:
+      lb_algorithm: ROUND_ROBIN
+      protocol: HTTP
+      listener: { get_resource: listener }
+
+  listener:
+    type: OS::Neutron::LBaaS::Listener 
+    properties:
+      loadbalancer: { get_resource: lb }
+      protocol: HTTP
+      protocol_port: 80
+  
+  lb:
+    type: OS::Neutron::LBaaS::LoadBalancer
+    properties:
+      vip_subnet: { get_param: private_sig_subnet_id }
 
 outputs:
   scaleup_webhook:
@@ -139,3 +173,6 @@ outputs:
   scaledown_webhook:
     description: Bono webhook for scale down policy
     value: {get_attr: [bono_scaledown_policy, alarm_url]}
+  lb-url-vip:
+     value: {get_attr: [lb, vip_address]}
+     description: VIP for our Load Balancer
