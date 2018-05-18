@@ -2,11 +2,13 @@ import logging
 import time
 from keystoneauth1 import identity
 from keystoneauth1 import session
+from keystoneauth1.exceptions import *
 from neutronclient.v2_0 import client as ntclient
 from novaclient import client as nvclient
 from novaclient.exceptions import *
 from glanceclient import Client as gclient
 from openstack import connection
+from openstack.exceptions import HttpException
 from utilities import Utilities
 from heatclient.common import template_utils
 from keystoneauth1.identity import v2
@@ -24,6 +26,7 @@ class Stack(object):
         self.auth_url = auth_url
         self.project_name = project_name
         self.project_id = project_id
+        self.authenticate_clients()
 
     def authenticate_clients(self):
         try:
@@ -35,6 +38,11 @@ class Stack(object):
                 self.auth_url, self.sess, self.auth, 'orchestration')
             self.openstack = self._get_openstacksdk_client(
                 self.auth_url, self.password)
+            #self.nova.client.get_endpoint()
+            self.openstack.authorize()
+        except HttpException as err:
+            logger.debug(err)
+            raise Exception("OpenStack Authorization failed. Verify credentials.")
         except Exception as err:
             raise
 
@@ -52,12 +60,7 @@ class Stack(object):
         #    raise
 
     def _get_session(self, auth):
-        # try:
-        #sess = session.Session(auth=auth)
         return session.Session(auth=auth)
-        # except Exception as err:
-        #    logger.debug(err)
-        #    raise
 
     def _get_openstacksdk_client(self, auth_url, password, username='admin', project_name='admin'):
         try:
@@ -258,28 +261,6 @@ class Stack(object):
         except Exception as err:
             logger.debug(err)
             raise
-    '''
-    def upload_image(self, image_name, url=None):
-        try:
-            if not self.nova.images.findall(name=image_name):
-                assert url == None, "Image not found. Provide image URL"
-                Utilities.get_file(url, 'images', image_name)
-                path = Utilities.join_path(
-                    Utilities.get_current_directory(), 'images', image_name)
-                with open(path) as img:
-                    image_attrs = {
-                        'name': image_name,
-                        'data': img,
-                        'disk_format': 'qcow2',
-                        'container_format': 'bare',
-                        'visibility': 'public'
-                    }
-        except AssertionError as err:
-            raise
-        except Exception as err:
-            logger.debug(err)
-            raise
-    '''
 
     def upload_image(self, image_name, url=None):
         """ Load image if not present download it."""
@@ -378,13 +359,6 @@ class Stack(object):
             for s in sec_groups:
                 sec = self.openstack.network.find_security_group(s)
                 security_groups.append({'name': sec.name})
-            '''
-            print "IMAGE ID: %s" % image.id
-            print "FLAVOR iD: %s" % flavor.id
-            print "KEYPAIR: %s" %keypair.name
-            print "NETWORKS: %s" % networks
-            print "S GROUPS: %s" % security_groups
-            '''
             server = self.openstack.compute.create_server(name=name,
                                                           image_id=image.id, flavor_id=flavor.id,
                                                           key_name=keypair.name, networks=networks, security_groups=security_groups)
@@ -471,3 +445,46 @@ class Stack(object):
             return True
         except Exception as err:
             raise
+
+    def _hypervisors(self):
+        return self.nova.hypervisors.list()
+
+    def _find_host(self, hostname):
+        try:
+            hyp = self.nova.hypervisors.find(hypervisor_hostname=hostname)
+            logger.info("Host '%s' found", hostname)
+            return hyp
+        except NotFound:
+            logger.error("Host '%s' not found", hostname)
+            raise
+
+    def _get_host(self, hostname):
+        try:
+            return self._find_host(hostname)
+        except NotFound:
+            raise
+
+    def get_hypervisors(self):
+        try:
+            hypervisors = []
+            for h in self._hypervisors():
+                hypervisors.append(h.hypervisor_hostname)
+            return hypervisors
+        except Exception as err:
+            raise
+
+    def _get_hypervisor_resources(self, hostname):
+        try:
+            resources = {'total': {}, 'used': {}}
+            hypervisor = self._get_host(hostname)
+            resources['total']['vcpus'] = hypervisor.vcpus
+            resources['total']['memory'] = hypervisor.memory_mb
+            resources['total']['storage'] = hypervisor.local_gb
+            resources['used']['vcpus'] = hypervisor.vcpus_used
+            resources['used']['memory'] = hypervisor.memory_mb_used
+            resources['used']['storage'] = hypervisor.local_gb_used
+            return resources
+        except Exception as err:
+            #logger.debug(err)
+            raise
+
