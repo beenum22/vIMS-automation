@@ -1,7 +1,5 @@
 resource_registry:
         "ClearwaterIMS::Network": "./network.yaml"
-        "ClearwaterIMS::Router": "./router.yaml"
-        "ClearwaterIMS::Subnet": "./subnet.yaml"
         "ClearwaterIMS::SecurityGroups": "./security-groups.yaml"
         "ClearwaterIMS::Bono": "./bono.yaml"
         "ClearwaterIMS::BonoCluster": "./bono_cluster.yaml"

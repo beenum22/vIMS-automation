@@ -52,6 +52,15 @@ parameters:
         - "6"
         description: Must be 4 (IPv4) or 6 (IPv6)
     default: "4"
+  private_mgmt_net_ip_version:
+    type: string
+    description: IP version (4 or 6) on the private signaling network
+    constraints:
+      - allowed_values:
+        - "4"
+        - "6"
+        description: Must be 4 (IPv4) or 6 (IPv6)
+    default: "4"
   private_sig_net_cidr:
     type: string
     description: Private signaling network address (CIDR notation)
@@ -68,6 +77,38 @@ parameters:
     type: string
     description: End of private signaling network IP address pool
     default: 192.168.1.253
+  vip_bono_net_cidr:
+    type: string
+    description: VIP Bono network address (CIDR notation)
+    default: 192.168.2.0/26
+  vip_bono_net_gateway:
+    type: string
+    description: VIP Bono network gateway address
+    default: 192.168.2.1
+  vip_bono_net_pool_start:
+    type: string
+    description: Start of VIP Bono network IP address pool
+    default: 192.168.2.2
+  vip_bono_net_pool_end:
+    type: string
+    description: End of VIP Bono network IP address pool
+    default: 192.168.2.62
+  vip_dns_net_cidr:
+    type: string
+    description: VIP DNS network address (CIDR notation)
+    default: 192.168.2.64/26
+  vip_dns_net_gateway:
+    type: string
+    description: VIP DNS network gateway address
+    default: 192.168.2.65
+  vip_dns_net_pool_start:
+    type: string
+    description: Start of VIP DNS network IP address pool
+    default: 192.168.2.66
+  vip_dns_net_pool_end:
+    type: string
+    description: End of VIP DNS network IP address pool
+    default: 192.168.2.126
   external_sig_dns_ip:
     type: string
     description: IP address of external DNS server on signaling network
@@ -161,48 +202,30 @@ parameters:
     default: 6
 
 resources:
-  affinity_group:
-   type: OS::Nova::ServerGroup
-   properties:
-    name: hosts on one compute-node
-    policies:
-     - soft-affinity
-
-  anti_affinity_group:
-   type: OS::Nova::ServerGroup
-   properties:
-    name: hosts on separate compute nodes
-    policies:
-     - anti-affinity
-
-  anti_affinity_group2:
-   type: OS::Nova::ServerGroup
-   properties:
-    name: hosts on separate compute nodes
-    policies:
-     - anti-affinity
-
   mgmt_network:
     type: ClearwaterIMS::Network
     properties:
       public_net_id: { get_param: public_mgmt_net_id }
       private_net_name: { str_replace: { params: { __stack__: { get_param: "OS::stack_name" } }, template: __stack__-private-management } }
+      private_net_ip_version: { get_param: private_mgmt_net_ip_version }
       private_net_cidr: { get_param: private_mgmt_net_cidr }
       private_net_gateway: { get_param: private_mgmt_net_gateway }
       private_net_pool_start: { get_param: private_mgmt_net_pool_start }
       private_net_pool_end: { get_param: private_mgmt_net_pool_end }
+      subnet_name: { str_replace: { params: { __stack__: { get_param: "OS::stack_name" } }, template: __stack__-private-mgmt-subnet} }
       dns_ip: { get_param: external_mgmt_dns_ip }
 
   sig_network:
     type: ClearwaterIMS::Network
     properties:
-      public_net_id: { get_param: public_sig_net_id }
       private_net_name: { str_replace: { params: { __stack__: { get_param: "OS::stack_name" } }, template: __stack__-private-signaling } }
+      public_net_id: { get_param: public_mgmt_net_id }
       private_net_ip_version: { get_param: private_sig_net_ip_version }
       private_net_cidr: { get_param: private_sig_net_cidr }
       private_net_gateway: { get_param: private_sig_net_gateway }
       private_net_pool_start: { get_param: private_sig_net_pool_start }
       private_net_pool_end: { get_param: private_sig_net_pool_end }
+      subnet_name: { str_replace: { params: { __stack__: { get_param: "OS::stack_name" } }, template: __stack__-private-sig-subnet} }
       dns_ip: { get_param: external_sig_dns_ip }
 
   security_groups:
@@ -214,10 +237,10 @@ resources:
     type: ClearwaterIMS::DNS
     properties:
       public_mgmt_net_id: { get_param: public_mgmt_net_id }
-      private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
+      private_mgmt_net_id: { get_attr: [ mgmt_network, net_id ] }
       public_sig_net_id: { get_param: public_sig_net_id }
-      private_sig_net_id: { get_attr: [ sig_network, private_net ] }
-      private_sig_net_cidr: { get_attr: [ sig_network, private_net_cidr ] }
+      private_sig_net_id: { get_attr: [ sig_network, net_id ] }
+      private_sig_net_cidr: { get_attr: [ sig_network, subnet_cidr ] }
       flavor: { get_param: flavor }
       image: { get_param: image }
       key_name: { get_param: key_name }
@@ -229,7 +252,7 @@ resources:
     type: ClearwaterIMS::Ellis
     properties:
       public_mgmt_net_id: { get_param: public_mgmt_net_id }
-      private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
+      private_mgmt_net_id: { get_attr: [ mgmt_network, net_id ] }
       flavor: { get_param: flavor }
       image: { get_param: image }
       key_name: { get_param: key_name }
@@ -248,11 +271,12 @@ resources:
     properties:
       cluster_size: { get_param: bono_cluster_size}
       public_mgmt_net_id: { get_param: public_mgmt_net_id }
-      private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
+      private_mgmt_net_id: { get_attr: [ mgmt_network, net_id ] }
       public_sig_net_id: { get_param: public_sig_net_id }
-      private_sig_net_id: { get_attr: [ sig_network, private_net ] }
-      private_sig_net_cidr: { get_attr: [ sig_network, private_net_cidr ] }
-      private_sig_net_gateway: { get_attr: [ sig_network, private_net_gateway ] }
+      private_sig_subnet_id: { get_attr: [ sig_network, subnet_id ] }
+      private_sig_net_id: { get_attr: [ sig_network, net_id ] }
+      private_sig_net_cidr: { get_attr: [ sig_network, subnet_cidr ] }
+      private_sig_net_gateway: { get_attr: [ sig_network, subnet_gateway ] }
       flavor: { get_param: flavor }
       image: { get_param: image }
       key_name: { get_param: key_name }
@@ -264,19 +288,17 @@ resources:
       dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
       dnssec_key: { get_param: dnssec_key }
       etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }      
-      #index: { get_param: index}
-      #affinity_group: {get_resource: anti_affinity_group}
 
   sprout_cluster:
     type: ClearwaterIMS::SproutCluster
     properties:
       cluster_size: { get_param: sprout_cluster_size}
       public_mgmt_net_id: { get_param: public_mgmt_net_id }
-      private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
+      private_mgmt_net_id: { get_attr: [ mgmt_network, net_id ] }
       public_sig_net_id: { get_param: public_sig_net_id }
-      private_sig_net_id: { get_attr: [ sig_network, private_net ] }
-      private_sig_net_cidr: { get_attr: [ sig_network, private_net_cidr ] }
-      private_sig_net_gateway: { get_attr: [ sig_network, private_net_gateway ] }
+      private_sig_net_id: { get_attr: [ sig_network, net_id ] }
+      private_sig_net_cidr: { get_attr: [ sig_network, subnet_cidr ] }
+      private_sig_net_gateway: { get_attr: [ sig_network, subnet_gateway ] }
       flavor: { get_param: flavor }
       image: { get_param: image }
       key_name: { get_param: key_name }
@@ -288,20 +310,18 @@ resources:
       dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
       dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
       dnssec_key: { get_param: dnssec_key }
-      etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
-      #index: { get_param: index}
-      #affinity_group: {get_resource: anti_affinity_group2}      
+      etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }  
 
   homer_cluster:
     type: ClearwaterIMS::HomerCluster
     properties:
       cluster_size: { get_param: homer_cluster_size}
       public_mgmt_net_id: { get_param: public_mgmt_net_id }
-      private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
+      private_mgmt_net_id: { get_attr: [ mgmt_network, net_id ] }
       public_sig_net_id: { get_param: public_sig_net_id }
-      private_sig_net_id: { get_attr: [ sig_network, private_net ] }
-      private_sig_net_cidr: { get_attr: [ sig_network, private_net_cidr ] }
-      private_sig_net_gateway: { get_attr: [ sig_network, private_net_gateway ] }
+      private_sig_net_id: { get_attr: [ sig_network, net_id ] }
+      private_sig_net_cidr: { get_attr: [ sig_network, subnet_cidr ] }
+      private_sig_net_gateway: { get_attr: [ sig_network, subnet_gateway ] }
       flavor: { get_param: flavor }
       image: { get_param: image }
       key_name: { get_param: key_name }
@@ -314,19 +334,17 @@ resources:
       dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
       dnssec_key: { get_param: dnssec_key }
       etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
-      #index: { get_param: index}
-      #affinity_group: {get_resource: anti_affinity_group}
 
   dime_cluster:
     type: ClearwaterIMS::DimeCluster
     properties:
       cluster_size: { get_param: dime_cluster_size}
       public_mgmt_net_id: { get_param: public_mgmt_net_id }
-      private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
+      private_mgmt_net_id: { get_attr: [ mgmt_network, net_id ] }
       public_sig_net_id: { get_param: public_sig_net_id }
-      private_sig_net_id: { get_attr: [ sig_network, private_net ] }
-      private_sig_net_cidr: { get_attr: [ sig_network, private_net_cidr ] }
-      private_sig_net_gateway: { get_attr: [ sig_network, private_net_gateway ] }
+      private_sig_net_id: { get_attr: [ sig_network, net_id ] }
+      private_sig_net_cidr: { get_attr: [ sig_network, subnet_cidr ] }
+      private_sig_net_gateway: { get_attr: [ sig_network, subnet_gateway ] }
       flavor: { get_param: flavor }
       image: { get_param: image }
       key_name: { get_param: key_name }
@@ -339,19 +357,17 @@ resources:
       dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
       dnssec_key: { get_param: dnssec_key }
       etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
-      #index: { get_param: index}
-      #affinity_group: {get_resource: anti_affinity_group}
 
   vellum_cluster:
     type: ClearwaterIMS::VellumCluster
     properties:
       cluster_size: { get_param: vellum_cluster_size}
       public_mgmt_net_id: { get_param: public_mgmt_net_id }
-      private_mgmt_net_id: { get_attr: [ mgmt_network, private_net ] }
+      private_mgmt_net_id: { get_attr: [ mgmt_network, net_id ] }
       public_sig_net_id: { get_param: public_sig_net_id }
-      private_sig_net_id: { get_attr: [ sig_network, private_net ] }
-      private_sig_net_cidr: { get_attr: [ sig_network, private_net_cidr ] }
-      private_sig_net_gateway: { get_attr: [ sig_network, private_net_gateway ] }
+      private_sig_net_id: { get_attr: [ sig_network, net_id ] }
+      private_sig_net_cidr: { get_attr: [ sig_network, subnet_cidr ] }
+      private_sig_net_gateway: { get_attr: [ sig_network, subnet_gateway ] }
       flavor: { get_param: flavor }
       image: { get_param: image }
       key_name: { get_param: key_name }
@@ -364,8 +380,6 @@ resources:
       dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
       dnssec_key: { get_param: dnssec_key }
       etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
-      #index: { get_param: index}
-      #affinity_group: {get_resource: anti_affinity_group}
 
 outputs:
   zone:
@@ -374,6 +388,8 @@ outputs:
   dns_ip:
     description: IP address of DNS
     value: { get_attr: [ dns, public_mgmt_ip ] }
+  bono_vip:
+    value: { get_attr: [bono_cluster, lb-url-vip]}
   bono_scaleup_url:
     description: Bono webhook for scale up policy
     value: {get_attr: [bono_cluster, scaleup_webhook]}
