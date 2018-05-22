@@ -389,7 +389,11 @@ outputs:
     description: IP address of DNS
     value: { get_attr: [ dns, public_mgmt_ip ] }
   bono_vip:
-    value: { get_attr: [bono_cluster, lb-url-vip]}
+    description: Private VIP for Bono Cluster
+    value: { get_attr: [bono_cluster, lb_private_vip]}
+  bono_floating_vip:
+    description: Public VIP for Bono Cluster
+    value: { get_attr: [bono_cluster, lb_floating_vip]}
   bono_scaleup_url:
     description: Bono webhook for scale up policy
     value: {get_attr: [bono_cluster, scaleup_webhook]}

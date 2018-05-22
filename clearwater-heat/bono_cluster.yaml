@@ -166,6 +166,12 @@ resources:
     properties:
       vip_subnet: { get_param: private_sig_subnet_id }
 
+  lb_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network_id: { get_param: public_sig_net_id }
+      port_id: { get_attr: [ lb, vip_port_id ] }
+
 outputs:
   scaleup_webhook:
     description: Bono webhook for scale up policy
@@ -173,6 +179,11 @@ outputs:
   scaledown_webhook:
     description: Bono webhook for scale down policy
     value: {get_attr: [bono_scaledown_policy, alarm_url]}
-  lb-url-vip:
-     value: {get_attr: [lb, vip_address]}
+  lb_private_vip:
+     value: {get_attr: [ lb, vip_address ] }
      description: VIP for our Load Balancer
+  lb_floating_vip:
+    description: Public VIP for our Load Balancer
+    value: { get_attr: [ lb_floating_ip, floating_ip_address ] }
+  lb_vip_port:
+    value: { get_attr: [ lb, vip_port_id ] }

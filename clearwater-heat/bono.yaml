@@ -202,9 +202,3 @@ outputs:
   private_sig_ip:
     description: IP address in private signaling network
     value: { get_attr: [ sig_port, fixed_ips, 0, ip_address ] }
-  #vip_bono_ip:
-  #  description: IP address in vip network
-  #  value: { get_attr: [ lb_port , fixed_ips, 0, ip_address]}
-  #lb_member:
-  #  description: LB member details.
-  #  value: { get_attr: [member, show] }
