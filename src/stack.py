@@ -488,3 +488,24 @@ class Stack(object):
             #logger.debug(err)
             raise
 
+    def _get_network_info(self, name):
+        try:
+            net_id = self.get_net_id(name)
+            return self.openstack.network.get_network_ip_availability(net_id)
+        except Exception as err:
+            logger.debug(err)
+            raise
+
+    def total_net_ips(self, name):
+        try:
+            return self._get_network_info(name)['total_ips']
+        except Exception as err:
+            raise
+
+    def available_net_ips(self, name):
+        try:
+            avail_ips = self._get_network_info(name)['total_ips'] - self._get_network_info(name)['used_ips']
+            return avail_ips
+        except Exception as err:
+            raise
+
