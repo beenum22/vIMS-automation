@@ -219,7 +219,7 @@ resources:
     type: ClearwaterIMS::Network
     properties:
       private_net_name: { str_replace: { params: { __stack__: { get_param: "OS::stack_name" } }, template: __stack__-private-signaling } }
-      public_net_id: { get_param: public_mgmt_net_id }
+      public_net_id: { get_param: public_sig_net_id }
       private_net_ip_version: { get_param: private_sig_net_ip_version }
       private_net_cidr: { get_param: private_sig_net_cidr }
       private_net_gateway: { get_param: private_sig_net_gateway }

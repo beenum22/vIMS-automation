@@ -67,7 +67,8 @@ ip2rr() {
 retries=0
 while ! { nsupdate -y "__zone__:__dnssec_key__" -v << EOF
 server __dns_mgmt_ip__
-update add dime-__index__.__zone__. 30 $(ip2rr __public_mgmt_ip__)
+# Commenting out public entry. Uncomment if required.
+#update add dime-__index__.__zone__. 30 $(ip2rr __public_mgmt_ip__)
 update add ralf.__zone__. 30 $(ip2rr __private_sig_ip__)
 update add hs.__zone__. 30 $(ip2rr __private_sig_ip__)
 update add hs-prov.__zone__. 30 $(ip2rr __private_mgmt_ip__)

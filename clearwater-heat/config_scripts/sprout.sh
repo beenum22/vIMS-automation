@@ -67,7 +67,8 @@ ip2rr() {
 retries=0
 while ! { nsupdate -y "__zone__:__dnssec_key__" -v << EOF
 server __dns_mgmt_ip__
-update add sprout-__index__.__zone__. 30 $(ip2rr __public_mgmt_ip__)
+# Commenting out entry for Public IP. Uncomment if required.
+#update add sprout-__index__.__zone__. 30 $(ip2rr __public_mgmt_ip__)
 update add __index__.sprout.__zone__. 30 $(ip2rr __private_sig_ip__)
 update add sprout.__zone__. 30 $(ip2rr __private_sig_ip__)
 update add scscf.sprout.__zone__. 30 $(ip2rr __private_sig_ip__)

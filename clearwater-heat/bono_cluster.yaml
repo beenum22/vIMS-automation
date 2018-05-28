@@ -151,15 +151,15 @@ resources:
     type: OS::Neutron::LBaaS::Pool
     properties:
       lb_algorithm: ROUND_ROBIN
-      protocol: HTTP
+      protocol: TCP
       listener: { get_resource: listener }
 
   listener:
-    type: OS::Neutron::LBaaS::Listener 
+    type: OS::Neutron::LBaaS::Listener
     properties:
       loadbalancer: { get_resource: lb }
-      protocol: HTTP
-      protocol_port: 80
+      protocol: TCP
+      protocol_port: 8080
   
   lb:
     type: OS::Neutron::LBaaS::LoadBalancer

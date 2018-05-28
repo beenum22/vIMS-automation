@@ -46,7 +46,8 @@ signaling_dns_server=__dns_sig_ip__
 management_local_ip=__private_mgmt_ip__
 local_ip=__private_sig_ip__
 public_ip=__private_sig_ip__
-public_hostname=__index__.vellum.__zone__
+#public_hostname=__index__.vellum.__zone__
+public_hostname=vellum-__index__.__zone__
 etcd_cluster=$etcd_ip
 EOF
 
@@ -86,7 +87,8 @@ ip2rr() {
 retries=0
 while ! { nsupdate -y "__zone__:__dnssec_key__" -v << EOF
 server __dns_mgmt_ip__
-update add vellum-__index__.__zone__. 30 $(ip2rr __public_mgmt_ip__)
+# Uncomment if required
+#update add vellum-__index__.__zone__. 30 $(ip2rr __public_mgmt_ip__)
 update add vellum.__zone__. 30 $(ip2rr __private_sig_ip__)
 send
 EOF

@@ -112,11 +112,12 @@ resources:
         - { get_param: base_mgmt_security_group }
         - { get_param: homer_mgmt_security_group }
 
-  mgmt_floating_ip:
-    type: OS::Neutron::FloatingIP
-    properties:
-      floating_network_id: { get_param: public_mgmt_net_id }
-      port_id: { get_resource: mgmt_port }
+  # Commenting out Floating IP. Uncomment if required
+  #mgmt_floating_ip:
+  #  type: OS::Neutron::FloatingIP
+  #  properties:
+  #    floating_network_id: { get_param: public_mgmt_net_id }
+  #    port_id: { get_resource: mgmt_port }
 
   sig_port:
     type: OS::Neutron::Port
@@ -126,11 +127,12 @@ resources:
       security_groups:
         - { get_param: homer_sig_security_group }
 
-  sig_floating_ip:
-    type: OS::Neutron::FloatingIP
-    properties:
-      floating_network_id: { get_param: public_sig_net_id }
-      port_id: { get_resource: sig_port }
+  # Commenting out Floating IP. Uncomment if required
+  #sig_floating_ip:
+  #  type: OS::Neutron::FloatingIP
+  #  properties:
+  #    floating_network_id: { get_param: public_sig_net_id }
+  #    port_id: { get_resource: sig_port }
 
   rand_name:
     type: OS::Heat::RandomString
@@ -155,9 +157,11 @@ resources:
           params:
             __repo_url__: { get_param: repo_url }
             __zone__: { get_param: zone }
-            __public_mgmt_ip__: { get_attr: [ mgmt_floating_ip, floating_ip_address ] }
+            # Commenting out Floating IP. Uncomment if required
+            #__public_mgmt_ip__: { get_attr: [ mgmt_floating_ip, floating_ip_address ] }
             __private_mgmt_ip__: { get_attr: [ mgmt_port, fixed_ips, 0, ip_address ] }
-            __public_sig_ip__: { get_attr: [ sig_floating_ip, floating_ip_address ] }
+            # Commenting out Floating IP. Uncomment if required
+            #__public_sig_ip__: { get_attr: [ sig_floating_ip, floating_ip_address ] }
             __private_sig_ip__: { get_attr: [ sig_port, fixed_ips, 0, ip_address ] }
             __private_sig_cidr__: { get_param: private_sig_net_cidr }
             __private_sig_gateway__: { get_param: private_sig_net_gateway }
@@ -169,15 +173,16 @@ resources:
           template: {get_file: config_scripts/homer.sh}
 
 outputs:
-  public_mgmt_ip:
-    description: IP address in public management network
-    value: { get_attr: [ mgmt_floating_ip, floating_ip_address ] }
+  # Uncomment if required
+  #public_mgmt_ip:
+  #  description: IP address in public management network
+  #  value: { get_attr: [ mgmt_floating_ip, floating_ip_address ] }
   private_mgmt_ip:
     description: IP address in private management network
     value: { get_attr: [ mgmt_port, fixed_ips, 0, ip_address ] }
-  public_sig_ip:
-    description: IP address in public signaling network
-    value: { get_attr: [ sig_floating_ip, floating_ip_address ] }
+  #public_sig_ip:
+  #  description: IP address in public signaling network
+  #  value: { get_attr: [ sig_floating_ip, floating_ip_address ] }
   private_sig_ip:
     description: IP address in private signaling network
     value: { get_attr: [ sig_port, fixed_ips, 0, ip_address ] }

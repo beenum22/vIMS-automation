@@ -185,7 +185,7 @@ resources:
       pool: { get_param: pool_id }
       address: { get_attr: [ sig_port, fixed_ips, 0, ip_address ] }
       #address: { get_attr: [server, first_address] }
-      protocol_port: 80
+      protocol_port: 8080
       #subnet: { get_param: lb_subnet }
       subnet: { get_param: private_sig_subnet_id }
 

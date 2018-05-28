@@ -18,6 +18,13 @@ class vIMS(Stack):
         super(vIMS, self).__init__(self.settings.auth[
             'password'], self.settings.auth['auth_url'])
         self.authenticate_clients()
+        '''
+        try:
+            assert self.available_net_ips(self.settings.universal[
+                                          'public_network']) > 66, "Not enough floating IPs available for the desired vIMS cluster size"
+        except AssertionError as err:
+            raise
+        '''
         #self.flavor_name = self.settings.universal['flavor_name']
         #self.public_network = self.settings.universal['public_network']
         #self.keypair_name = self.settings.universal['keypair_name']
@@ -58,18 +65,20 @@ class vIMS(Stack):
     def setup_env(self):
         try:
             self.upload_image(self.settings.universal[
-                                    'image_name'], url=self.settings.universal['image_url'])
+                'image_name'], url=self.settings.universal['image_url'])
             self.create_keypair(self.settings.universal['keypair_name'])
-            self.create_flavor(self.settings.universal['flavor_name'], ram=4096, vcpus=2, disk=40)
-            self.check_quotas(security_groups=30)
+            self.create_flavor(self.settings.universal[
+                               'flavor_name'], ram=4096, vcpus=2, disk=40)
+            self.check_quotas(security_groups=30, floating_ips=50)
             public_net_id = self.get_net_id(
                 self.settings.universal['public_network'])
             mgmt_net_pool = Utilities.get_ip_range(self.settings.mgmt_net[
                                                    'subnet_cidr'], self.settings.mgmt_net['gateway'], self.settings.mgmt_net['ip_pool'])
             sig_net_pool = Utilities.get_ip_range(self.settings.sig_net[
-                                                   'subnet_cidr'], self.settings.sig_net['gateway'], self.settings.sig_net['ip_pool'])
+                'subnet_cidr'], self.settings.sig_net['gateway'], self.settings.sig_net['ip_pool'])
             if not self.settings.universal.get('dnssec_key'):
-                self.settings.universal['dnssec_key'] = Utilities.get_dnssec_key()
+                self.settings.universal[
+                    'dnssec_key'] = Utilities.get_dnssec_key()
             params = {
                 "public_mgmt_net_id": public_net_id,
                 "public_sig_net_id": public_net_id,
@@ -95,6 +104,10 @@ class vIMS(Stack):
             }
             self.create_stack(
                 self.stack_name, self.heat_template, params=params, env_file=self.env_file)
+            for output in self.openstack.orchestration.get_stack(self.stack_name).outputs:
+                if output['output_key'] == 'dns_ip':
+                    logger.info("Public vIMS DNS IP: %s", output['output_value'])
+                    break
         except Exception as err:
             raise
 

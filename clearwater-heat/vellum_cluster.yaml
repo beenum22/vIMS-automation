@@ -92,7 +92,7 @@ resources:
           public_mgmt_net_id: { get_param: public_mgmt_net_id }
           private_mgmt_net_id: { get_param: private_mgmt_net_id }
           public_sig_net_id: { get_param: public_sig_net_id }
-          private_sig_net_id: { get_param: private_mgmt_net_id }
+          private_sig_net_id: { get_param: private_sig_net_id }
           private_sig_net_cidr: { get_param: private_sig_net_cidr }
           private_sig_net_gateway: { get_param: private_sig_net_gateway }
           flavor: { get_param: flavor }
@@ -119,7 +119,7 @@ resources:
           public_mgmt_net_id: { get_param: public_mgmt_net_id }
           private_mgmt_net_id: { get_param: private_mgmt_net_id }
           public_sig_net_id: { get_param: public_sig_net_id }
-          private_sig_net_id: { get_param: private_mgmt_net_id }
+          private_sig_net_id: { get_param: private_sig_net_id }
           private_sig_net_cidr: { get_param: private_sig_net_cidr }
           private_sig_net_gateway: { get_param: private_sig_net_gateway }
           flavor: { get_param: flavor }

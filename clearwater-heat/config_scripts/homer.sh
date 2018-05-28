@@ -45,7 +45,8 @@ signaling_namespace=signaling
 signaling_dns_server=__dns_sig_ip__
 management_local_ip=__private_mgmt_ip__
 local_ip=__private_sig_ip__
-public_ip=__public_sig_ip__
+#public_ip=__public_sig_ip__
+public_ip=__private_sig_ip__
 public_hostname=homer-__index__.__zone__
 etcd_cluster=$etcd_ip
 EOF
@@ -67,8 +68,9 @@ ip2rr() {
 retries=0
 while ! { nsupdate -y "__zone__:__dnssec_key__" -v << EOF
 server __dns_mgmt_ip__
-update add homer-__index__.__zone__. 30 $(ip2rr __public_mgmt_ip__)
-update add homer.__zone__. 30 $(ip2rr __public_sig_ip__)
+#update add homer-__index__.__zone__. 30 $(ip2rr __public_mgmt_ip__)
+#update add homer.__zone__. 30 $(ip2rr __public_sig_ip__)
+update add homer.__zone__. 30 $(ip2rr __private_sig_ip__)
 send
 EOF
 } && [ $retries -lt 10 ]
