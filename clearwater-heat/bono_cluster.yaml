@@ -1,4 +1,4 @@
-heat_template_version: 2013-05-23
+heat_template_version: 2015-10-15
 
 description: >
   Scalable Bono Cluster
@@ -44,6 +44,10 @@ parameters:
     type: string
   etcd_ip:
     type: string
+  stack_id:
+    type: string
+  #metadata:
+  #  type: string
   #index:
   #  type: string
   #affinity_group:
@@ -108,7 +112,9 @@ resources:
           dnssec_key: { get_param: dnssec_key }
           etcd_ip: { get_param: etcd_ip }      
           affinity_group: {get_resource: bono_soft_group}
-          pool_id: { get_resource: pool}
+          stack_id: { get_param: stack_id }
+          #metadata: { get_param: metadata }
+          #pool_id: { get_resource: pool}
 
   bono_init:
     type: OS::Heat::ResourceGroup
@@ -136,41 +142,84 @@ resources:
           dnssec_key: { get_param: dnssec_key }
           etcd_ip: { get_param: etcd_ip }      
           affinity_group: {get_resource: bono_hard_group}
-          pool_id: { get_resource: pool}
+          stack_id: { get_param: stack_id }
+          #pool_id: { get_resource: pool}
 
-  monitor:
-    type: OS::Neutron::LBaaS::HealthMonitor
+  cpu_alarm_high:
+    type: OS::Aodh::GnocchiAggregationByResourcesAlarm
     properties:
-      delay: 5
-      type: HTTP
-      timeout: 5
-      max_retries: 3
-      pool: { get_resource: pool }
+      description: Scale up if CPU > 60% for 5 minutes
+      metric: cpu_util
+      aggregation_method: mean
+      granularity: 300
+      evaluation_periods: 1
+      threshold: 60
+      resource_type: instance
+      comparison_operator: gt
+      alarm_actions:
+        - str_replace:
+            template: trust+url
+            params:
+              url: {get_attr: [bono_scaleup_policy, signal_url]}
+      query:
+        list_join:
+          - ''
+          - - {'=': {server_group: {get_param: stack_id}}}
 
-  pool:
-    type: OS::Neutron::LBaaS::Pool
+  cpu_alarm_low:
+    type: OS::Aodh::GnocchiAggregationByResourcesAlarm
     properties:
-      lb_algorithm: ROUND_ROBIN
-      protocol: TCP
-      listener: { get_resource: listener }
+      description: Scale down if CPU < 15% for 5 minutes
+      metric: cpu_util
+      aggregation_method: mean
+      granularity: 300
+      evaluation_periods: 1
+      threshold: 15
+      resource_type: instance
+      comparison_operator: lt
+      alarm_actions:
+        - str_replace:
+            template: trust+url
+            params:
+              url: {get_attr: [bono_scaledown_policy, signal_url]}
+      query:
+        list_join:
+          - ''
+          - - {'=': {server_group: {get_param: "OS::stack_id"}}}
 
-  listener:
-    type: OS::Neutron::LBaaS::Listener
-    properties:
-      loadbalancer: { get_resource: lb }
-      protocol: TCP
-      protocol_port: 8080
+  #monitor:
+  #  type: OS::Neutron::LBaaS::HealthMonitor
+  #  properties:
+  #    delay: 5
+  #    type: HTTP
+  #    timeout: 5
+  #    max_retries: 3
+  #    pool: { get_resource: pool }
+
+  #pool:
+  #  type: OS::Neutron::LBaaS::Pool
+  #  properties:
+  #    lb_algorithm: ROUND_ROBIN
+  #    protocol: TCP
+  #    listener: { get_resource: listener }
+
+  #listener:
+  #  type: OS::Neutron::LBaaS::Listener
+  #  properties:
+  #    loadbalancer: { get_resource: lb }
+  #    protocol: TCP
+  #    protocol_port: 8080
   
-  lb:
-    type: OS::Neutron::LBaaS::LoadBalancer
-    properties:
-      vip_subnet: { get_param: private_sig_subnet_id }
+  #lb:
+  #  type: OS::Neutron::LBaaS::LoadBalancer
+  #  properties:
+  #    vip_subnet: { get_param: private_sig_subnet_id }
 
-  lb_floating_ip:
-    type: OS::Neutron::FloatingIP
-    properties:
-      floating_network_id: { get_param: public_sig_net_id }
-      port_id: { get_attr: [ lb, vip_port_id ] }
+  #lb_floating_ip:
+  #  type: OS::Neutron::FloatingIP
+  #  properties:
+  #    floating_network_id: { get_param: public_sig_net_id }
+  #    port_id: { get_attr: [ lb, vip_port_id ] }
 
 outputs:
   scaleup_webhook:
@@ -179,11 +228,12 @@ outputs:
   scaledown_webhook:
     description: Bono webhook for scale down policy
     value: {get_attr: [bono_scaledown_policy, alarm_url]}
-  lb_private_vip:
-     value: {get_attr: [ lb, vip_address ] }
-     description: VIP for our Load Balancer
-  lb_floating_vip:
-    description: Public VIP for our Load Balancer
-    value: { get_attr: [ lb_floating_ip, floating_ip_address ] }
-  lb_vip_port:
-    value: { get_attr: [ lb, vip_port_id ] }
+  #lb_private_vip:
+  #   value: {get_attr: [ lb, vip_address ] }
+  #   description: VIP for our Load Balancer
+  #lb_floating_vip:
+  #  description: Public VIP for our Load Balancer
+  #  value: { get_attr: [ lb_floating_ip, floating_ip_address ] }
+  #lb_vip_port:
+  #  value: { get_attr: [ lb, vip_port_id ] }
+  

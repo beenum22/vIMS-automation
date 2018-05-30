@@ -67,6 +67,15 @@ parameters:
   dnssec_key:
     type: string
     description: DNSSEC private key (Base64-encoded)
+  dns_virtual_ip_mgmt:
+    type: string
+    description: Virtual IP address that can be used on different instances
+  dns_virtual_ip_sig:
+    type: string
+    description: Virtual IP address that can be used on different instances
+  index:
+    type: number
+    description: Node count
 
 resources:
   mgmt_port:
@@ -74,6 +83,8 @@ resources:
     properties:
       # Specify the network ID by string to work around OpenStack issues - see https://github.com/Metaswitch/clearwater-heat/issues/18.
       network_id: { str_replace: { params: { x: { get_param: private_mgmt_net_id } }, template: x } }
+      allowed_address_pairs:
+        - ip_address: { get_param: dns_virtual_ip_mgmt }
       security_groups:
         - { get_param: dns_security_group }
 
@@ -88,13 +99,16 @@ resources:
     properties:
       # Specify the network ID by string to work around OpenStack issues - see https://github.com/Metaswitch/clearwater-heat/issues/18.
       network_id: { str_replace: { params: { x: { get_param: private_sig_net_id } }, template: x } }
+      allowed_address_pairs:
+        - ip_address: { get_param: dns_virtual_ip_sig }
       security_groups:
         - { get_param: dns_security_group }
 
   server:
     type: OS::Nova::Server
     properties:
-      name: { str_replace: { params: { __zone__: { get_param: zone } }, template: ns.__zone__ } }
+      name: { str_replace: { params: { __index__: { get_param: index }, __zone__: { get_param: zone } }, template: ns-__index__.__zone__ } }
+      #name: { str_replace: { params: { __zone__: { get_param: zone } }, template: ns.__zone__ } }
       image: { get_param: image }
       flavor: { get_param: flavor }
       key_name: { get_param: key_name }
@@ -122,6 +136,12 @@ outputs:
   private_sig_ip:
     description: IP address in private signaling network
     value: { get_attr: [ sig_port, fixed_ips, 0, ip_address ] }
+  vip_sig:
+    description: VIP in private signaling network
+    value: { get_attr: [ sig_port, allowed_address_pairs, 0, ip_address ] }
+  vip_mgmt:
+    description: VIP in private mgmt network
+    value: { get_attr: [ mgmt_port, allowed_address_pairs, 0, ip_address ] }
   zone:
     description: DNS zone
     value: { get_param: zone }

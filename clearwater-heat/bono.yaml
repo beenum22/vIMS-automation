@@ -100,9 +100,11 @@ parameters:
   affinity_group:
     type: string
     default: affinity
-  pool_id:
+  stack_id:
     type: string
-    description: Pool to contact by load balancer
+  #pool_id:
+  #  type: string
+  #  description: Pool to contact by load balancer
   #cloud_url:
   #  type: string
   #  description: OpenStack url
@@ -152,6 +154,7 @@ resources:
     type: OS::Nova::Server
     properties:
       name: { str_replace: { params: { __index__: { get_attr: [rand_name, value] }, __zone__: { get_param: zone } }, template: bono-__index__.__zone__ } }
+      metadata: {"metering.server_group": {get_param: stack_id}}
       image: { get_param: image }
       flavor: { get_param: flavor }
       key_name: { get_param: key_name }
@@ -179,15 +182,15 @@ resources:
             __index__ : { get_attr: [rand_name, value] }
           template: {get_file: config_scripts/bono.sh}
 
-  member:
-    type: OS::Neutron::LBaaS::PoolMember
-    properties:
-      pool: { get_param: pool_id }
-      address: { get_attr: [ sig_port, fixed_ips, 0, ip_address ] }
+  #member:
+  #  type: OS::Neutron::LBaaS::PoolMember
+  #  properties:
+  #    pool: { get_param: pool_id }
+  #    address: { get_attr: [ sig_port, fixed_ips, 0, ip_address ] }
       #address: { get_attr: [server, first_address] }
-      protocol_port: 8080
+  #    protocol_port: 8080
       #subnet: { get_param: lb_subnet }
-      subnet: { get_param: private_sig_subnet_id }
+  #    subnet: { get_param: private_sig_subnet_id }
 
 outputs:
   public_mgmt_ip:
