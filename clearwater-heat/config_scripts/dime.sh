@@ -87,3 +87,11 @@ echo 'RESOLV_CONF=/etc/dnsmasq.resolv.conf' >> /etc/default/dnsmasq
 mkdir -p /etc/netns/signaling
 echo 'nameserver __dns_sig_ip__' > /etc/netns/signaling/resolv.conf
 service dnsmasq force-reload
+
+# Set up SNMP
+apt-get -y install python-pip && pip install docopt && apt-get install -y smitools git clearwater-snmpd
+mkdir /root/clearwater-mibs
+git clone https://github.com/Metaswitch/clearwater-snmp-handlers.git /root/clearwater-mibs/clearwater-snmp-handlers && python /root/clearwater-mibs/clearwater-snmp-handlers/mib-generator/cw_mib_generator.py /root/clearwater-mibs
+cp /root/clearwater-mibs/PROJECT-CLEARWATER-MIB /etc/snmp && cp /root/clearwater-mibs/PROJECT-CLEARWATER-MIB /usr/share/snmp/mibs/
+echo "mibs +PROJECT-CLEARWATER-MIB" > /etc/snmp/snmp.conf
+service snmpd restart
