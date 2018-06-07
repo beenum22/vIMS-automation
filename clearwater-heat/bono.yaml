@@ -77,12 +77,18 @@ parameters:
     type: string
     description: DNS zone
     default: example.com
-  dns_mgmt_ip:
+  dns_mgmt_ip_1:
     type: string
     description: IP address for DNS server on management network
-  dns_sig_ip:
+  dns_mgmt_ip_2:
     type: string
-    description: IP address for DNS server on signaling network
+    description: IP address for DNS server on management network
+  dns_virtual_ip_mgmt:
+    type: string
+    description: VIP address for DNS server on management network
+  dns_virtual_ip_sig:
+    type: string
+    description: VIP address for DNS server on signaling network
   dnssec_key:
     type: string
     description: DNSSEC private key (Base64-encoded)
@@ -100,8 +106,8 @@ parameters:
   affinity_group:
     type: string
     default: affinity
-  stack_id:
-    type: string
+  #stack_id:
+  #  type: string
   #pool_id:
   #  type: string
   #  description: Pool to contact by load balancer
@@ -154,7 +160,7 @@ resources:
     type: OS::Nova::Server
     properties:
       name: { str_replace: { params: { __index__: { get_attr: [rand_name, value] }, __zone__: { get_param: zone } }, template: bono-__index__.__zone__ } }
-      metadata: {"metering.server_group": {get_param: stack_id}}
+      metadata: {"metering.server_group": bono_cluster}
       image: { get_param: image }
       flavor: { get_param: flavor }
       key_name: { get_param: key_name }
@@ -175,8 +181,10 @@ resources:
             __private_sig_ip__: { get_attr: [ sig_port, fixed_ips, 0, ip_address ] }
             __private_sig_cidr__: { get_param: private_sig_net_cidr }
             __private_sig_gateway__: { get_param: private_sig_net_gateway }
-            __dns_mgmt_ip__: { get_param: dns_mgmt_ip }
-            __dns_sig_ip__: { get_param: dns_sig_ip }
+            __dns_mgmt_ip_1__: { get_param: dns_mgmt_ip_1 }
+            __dns_mgmt_ip_2__: { get_param: dns_mgmt_ip_2 }
+            __dns_vip_mgmt__: { get_param: dns_virtual_ip_mgmt }
+            __dns_vip_sig__: { get_param: dns_virtual_ip_sig }
             __dnssec_key__: { get_param: dnssec_key }
             __etcd_ip__ : { get_param: etcd_ip }
             __index__ : { get_attr: [rand_name, value] }

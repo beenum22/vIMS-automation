@@ -82,7 +82,22 @@ ip2rr() {
 # Update DNS
 retries=0
 while ! { nsupdate -y "__zone__:__dnssec_key__" -v << EOF
-server __dns_mgmt_ip__
+server __dns_mgmt_ip_1__
+update add ellis-__index__.__zone__. 30 $(ip2rr __public_mgmt_ip__)
+update add ellis.__zone__. 30 $(ip2rr __public_mgmt_ip__)
+send
+EOF
+} && [ $retries -lt 10 ]
+do
+  retries=$((retries + 1))
+  echo 'nsupdate failed - retrying (retry '$retries')...'
+  sleep 5
+done
+
+# Update DNS-HA
+retries=0
+while ! { nsupdate -y "__zone__:__dnssec_key__" -v << EOF
+server __dns_mgmt_ip_2__
 update add ellis-__index__.__zone__. 30 $(ip2rr __public_mgmt_ip__)
 update add ellis.__zone__. 30 $(ip2rr __public_mgmt_ip__)
 send
@@ -95,6 +110,6 @@ do
 done
 
 # Use the DNS server.
-echo 'nameserver __dns_mgmt_ip__' > /etc/dnsmasq.resolv.conf
+echo 'nameserver __dns_vip_mgmt__' > /etc/dnsmasq.resolv.conf
 echo 'RESOLV_CONF=/etc/dnsmasq.resolv.conf' >> /etc/default/dnsmasq
 service dnsmasq force-reload

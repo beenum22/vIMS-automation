@@ -1,0 +1,103 @@
+heat_template_version: 2013-05-23
+
+description: >
+  Clearwater Monitoring node
+
+parameters:
+  public_mgmt_net_id:
+    type: string
+    description: ID of public management network
+    constraints:
+      - custom_constraint: neutron.network
+        description: Must be a valid network ID
+  private_mgmt_net_id:
+    type: string
+    description: ID of private management network
+    constraints:
+      - custom_constraint: neutron.network
+        description: Must be a valid network ID
+  flavor:
+    type: string
+    description: Flavor to use
+    constraints:
+      - custom_constraint: nova.flavor
+        description: Must be a valid flavor name
+  image:
+    type: string
+    description: Name of image to use
+    constraints:
+      - custom_constraint: glance.image
+        description: Must be a valid image name
+  key_name:
+    type: string
+    description: Name of keypair to assign
+    constraints:
+      - custom_constraint: nova.keypair
+        description: Must be a valid keypair name
+  base_mgmt_security_group:
+    type: string
+    description: ID of base security group for all Clearwater nodes (management)
+  #mon_mgmt_security_group:
+  #  type: string
+  #  description: In case it requires more permissions
+  zone:
+    type: string
+    description: DNS zone
+    default: example.com
+  dns_mgmt_ip:
+    type: string
+    description: IP address for DNS server
+  dnssec_key:
+    type: string
+    description: DNSSEC private key (Base64-encoded)
+    constraints:
+      - allowed_pattern: "[0-9A-Za-z+/=]+"
+        description: Must be Base64-encoded
+  #etcd_ip:
+  #  type: string
+  #  description: IP address of an existing member of the etcd cluster
+  #  default: ""
+  repo_url:
+    type: string
+    description: URL for Clearwater repository
+    default: http://repo.cw-ngv.com/stable
+
+resources:
+  mgmt_port:
+    type: OS::Neutron::Port
+    properties:
+      # Specify the network ID by string to work around OpenStack issues - see https://github.com/Metaswitch/clearwater-heat/issues/18.
+      network_id: { str_replace: { params: { x: { get_param: private_mgmt_net_id } }, template: x } }
+      security_groups:
+        - { get_param: base_mgmt_security_group }
+        #- { get_param: mon_mgmt_security_group }
+
+  mgmt_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network_id: { get_param: public_mgmt_net_id }
+      port_id: { get_resource: mgmt_port }
+
+  server:
+    type: OS::Nova::Server
+    properties:
+      name: { str_replace: { params: { __zone__: { get_param: zone } }, template: monit.__zone__ } }
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      key_name: { get_param: key_name }
+      networks:
+        - port: { get_resource: mgmt_port }
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          params:
+            __repo_url__: { get_param: repo_url }
+          template: {get_file: config_scripts/monit.sh}
+
+outputs:
+  public_mgmt_ip:
+    description: IP address in public management network
+    value: { get_attr: [ mgmt_floating_ip, floating_ip_address ] }
+  private_mgmt_ip:
+    description: IP address in private management network
+    value: { get_attr: [ mgmt_port, fixed_ips, 0, ip_address ] }

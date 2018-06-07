@@ -36,9 +36,13 @@ parameters:
     type: string
   zone:
     type: string
-  dns_mgmt_ip:
+  dns_mgmt_ip_1:
     type: string
-  dns_sig_ip:
+  dns_mgmt_ip_2:
+    type: string
+  dns_virtual_ip_mgmt:
+    type: string
+  dns_virtual_ip_sig:
     type: string
   dnssec_key:
     type: string
@@ -107,12 +111,14 @@ resources:
           bono_sig_security_group: { get_param: bono_sig_security_group }
           repo_url: { get_param: repo_url }
           zone: { get_param: zone }
-          dns_mgmt_ip: { get_param: dns_mgmt_ip }
-          dns_sig_ip: { get_param: dns_sig_ip }
+          dns_mgmt_ip_1: { get_param: dns_mgmt_ip_1 }
+          dns_mgmt_ip_2: { get_param: dns_mgmt_ip_2 }
+          dns_virtual_ip_mgmt: { get_param: dns_virtual_ip_mgmt }
+          dns_virtual_ip_sig: { get_param: dns_virtual_ip_sig }
           dnssec_key: { get_param: dnssec_key }
           etcd_ip: { get_param: etcd_ip }      
           affinity_group: {get_resource: bono_soft_group}
-          stack_id: { get_param: stack_id }
+          #stack_id: { get_param: "OS::stack_id" }
           #metadata: { get_param: metadata }
           #pool_id: { get_resource: pool}
 
@@ -137,23 +143,25 @@ resources:
           bono_sig_security_group: { get_param: bono_sig_security_group }
           repo_url: { get_param: repo_url }
           zone: { get_param: zone }
-          dns_mgmt_ip: { get_param: dns_mgmt_ip }
-          dns_sig_ip: { get_param: dns_sig_ip }
+          dns_mgmt_ip_1: { get_param: dns_mgmt_ip_1 }
+          dns_mgmt_ip_2: { get_param: dns_mgmt_ip_2 }
+          dns_virtual_ip_mgmt: { get_param: dns_virtual_ip_mgmt }
+          dns_virtual_ip_sig: { get_param: dns_virtual_ip_sig }
           dnssec_key: { get_param: dnssec_key }
           etcd_ip: { get_param: etcd_ip }      
           affinity_group: {get_resource: bono_hard_group}
-          stack_id: { get_param: stack_id }
+          #stack_id: { get_param: "OS::stack_id" }
           #pool_id: { get_resource: pool}
 
   cpu_alarm_high:
     type: OS::Aodh::GnocchiAggregationByResourcesAlarm
     properties:
-      description: Scale up if CPU > 60% for 5 minutes
+      description: Scale up if CPU > 60% for 1 minute
       metric: cpu_util
       aggregation_method: mean
-      granularity: 300
+      granularity: 60
       evaluation_periods: 1
-      threshold: 60
+      threshold: 10
       resource_type: instance
       comparison_operator: gt
       alarm_actions:
@@ -164,17 +172,17 @@ resources:
       query:
         list_join:
           - ''
-          - - {'=': {server_group: {get_param: stack_id}}}
+          - - {'=': {server_group: bono_cluster}}
 
   cpu_alarm_low:
     type: OS::Aodh::GnocchiAggregationByResourcesAlarm
     properties:
-      description: Scale down if CPU < 15% for 5 minutes
+      description: Scale down if CPU < 15% for 1 minutes
       metric: cpu_util
       aggregation_method: mean
-      granularity: 300
+      granularity: 60
       evaluation_periods: 1
-      threshold: 15
+      threshold: 5
       resource_type: instance
       comparison_operator: lt
       alarm_actions:
@@ -185,7 +193,7 @@ resources:
       query:
         list_join:
           - ''
-          - - {'=': {server_group: {get_param: "OS::stack_id"}}}
+          - - {'=': {server_group: bono_cluster}}
 
   #monitor:
   #  type: OS::Neutron::LBaaS::HealthMonitor

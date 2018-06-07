@@ -74,6 +74,17 @@ EOF
 DEBIAN_FRONTEND=noninteractive apt-get install vellum --yes --force-yes
 DEBIAN_FRONTEND=noninteractive apt-get install clearwater-management --yes --force-yes
 
+# Set up SNMP
+#apt-get -y install python-pip
+#pip install docopt && apt-get install -y smitools git 
+apt-get install -y git smitools clearwater-snmpd clearwater-snmp-handler-astaire
+#mkdir /root/clearwater-mibs
+pip install docopt
+git clone https://github.com/Metaswitch/clearwater-snmp-handlers.git $HOME/clearwater-mibs/clearwater-snmp-handlers && python $HOME/clearwater-mibs/clearwater-snmp-handlers/mib-generator/cw_mib_generator.py $HOME/clearwater-mibs
+cp $HOME/clearwater-mibs/PROJECT-CLEARWATER-MIB /etc/snmp && cp $HOME/clearwater-mibs/PROJECT-CLEARWATER-MIB /usr/share/snmp/mibs/
+echo "mibs +PROJECT-CLEARWATER-MIB" > /etc/snmp/snmp.conf
+service snmpd restart
+
 # Function to give DNS record type and IP address for specified IP address
 ip2rr() {
   if echo $1 | grep -q -e '[^0-9.]' ; then
@@ -87,8 +98,7 @@ ip2rr() {
 retries=0
 while ! { nsupdate -y "__zone__:__dnssec_key__" -v << EOF
 server __dns_mgmt_ip__
-# Uncomment if required
-#update add vellum-__index__.__zone__. 30 $(ip2rr __public_mgmt_ip__)
+update add vellum-__index__.__zone__. 30 $(ip2rr __private_mgmt_ip__)
 update add vellum.__zone__. 30 $(ip2rr __private_sig_ip__)
 send
 EOF

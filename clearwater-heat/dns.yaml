@@ -76,6 +76,12 @@ parameters:
   index:
     type: number
     description: Node count
+  state:
+    type: string
+    description: VRRP State
+  name:
+    type: string
+    description: Name of the DNS
 
 resources:
   mgmt_port:
@@ -107,7 +113,7 @@ resources:
   server:
     type: OS::Nova::Server
     properties:
-      name: { str_replace: { params: { __index__: { get_param: index }, __zone__: { get_param: zone } }, template: ns-__index__.__zone__ } }
+      name: { get_param: name}
       #name: { str_replace: { params: { __zone__: { get_param: zone } }, template: ns.__zone__ } }
       image: { get_param: image }
       flavor: { get_param: flavor }
@@ -119,6 +125,9 @@ resources:
       user_data:
         str_replace:
           params:
+            __state__: { get_param: state }
+            __vip_mgmt__: { get_param: dns_virtual_ip_mgmt }
+            __vip_sig__: { get_param: dns_virtual_ip_sig }
             __zone__: { get_param: zone }
             __dnssec_key__: { get_param: dnssec_key }
             __public_ip__: { get_attr: [ mgmt_floating_ip, floating_ip_address ] }

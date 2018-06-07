@@ -42,7 +42,7 @@ etcd_ip=__etcd_ip__
 [ -n "$etcd_ip" ] || etcd_ip=__private_mgmt_ip__
 cat > /etc/clearwater/local_config << EOF
 signaling_namespace=signaling
-signaling_dns_server=__dns_sig_ip__
+signaling_dns_server=__dns_vip_sig__
 management_local_ip=__private_mgmt_ip__
 local_ip=__private_sig_ip__
 public_ip=__public_sig_ip__
@@ -53,6 +53,17 @@ EOF
 # Now install the software.
 DEBIAN_FRONTEND=noninteractive apt-get install bono --yes --force-yes
 DEBIAN_FRONTEND=noninteractive apt-get install clearwater-management --yes --force-yes
+
+# Set up SNMP
+#apt-get -y install python-pip
+#pip install docopt && apt-get install -y smitools git 
+apt-get install -y git smitools clearwater-snmpd
+#mkdir /root/clearwater-mibs
+pip install docopt
+git clone https://github.com/Metaswitch/clearwater-snmp-handlers.git $HOME/clearwater-mibs/clearwater-snmp-handlers && python $HOME/clearwater-mibs/clearwater-snmp-handlers/mib-generator/cw_mib_generator.py $HOME/clearwater-mibs
+cp $HOME/clearwater-mibs/PROJECT-CLEARWATER-MIB /etc/snmp && cp $HOME/clearwater-mibs/PROJECT-CLEARWATER-MIB /usr/share/snmp/mibs/
+echo "mibs +PROJECT-CLEARWATER-MIB" > /etc/snmp/snmp.conf
+service snmpd restart
 
 # Function to give DNS record type and IP address for specified IP address
 ip2rr() {
@@ -66,7 +77,27 @@ ip2rr() {
 # Update DNS
 retries=0
 while ! { nsupdate -y "__zone__:__dnssec_key__" -v << EOF
-server __dns_mgmt_ip__
+server __dns_mgmt_ip_1__
+update add bono-__index__.__zone__. 30 $(ip2rr __public_mgmt_ip__)
+update add __index__.bono.__zone__. 30 $(ip2rr __public_sig_ip__)
+update add __zone__. 30 $(ip2rr __public_sig_ip__)
+update add __zone__. 30 NAPTR 0 0 "s" "SIP+D2T" "" _sip._tcp.__zone__.
+update add __zone__. 30 NAPTR 0 0 "s" "SIP+D2U" "" _sip._udp.__zone__.
+update add _sip._tcp.__zone__. 30 SRV 0 0 5060 __index__.bono.__zone__.
+update add _sip._udp.__zone__. 30 SRV 0 0 5060 __index__.bono.__zone__.
+send
+EOF
+} && [ $retries -lt 10 ]
+do
+  retries=$((retries + 1))
+  echo 'nsupdate failed - retrying (retry '$retries')...'
+  sleep 5
+done
+
+# Update DNS
+retries=0
+while ! { nsupdate -y "__zone__:__dnssec_key__" -v << EOF
+server __dns_mgmt_ip_2__
 update add bono-__index__.__zone__. 30 $(ip2rr __public_mgmt_ip__)
 update add __index__.bono.__zone__. 30 $(ip2rr __public_sig_ip__)
 update add __zone__. 30 $(ip2rr __public_sig_ip__)
@@ -84,16 +115,8 @@ do
 done
 
 # Use the DNS server.
-echo 'nameserver __dns_mgmt_ip__' > /etc/dnsmasq.resolv.conf
+echo 'nameserver __dns_vip_mgmt__' > /etc/dnsmasq.resolv.conf
 echo 'RESOLV_CONF=/etc/dnsmasq.resolv.conf' >> /etc/default/dnsmasq
 mkdir -p /etc/netns/signaling
-echo 'nameserver __dns_sig_ip__' > /etc/netns/signaling/resolv.conf
+echo 'nameserver __dns_vip_sig__' > /etc/netns/signaling/resolv.conf
 service dnsmasq force-reload
-
-# Set up SNMP
-apt-get -y install python-pip && pip install docopt && apt-get install -y smitools git clearwater-snmpd
-mkdir /root/clearwater-mibs
-git clone https://github.com/Metaswitch/clearwater-snmp-handlers.git /root/clearwater-mibs/clearwater-snmp-handlers && python /root/clearwater-mibs/clearwater-snmp-handlers/mib-generator/cw_mib_generator.py /root/clearwater-mibs
-cp /root/clearwater-mibs/PROJECT-CLEARWATER-MIB /etc/snmp && cp /root/clearwater-mibs/PROJECT-CLEARWATER-MIB /usr/share/snmp/mibs/
-echo "mibs +PROJECT-CLEARWATER-MIB" > /etc/snmp/snmp.conf
-service snmpd restart

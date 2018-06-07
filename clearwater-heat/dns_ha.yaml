@@ -60,54 +60,113 @@ parameters:
   dnssec_key:
     type: string
     description: DNSSEC private key (Base64-encoded)
-  dns_virtual_ip_mgmt:
-    type: string
-    description: Virtual IP address that can be used on different instances
-  dns_virtual_ip_sig:
-    type: string
-    description: Virtual IP address that can be used on different instances
+#  dns_virtual_ip_mgmt:
+#    type: string
+#    description: Virtual IP address that can be used on different instances
+#  dns_virtual_ip_sig:
+#    type: string
+#    description: Virtual IP address that can be used on different instances
   index:
     type: number
     description: Node count
 
 resources:
-  dns_ha:
-    type: OS::Heat::ResourceGroup
+  vip_port_mgmt:
+    type: OS::Neutron::Port
     properties:
-      count: 2
-      resource_def:
-        type: ClearwaterIMS::DNS
-        properties:
-          public_mgmt_net_id: { get_param: public_mgmt_net_id }
-          private_mgmt_net_id: { get_param: private_mgmt_net_id }
-          public_sig_net_id: { get_param: public_sig_net_id }
-          private_sig_net_id: { get_param: private_sig_net_id }
-          private_sig_net_cidr: { get_param: private_sig_net_cidr }
-          flavor: { get_param: flavor }
-          image: { get_param: image }
-          key_name: { get_param: key_name }
-          dns_security_group: {get_param: dns_security_group}
-          zone: { get_param: zone }
-          dnssec_key: { get_param: dnssec_key }
-          dns_virtual_ip_sig: { get_param: dns_virtual_ip_sig }
-          dns_virtual_ip_mgmt: { get_param: dns_virtual_ip_mgmt}
-          index: { get_param: index}
+      network_id: { get_param: private_mgmt_net_id}
+      security_groups:
+        - {get_param: dns_security_group}
+
+  vip_port_sig:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: private_sig_net_id}
+      security_groups:
+        - {get_param: dns_security_group}
+
+  vip_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network_id: { get_param: public_sig_net_id }
+      port_id: { get_resource: vip_port_mgmt }
+
+#  dns_ha:
+#    type: OS::Heat::ResourceGroup
+#    properties:
+#      count: 2
+#      resource_def:
+  dns_master:
+    type: ClearwaterIMS::DNS
+    properties:
+      name: dns-master.xflow.com
+      public_mgmt_net_id: { get_param: public_mgmt_net_id }
+      private_mgmt_net_id: { get_param: private_mgmt_net_id }
+      public_sig_net_id: { get_param: public_sig_net_id }
+      private_sig_net_id: { get_param: private_sig_net_id }
+      private_sig_net_cidr: { get_param: private_sig_net_cidr }
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_param: key_name }
+      dns_security_group: {get_param: dns_security_group}
+      zone: { get_param: zone }
+      dnssec_key: { get_param: dnssec_key }
+      dns_virtual_ip_sig: { get_attr: [ vip_port_sig, fixed_ips, 0, ip_address ] }
+      dns_virtual_ip_mgmt: { get_attr: [ vip_port_mgmt, fixed_ips, 0, ip_address ]}
+      index: { get_param: index}
+      state: MASTER
+
+  dns_backup:
+    type: ClearwaterIMS::DNS
+    properties:
+      name: dns-backup.xflow.com
+      public_mgmt_net_id: { get_param: public_mgmt_net_id }
+      private_mgmt_net_id: { get_param: private_mgmt_net_id }
+      public_sig_net_id: { get_param: public_sig_net_id }
+      private_sig_net_id: { get_param: private_sig_net_id }
+      private_sig_net_cidr: { get_param: private_sig_net_cidr }
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_param: key_name }
+      dns_security_group: {get_param: dns_security_group}
+      zone: { get_param: zone }
+      dnssec_key: { get_param: dnssec_key }
+      dns_virtual_ip_sig: { get_attr: [ vip_port_sig, fixed_ips, 0, ip_address ] }
+      dns_virtual_ip_mgmt: { get_attr: [ vip_port_mgmt, fixed_ips, 0, ip_address ]}
+      index: { get_param: index}
+      state: BACKUP
 
 outputs:
-  private_mgmt_ip_list:
-    value: {get_attr: [dns_ha, private_mgmt_ip]}
-  private_mgmt_ip_1:
-    description: DNS 1 management IP
-    value: { get_attr: [dns_ha, resource.0.private_mgmt_ip] }
-  private_mgmt_ip_2:
-    description: DNS 2 management IP
-    value: { get_attr: [dns_ha, resource.1.private_mgmt_ip] }
-  private_sig_ip_1:
-    description: DNS 1 signaling IP
-    value: { get_attr: [dns_ha, resource.0.private_sig_ip] }
-  private_sig_ip_2:
-    description: DNS 2 signaling IP
-    value: { get_attr: [dns_ha, resource.1.private_sig_ip] }
+  master_private_mgmt_ip:
+    value: { get_attr: [ dns_master, private_mgmt_ip]}
+  backup_private_mgmt_ip:
+    value: { get_attr: [ dns_backup, private_mgmt_ip]}
+  master_private_sig_ip:
+    value: { get_attr: [ dns_master, private_sig_ip]}
+  backup_private_sig_ip:
+    value: { get_attr: [ dns_backup, private_sig_ip]}
+  #private_mgmt_ip_list:
+  #  value: {get_attr: [dns_ha, private_mgmt_ip]}
+  #private_mgmt_ip_1:
+  #  description: DNS 1 management IP
+  #  value: { get_attr: [dns_ha, resource.0.private_mgmt_ip] }
+  #private_mgmt_ip_2:
+  #  description: DNS 2 management IP
+  #  value: { get_attr: [dns_ha, resource.1.private_mgmt_ip] }
+  #private_sig_ip_1:
+  #  description: DNS 1 signaling IP
+  #  value: { get_attr: [dns_ha, resource.0.private_sig_ip] }
+  #private_sig_ip_2:
+  #  description: DNS 2 signaling IP
+  #  value: { get_attr: [dns_ha, resource.1.private_sig_ip] }
+  vip_mgmt:
+    description: DNS management VIP
+    value: { get_attr: [ vip_port_mgmt, fixed_ips, 0, ip_address ]}
+  vip_sig:
+    description: DNS signaling VIP
+    value: { get_attr: [ vip_port_sig, fixed_ips, 0, ip_address ]}
+  vip_floating_ip:
+    value: { get_attr: [ vip_floating_ip, floating_ip_address ] }
   #dns_public_sig:
   #  description: Public signaling VIP
   #  value: {}

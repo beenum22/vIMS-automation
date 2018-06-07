@@ -69,9 +69,15 @@ parameters:
     constraints:
       - allowed_pattern: "[0-9]+"
         description: Must be numeric
-  dns_mgmt_ip:
+  dns_mgmt_ip_1:
     type: string
     description: IP address for DNS server
+  dns_mgmt_ip_2:
+    type: string
+    description: IP address for DNS server
+  dns_virtual_ip_mgmt:
+    type: string
+    description: VIP address for DNS server on management network
   dnssec_key:
     type: string
     description: DNSSEC private key (Base64-encoded)
@@ -127,7 +133,9 @@ resources:
             __private_mgmt_ip__: { get_attr: [ mgmt_port, fixed_ips, 0, ip_address ] }
             __dn_range_start__: { get_param: dn_range_start }
             __dn_range_length__: { get_param: dn_range_length }
-            __dns_mgmt_ip__: { get_param: dns_mgmt_ip }
+            __dns_mgmt_ip_1__: { get_param: dns_mgmt_ip_1 }
+            __dns_mgmt_ip_2__: { get_param: dns_mgmt_ip_2 }
+            __dns_vip_mgmt__: { get_param: dns_virtual_ip_mgmt }
             __dnssec_key__: { get_param: dnssec_key }
             __etcd_ip__ : { get_param: etcd_ip }
             __index__ : { get_attr: [rand_name, value] }

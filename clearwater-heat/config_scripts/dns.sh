@@ -49,3 +49,38 @@ chown root:bind /var/lib/bind/db.__zone__
 
 # Now that BIND configuration is correct, kick it to reload.
 service bind9 reload
+
+apt install -y keepalived
+cat > /etc/keepalived/keepalived.conf << EOF
+vrrp_instance dns_ha_mgmt {
+    state __state__
+    interface eth0
+    virtual_router_id 51
+    priority 150
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass supersecretpassword
+    }
+    virtual_ipaddress {
+        __vip_mgmt__
+    }
+}
+
+vrrp_instance dns_ha_sig {
+    state __state__
+    interface eth1
+    virtual_router_id 51
+    priority 150
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass supersecretpassword
+    }
+    virtual_ipaddress {
+        __vip_sig__
+    }
+}
+EOF
+
+service keepalived restart
