@@ -17,7 +17,7 @@ class vIMS(Stack):
         self.settings.parse_settings_file()
         super(vIMS, self).__init__(self.settings.auth[
             'password'], self.settings.auth['auth_url'])
-        self.authenticate_clients()
+        # self.authenticate_clients()
         '''
         try:
             assert self.available_net_ips(self.settings.universal[
@@ -69,7 +69,9 @@ class vIMS(Stack):
             self.create_keypair(self.settings.universal['keypair_name'])
             self.create_flavor(self.settings.universal[
                                'flavor_name'], ram=1024, vcpus=1, disk=40)
-            self.check_quotas(security_groups=30, floating_ips=50)
+            instances_count = int(self.settings.universal['bono_cluster_size']) + int(self.settings.universal[
+                            'sprout_cluster_size']) + int(self.settings.universal['dime_cluster_size']) + int(self.settings.universal['vellum_cluster_size']) + int(self.settings.universal['homer_cluster_size']) + 4
+            self.check_resources(instances_count, self.settings.universal['flavor_name'])
             public_net_id = self.get_net_id(
                 self.settings.universal['public_network'])
             mgmt_net_pool = Utilities.get_ip_range(self.settings.mgmt_net[
@@ -106,21 +108,24 @@ class vIMS(Stack):
                 self.stack_name, self.heat_template, params=params, env_file=self.env_file)
             for output in self.openstack.orchestration.get_stack(self.stack_name).outputs:
                 if output['output_key'] == 'dns_ip':
-                    logger.info("Public vIMS DNS IP: %s", output['output_value'])
+                    logger.info("Public vIMS DNS IP: %s",
+                                output['output_value'])
                     break
         except Exception as err:
             raise
 
-    def verify_quotas(self, instances, flavor):
+    def check_resources(self, instances, flavor):
         try:
-            find_flavor = self.openstack.compute.find_flavor(flavor)
-            assert find_flavor != None, "Flavor '%s' not found" % flavor
-            get_flavor = self.openstack.compute.get_flavor(find_flavor.id)
-            total_vcpus = int(instances) * get_flavor.vcpus
-            total_ram = int(instances) * get_flavor.ram
-            total_disk = int(instances) * get_flavor.disk
-        except AssertionError as err:
-            raise
-        except Exception as err:
-            logger.debug(err)
+            logger.info("Verifying available resources")
+            flavor = self.get_flavor(flavor)
+            #hosts = s.get_hypervisors()
+            resources = self.get_total_available_resources()
+            assert (flavor.vcpus * instances) < resources[
+                'vcpus'], "Not enough resources available. Required vcpus: %s - Available vcpus: %s" % (flavor.vcpus * instances, resources['vcpus'])
+            assert (flavor.vcpus * instances) < resources[
+                'vcpus'], "Not enough resources available. Required memory: %s - Available memory: %s" % (flavor.ram * instances, resources['memory'])
+            assert (flavor.vcpus * instances) < resources[
+                'vcpus'], "Not enough resources available. Required storage: %s - Available storage: %s" % (flavor.disk * instances, resources['storage'])
+            self.check_quotas(security_groups=30, floating_ips=50)
+        except AssertionError:
             raise
