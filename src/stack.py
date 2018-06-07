@@ -38,7 +38,7 @@ class Stack(object):
                 self.auth_url, self.sess, self.auth, 'orchestration')
             self.openstack = self._get_openstacksdk_client(
                 self.auth_url, self.password)
-            #self.openstack.authorize()
+            self.openstack.authorize()
         except HttpException as err:
             logger.debug(err)
             raise Exception("OpenStack Authorization failed. Verify credentials.")
@@ -46,19 +46,23 @@ class Stack(object):
             raise
 
     def exception_handling(func):
-        def decorated():
+        def auth_exceptions(self, *args, **kwargs):
             try:
-                func()
+                return func(self, *args, **kwargs)
             except ConnectFailure as err:
                 logger.debug(err)
                 raise Exception("Failed to establish connection with auth_url: '%s'" % self.auth_url)
             except http.Unauthorized as err:
                 logger.debug(err)
-                raise Exception("OpenStack Authorization failed.")
-            except Exception as err:
-                print err
-        decorated._original = func
-        return decorated
+                raise Exception("OpenStack Authorization failed. Verify the credentials.")
+            except ResourceNotFound:
+                raise
+            except NotFound:
+                raise
+            except:
+                raise
+        #decorated._original = func
+        return auth_exceptions
 
     def _get_auth_sess(self):
         # try:
@@ -77,20 +81,20 @@ class Stack(object):
         return session.Session(auth=auth)
 
     def _get_openstacksdk_client(self, auth_url, password, username='admin', project_name='admin'):
-        try:
-            conn = connection.Connection(
-                auth_url=auth_url, project_name=project_name, username=username, password=password)
-            return conn
-        except Exception as err:
-            logger.debug(err)
-            raise
+        #try:
+        conn = connection.Connection(
+            auth_url=auth_url, project_name=project_name, username=username, password=password)
+        return conn
+        #except Exception as err:
+        #    logger.debug(err)
+        #    raise
 
     def _get_heatclient(self, auth_url, sess, auth, service_type, version='1'):
-        try:
-            return hclient.Client(version, auth_url=auth_url, session=sess, auth=auth, service_type=service_type)
-        except Exception as err:
-            logger.debug(err)
-            raise
+        #try:
+        return hclient.Client(version, auth_url=auth_url, session=sess, auth=auth, service_type=service_type)
+        #except Exception as err:
+        #    logger.debug(err)
+        #    raise
 
     def _get_novaclient(self, sess, version='2'):
         try:
@@ -99,101 +103,105 @@ class Stack(object):
             logger.debug(err)
             raise UnsupportedVersion(
                 "Invalid Nova client version '%s'" % version)
-        except:
-            raise
+        #except:
+        #    raise
 
     def _get_neutronclient(self, sess):
-        try:
-            return ntclient.Client(session=sess)
-        except Exception as err:
-            logger.debug(err)
-            raise
+        #try:
+        return ntclient.Client(session=sess)
+        #except Exception as err:
+        #    logger.debug(err)
+        #    raise
 
     def _get_glanceclient(self, sess, version='2'):
-        try:
-            return gclient(version, session=sess)
-        except Exception as err:
-            logger.debug(err)
-            raise
+        #try:
+        return gclient(version, session=sess)
+        #except Exception as err:
+        #    logger.debug(err)
+        #    raise
 
+    @exception_handling
     def _get_network(self, name):
-        try:
-            if not self.neutron:
-                auth, sess = self._get_auth_sess()
-                self.neutron = self._get_neutronclient(sess)
-            networks = self.neutron.list_networks(name=name)
-            return networks
-        except ConnectFailure as err:
-            logger.debug(err)
-            raise Exception("Failed to establish connection with auth_url: '%s'" % self.auth_url)
-        except http.Unauthorized as err:
-            logger.debug(err)
-            raise Exception("OpenStack Authorization failed.")
+        #try:
+        if not self.neutron:
+            auth, sess = self._get_auth_sess()
+            self.neutron = self._get_neutronclient(sess)
+        networks = self.neutron.list_networks(name=name)
+        #print "networks: %s" % networks
+        return networks
+        #except ConnectFailure as err:
+        #    logger.debug(err)
+        #    raise Exception("Failed to establish connection with auth_url: '%s'" % self.auth_url)
+        #except http.Unauthorized as err:
+        #    logger.debug(err)
+        #    raise Exception("OpenStack Authorization failed.")
 
+    @exception_handling
     def _get_subnet(self, name):
-        try:
-            if not self.neutron:
-                auth, sess = self._get_auth_sess()
-                self.neutron = self._get_neutronclient(sess)
-            return self.neutron.list_subnets(name=name)
-        except Exception as err:
-            logger.debug(err)
-            raise
+        #try:
+        if not self.neutron:
+            auth, sess = self._get_auth_sess()
+            self.neutron = self._get_neutronclient(sess)
+        return self.neutron.list_subnets(name=name)
+        #except Exception as err:
+        #    logger.debug(err)
+        #    raise
 
+    @exception_handling
     def _get_router(self, name):
-        try:
-            if not self.neutron:
-                auth, sess = self._get_auth_sess()
-                self.neutron = self._get_neutronclient(sess)
-            return self.neutron.list_routers(name=name)
-        except Exception as err:
-            logger.debug(err)
-            raise
+        #try:
+        if not self.neutron:
+            auth, sess = self._get_auth_sess()
+            self.neutron = self._get_neutronclient(sess)
+        return self.neutron.list_routers(name=name)
+        #except Exception as err:
+        #    logger.debug(err)
+        #    raise
 
     def get_net_id(self, name):
         """Generic function to get any network id"""
-        try:
-            net = self._get_network(name)
-            if net['networks']:
-                return net['networks'][0]['id']
-            return None
-        except:
-            raise
+        #try:
+        net = self._get_network(name)
+        if net['networks']:
+            return net['networks'][0]['id']
+        return None
+        #except:
+        #    raise
 
     def get_subnet_id(self, name):
         """Generic function to get any network id"""
-        try:
-            subnet = self._get_subnet(name)
-            if subnet['subnets']:
-                return subnet['subnets'][0]['id']
-            return None
-        except:
-            raise
+        #try:
+        subnet = self._get_subnet(name)
+        if subnet['subnets']:
+            return subnet['subnets'][0]['id']
+        return None
+        #except:
+        #    raise
 
     def get_router_id(self, name):
         """Generic function to get any network id"""
-        try:
-            router = self._get_router(name)
-            if router['routers']:
-                return router['routers'][0]['id']
-            return None
-        except:
-            raise
+        #try:
+        router = self._get_router(name)
+        if router['routers']:
+            return router['routers'][0]['id']
+        return None
+        #except:
+        #    raise
 
     def create_net(self, name):
-        try:
-            net_params = {'name': name, 'admin_state_up': True}
-            if not self._get_network(name)['networks']:
-                logger.debug("Creating '%s' network", name)
-                self.neutron.create_network({'network': net_params})
-                logger.info("Network '%s' succesfully created", name)
-                return True
-            else:
-                logger.debug("Network '%s' already exists", name)
-                return False
-        except Exception as err:
-            logger.debug(err)
-            raise
+        #try:
+        net_params = {'name': name, 'admin_state_up': True}
+        if not self._get_network(name)['networks']:
+            logger.debug("Creating '%s' network", name)
+            self.neutron.create_network({'network': net_params})
+            logger.info("Network '%s' succesfully created", name)
+            return True
+        else:
+            logger.debug("Network '%s' already exists", name)
+            return False
+        #except Exception as err:
+        #    logger.debug(err)
+        #    raise
 
     def create_subnet(self, name, net_id, cidr, gw, pool_size=-1, dns_list=['8.8.8.8']):
         try:
@@ -209,23 +217,22 @@ class Stack(object):
             else:
                 logger.debug("Subnet '%s' already exists", name)
                 return None
-        except Exception as err:
-            logger.debug(err)
+        except:
             raise
 
     def create_router(self, name, ext_gw_net=None):
-        try:
-            router = {'admin_state_up': True, 'name': name}
-            if ext_gw_net:
-                router['external_gateway_info'] = {'network_id': ext_gw_net}
-            if not self._get_router(name)['routers']:
-                logger.debug("Creating '%s' router", name)
-                self.neutron.create_router({'router': router})
-                logger.info("Router '%s' succesfully created", name)
-                return True
-        except Exception as err:
-            logger.debug(err)
-            raise
+        #try:
+        router = {'admin_state_up': True, 'name': name}
+        if ext_gw_net:
+            router['external_gateway_info'] = {'network_id': ext_gw_net}
+        if not self._get_router(name)['routers']:
+            logger.debug("Creating '%s' router", name)
+            self.neutron.create_router({'router': router})
+            logger.info("Router '%s' succesfully created", name)
+            return True
+        #except Exception as err:
+        #    logger.debug(err)
+        #    raise
 
     def add_router_int(self, router_id, subnet_id=None, port_id=None):
         try:
@@ -243,29 +250,30 @@ class Stack(object):
             logger.debug(err)
             raise
 
+    @exception_handling
     def create_keypair(self, keypair_name):
         """ Create Keypair file"""
-        try:
-            key = self.nova.keypairs.findall(name=keypair_name)
-            if not key:
-                logger.info("Creating Key Pair '%s'", keypair_name)
-                keypair = self.nova.keypairs.create(name=keypair_name)
-                # Open a file for storing the private key
-                #home_path = Utilities.get_home_directory()
-                path = Utilities.join_paths(
-                    Utilities.get_home_directory(), '.ssh', keypair_name)
-                with open(path + '.pem', "w+") as f:
-                    f.write(keypair.private_key)
-                with open(path + '.pub', "w+") as f:
-                    f.write(keypair.public_key)
-                logger.info("Key Pair created!")
-                return keypair
-            return None
-        except http.Unauthorized as err:
-            logger.debug(err)
-            raise Exception("OpenStack Authorization failed. Verify credentials.")
-        except:
-            raise
+        #try:
+        key = self.nova.keypairs.findall(name=keypair_name)
+        if not key:
+            logger.info("Creating Key Pair '%s'", keypair_name)
+            keypair = self.nova.keypairs.create(name=keypair_name)
+            # Open a file for storing the private key
+            #home_path = Utilities.get_home_directory()
+            path = Utilities.join_paths(
+                Utilities.get_home_directory(), '.ssh', keypair_name)
+            with open(path + '.pem', "w+") as f:
+                f.write(keypair.private_key)
+            with open(path + '.pub', "w+") as f:
+                f.write(keypair.public_key)
+            logger.info("Key Pair created!")
+            return keypair
+        return None
+        #except http.Unauthorized as err:
+        #    logger.debug(err)
+        #    raise Exception("OpenStack Authorization failed. Verify credentials.")
+        #except:
+        #    raise
 
     def create_flavor(self, flavor_name, ram, vcpus, disk):
         try:
@@ -281,6 +289,15 @@ class Stack(object):
             logger.debug(err)
             raise Exception("OpenStack Authorization failed. Verify credentials.")
         except:
+            raise
+
+    @exception_handling
+    def get_flavor(self, flavor_name):
+        try:
+            flavor = self.openstack.compute.find_flavor(flavor_name)
+            assert flavor, "Flavor: '%s' not found"
+            return self.openstack.compute.get_flavor(flavor.id)
+        except AssertionError:
             raise
 
     def upload_image(self, image_name, url=None):
@@ -491,51 +508,70 @@ class Stack(object):
         except:
             raise
 
+    @exception_handling
     def _hypervisors(self):
-        try:
-            return self.nova.hypervisors.list()
-        except http.Unauthorized as err:
-            logger.debug(err)
-            raise Exception("OpenStack Authorization failed. Verify credentials.")
+        #try:
+        return self.nova.hypervisors.list()
+        #except http.Unauthorized as err:
+        #    logger.debug(err)
+        #    raise Exception("OpenStack Authorization failed. Verify credentials.")
 
-    def _find_host(self, hostname):
+    #def _find_host(self, hostname):
+    #    try:
+    #        hyp = self.nova.hypervisors.find(hypervisor_hostname=hostname)
+    #        logger.info("Host '%s' found", hostname)
+    #        return hyp
+    #    except NotFound:
+    #        logger.error("Host '%s' not found", hostname)
+    #        raise
+
+    @exception_handling
+    def _get_host(self, hostname):
+        #try:
+        #    return self._find_host(hostname)
+        #except NotFound:
+        #    raise
         try:
             hyp = self.nova.hypervisors.find(hypervisor_hostname=hostname)
-            logger.info("Host '%s' found", hostname)
+            #logger.info("Host '%s' found", hostname)
             return hyp
-        except NotFound:
-            logger.error("Host '%s' not found", hostname)
-            raise
-
-    def _get_host(self, hostname):
-        try:
-            return self._find_host(hostname)
-        except NotFound:
-            raise
-
-    def get_hypervisors(self):
-        try:
-            hypervisors = []
-            for h in self._hypervisors():
-                hypervisors.append(h.hypervisor_hostname)
-            return hypervisors
-        except:
-            raise
+        except NotFound as err:
+            logger.error(err)
+            raise Exception("Host '%s' not found" % hostname)
 
     def _get_hypervisor_resources(self, hostname):
-        try:
-            resources = {'total': {}, 'used': {}}
-            hypervisor = self._get_host(hostname)
-            resources['total']['vcpus'] = hypervisor.vcpus
-            resources['total']['memory'] = hypervisor.memory_mb
-            resources['total']['storage'] = hypervisor.local_gb
-            resources['used']['vcpus'] = hypervisor.vcpus_used
-            resources['used']['memory'] = hypervisor.memory_mb_used
-            resources['used']['storage'] = hypervisor.local_gb_used
-            return resources
-        except Exception as err:
+        #try:
+        resources = {'total': {}, 'used': {}}
+        hypervisor = self._get_host(hostname)
+        resources['total']['vcpus'] = hypervisor.vcpus
+        resources['total']['memory'] = hypervisor.memory_mb
+        resources['total']['storage'] = hypervisor.local_gb
+        resources['used']['vcpus'] = hypervisor.vcpus_used
+        resources['used']['memory'] = hypervisor.memory_mb_used
+        resources['used']['storage'] = hypervisor.local_gb_used
+        return resources
+        #except Exception as err:
             #logger.debug(err)
-            raise
+        #    raise
+
+    def get_hypervisors(self):
+        #try:
+        hypervisors = []
+        for h in self._hypervisors():
+            hypervisors.append(h.hypervisor_hostname)
+        return hypervisors
+        #except:
+        #    raise
+
+    def get_total_available_resources(self):
+        total_avail = {'vcpus': 0, 'memory': 0, 'storage': 0}
+        hypervisors = self.get_hypervisors()
+        for hyp in hypervisors:
+            r = self._get_hypervisor_resources(hyp)
+            total_avail['vcpus'] += r['total']['vcpus'] - r['used']['vcpus']
+            total_avail['memory'] += r['total']['memory'] - r['used']['memory']
+            total_avail['storage'] += r['total']['storage'] - r['used']['storage']
+        return total_avail
 
     def _get_network_info(self, name):
         try:
@@ -543,12 +579,10 @@ class Stack(object):
             return self.openstack.network.get_network_ip_availability(net_id)
         except KeyError as err:
             logger.debug(err)
-            raise KeyError("Network:'%s' doesn't exist" % name)
+            raise Exception("Network:'%s' doesn't exist" % name)
         except ResourceNotFound as err:
             logger.debug(err)
-            raise Exception("Network ID:%s doesn't exist" % net_id)
-        except:
-            raise
+            raise ResourceNotFound("Network ID:%s doesn't exist" % net_id)
 
     def total_net_ips(self, name):
         try:
