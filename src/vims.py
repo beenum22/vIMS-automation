@@ -84,7 +84,7 @@ class vIMS(Stack):
             params = {
                 "public_mgmt_net_id": public_net_id,
                 "public_sig_net_id": public_net_id,
-                "zone": "xflow.com",
+                "zone": "xflowresearch.com",
                 "flavor":  self.settings.universal['flavor_name'],
                 "image":  self.settings.universal['image_name'],
                 "dnssec_key": self.settings.universal['dnssec_key'],
@@ -106,11 +106,17 @@ class vIMS(Stack):
             }
             self.create_stack(
                 self.stack_name, self.heat_template, params=params, env_file=self.env_file)
-            for output in self.openstack.orchestration.get_stack(self.stack_name).outputs:
+            outputs = self.openstack.orchestration.get_stack(self.stack_name).outputs
+            for output in outputs:
                 if output['output_key'] == 'dns_ip':
                     logger.info("Public vIMS DNS IP: %s",
                                 output['output_value'])
-                    break
+                elif output['output_key'] == 'etcd_ip':
+                    logger.info("Public vIMS Etcd leader IP: %s",
+                                output['output_value'])
+                elif output['output_key'] == 'monit_ip':
+                    logger.info("Public vIMS Monitoring node IP: %s",
+                                output['output_value'])
         except Exception as err:
             raise
 
