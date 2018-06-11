@@ -70,3 +70,17 @@ class SSHConnection(SSHClient):
         logger.debug("Executing command '%s' on '%s'", cmd, self.host_ip)
         ssh_stdin, ssh_stdout, ssh_stderr = self.exec_command(cmd)
         return ssh_stdout.readlines(), ssh_stderr.readlines()
+
+    @classmethod
+    def get_host_ssh_status(cls, host, username, password=None):
+        try:
+            ss = SSHConnection(host, username, password)
+            ss.set_missing_host_key_policy(AutoAddPolicy())
+            ss.connect(host, username=username, password=password)
+            logger.debug("SSH connection possible with '%s'", host)
+            ss.close()
+            return True
+        except (BadHostKeyException, AuthenticationException,
+            SSHException, socket.error) as err:
+            logger.debug("Unable to establish SSH connection with '%s'", host)
+            return False
