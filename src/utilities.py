@@ -8,7 +8,7 @@ import os
 import re
 import ipaddress
 #from ssh import SSHConnection
-from ssh import *
+#from ssh import *
 #import paramiko
 
 logger = logging.getLogger(__name__)
@@ -234,6 +234,13 @@ class Utilities(object):
         return p
 
     @classmethod
+    def check_file(cls, path):
+        if os.path.exists(path):
+            logger.debug("'%s' file already exisits", path)
+            return True
+        return False
+
+    @classmethod
     def get_username(cls):
         # return cls._cmd_sync('whoami')
         return socket.gethostname()
@@ -246,20 +253,6 @@ class Utilities(object):
             logger.debug(err)
             raise Exception(
                 "'%s' package doesn't exist" % pkg)
-
-    @classmethod
-    def get_host_ssh_status(cls, host, username, password=None):
-        try:
-            ss = SSHConnection(host, username, password)
-            ss.set_missing_host_key_policy(AutoAddPolicy())
-            ss.connect(host, username=username, password=password)
-            logger.debug("SSH connection possible with '%s'", host)
-            ss.close()
-            return True
-        except (BadHostKeyException, AuthenticationException,
-            SSHException, socket.error) as err:
-            logger.debug("Unable to establish SSH connection with '%s'", host)
-            return False
 
     @classmethod
     def get_ip_range(cls, cidr, gw, count):
