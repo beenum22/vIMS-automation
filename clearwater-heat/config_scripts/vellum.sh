@@ -83,6 +83,7 @@ pip install docopt
 git clone https://github.com/Metaswitch/clearwater-snmp-handlers.git $HOME/clearwater-mibs/clearwater-snmp-handlers && python $HOME/clearwater-mibs/clearwater-snmp-handlers/mib-generator/cw_mib_generator.py $HOME/clearwater-mibs
 cp $HOME/clearwater-mibs/PROJECT-CLEARWATER-MIB /etc/snmp && cp $HOME/clearwater-mibs/PROJECT-CLEARWATER-MIB /usr/share/snmp/mibs/
 echo "mibs +PROJECT-CLEARWATER-MIB" > /etc/snmp/snmp.conf
+echo "view clearwater included .1.3.6.1.4.1.2021.10" >> /etc/snmp/snmpd.conf
 service snmpd restart
 
 # Function to give DNS record type and IP address for specified IP address

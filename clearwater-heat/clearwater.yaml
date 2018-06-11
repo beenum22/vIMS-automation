@@ -450,10 +450,21 @@ resources:
       key_name: { get_param: key_name }
       zone: { get_param: zone }
       base_mgmt_security_group: { get_attr: [ security_groups, base_mgmt ] }
+      mon_mgmt_security_group: { get_attr: [ security_groups, monit ] }
       dns_mgmt_ip: { get_attr: [ dns, master_private_mgmt_ip ] }
       #dns_sig_ip: { get_attr: [ dns, master_private_sig_ip ] }
       dnssec_key: { get_param: dnssec_key }
-      #etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
+      etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
+      bono_up: {get_attr: [bono_cluster, scaleup_webhook]}
+      bono_down: {get_attr: [bono_cluster, scaledown_webhook]}
+      sprout_up: {get_attr: [sprout_cluster, scaleup_webhook]}
+      sprout_down: {get_attr: [sprout_cluster, scaledown_webhook]}
+      dime_up: {get_attr: [dime_cluster, scaleup_webhook]}
+      dime_down: {get_attr: [dime_cluster, scaledown_webhook]}
+      homer_up: {get_attr: [homer_cluster, scaleup_webhook]}
+      homer_down: {get_attr: [homer_cluster, scaledown_webhook]}
+      vellum_up: {get_attr: [vellum_cluster, scaleup_webhook]}
+      vellum_down: {get_attr: [vellum_cluster, scaledown_webhook]}
 
 outputs:
   #test_meta:
@@ -507,3 +518,9 @@ outputs:
   vellum_scaledown_url:
     description: Vellum webhook for scale down policy
     value: {get_attr: [vellum_cluster, scaledown_webhook]}
+  monit_ip:
+    description: Monitoring VM public IP
+    value: {get_attr: [monit, public_mgmt_ip]}
+  etcd_ip:
+    description: Etcd cluster private IP
+    value: { get_attr: [ ellis, public_mgmt_ip ] }

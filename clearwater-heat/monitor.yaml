@@ -37,9 +37,9 @@ parameters:
   base_mgmt_security_group:
     type: string
     description: ID of base security group for all Clearwater nodes (management)
-  #mon_mgmt_security_group:
-  #  type: string
-  #  description: In case it requires more permissions
+  mon_mgmt_security_group:
+    type: string
+    description: In case it requires more permissions
   zone:
     type: string
     description: DNS zone
@@ -53,14 +53,34 @@ parameters:
     constraints:
       - allowed_pattern: "[0-9A-Za-z+/=]+"
         description: Must be Base64-encoded
-  #etcd_ip:
-  #  type: string
-  #  description: IP address of an existing member of the etcd cluster
-  #  default: ""
+  etcd_ip:
+    type: string
+    description: IP address of an existing member of the etcd cluster
+    default: ""
   repo_url:
     type: string
     description: URL for Clearwater repository
     default: http://repo.cw-ngv.com/stable
+  bono_up:
+    type: string
+  bono_down:
+    type: string
+  sprout_up:
+    type: string
+  sprout_down:
+    type: string
+  dime_up:
+    type: string
+  dime_down:
+    type: string
+  homer_up:
+    type: string
+  homer_down:
+    type: string
+  vellum_up:
+    type: string
+  vellum_down:
+    type: string
 
 resources:
   mgmt_port:
@@ -70,13 +90,76 @@ resources:
       network_id: { str_replace: { params: { x: { get_param: private_mgmt_net_id } }, template: x } }
       security_groups:
         - { get_param: base_mgmt_security_group }
-        #- { get_param: mon_mgmt_security_group }
+        - { get_param: mon_mgmt_security_group }
 
   mgmt_floating_ip:
     type: OS::Neutron::FloatingIP
     properties:
       floating_network_id: { get_param: public_mgmt_net_id }
       port_id: { get_resource: mgmt_port }
+
+  copy_scripts:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        write_files:
+        - path: /root/monitoring_data/service/monitor.py
+          content: { get_file: "../monitoring_service/monitor.py"}
+        - path: /root/monitoring_data/service/utilities.py
+          content: { get_file: "../monitoring_service/utilities.py"}
+        - path: /root/monitoring_data/service/constants.ini
+          content: { get_file: "../monitoring_service/constants.ini"}
+
+  update_webhooks:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config:
+        str_replace:
+          params:
+            __bono_up__: { get_param: bono_up }
+            __bono_down__: { get_param: bono_down }
+            __sprout_up__: { get_param: sprout_up }
+            __sprout_down__: { get_param: sprout_down }
+            __dime_up__: { get_param: dime_up }
+            __dime_down__: { get_param: dime_down }
+            __homer_up__: { get_param: homer_up }
+            __homer_down__: { get_param: homer_down }
+            __vellum_up__: { get_param: vellum_up }
+            __vellum_down__: { get_param: vellum_down }
+          template: |
+             #!/bin/sh
+             echo "[webhooks]" >> /root/monitoring_data/service/constants.ini
+             echo "bono_scaleup=__bono_up__" >> /root/monitoring_data/service/constants.ini
+             echo "bono_scaledown=__bono_down__" >> /root/monitoring_data/service/constants.ini
+             echo "sprout_scaleup=__sprout_up__" >> /root/monitoring_data/service/constants.ini
+             echo "sprout_scaledown=__sprout_down__" >> /root/monitoring_data/service/constants.ini
+             echo "dime_scaleup=__dime_up__" >> /root/monitoring_data/service/constants.ini
+             echo "dime_scaledown=__dime_down__" >> /root/monitoring_data/service/constants.ini
+             echo "homer_scaleup=__homer_up__" >> /root/monitoring_data/service/constants.ini
+             echo "homer_scaledown=homer_scaledown" >> /root/monitoring_data/service/constants.ini
+             echo "vellum_scaleup=__vellum_up__" >> /root/monitoring_data/service/constants.ini
+             echo "vellum_scaledown=__vellum_down__" >> /root/monitoring_data/service/constants.ini
+
+  setup_node:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config:
+        str_replace:
+          params:
+            __repo_url__: { get_param: repo_url }
+          template: { get_file: config_scripts/monit.sh}
+
+  server_init:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: {get_resource: setup_node}
+      - config: {get_resource: copy_scripts}
+      - config: {get_resource: update_webhooks}
+        # referencing another OS::Heat::MultipartMime resource will result
+        # in each part of that resource being appended to this one.
 
   server:
     type: OS::Nova::Server
@@ -87,12 +170,14 @@ resources:
       key_name: { get_param: key_name }
       networks:
         - port: { get_resource: mgmt_port }
+      #personality: { "/root/test1.py":  { get_file: "../test1.py" } }
       user_data_format: RAW
       user_data:
-        str_replace:
-          params:
-            __repo_url__: { get_param: repo_url }
-          template: {get_file: config_scripts/monit.sh}
+        get_resource: server_init
+        #str_replace:
+          #params:
+          #  __repo_url__: { get_param: repo_url }
+          #template: {get_file: config_scripts/monit.sh}
 
 outputs:
   public_mgmt_ip:
