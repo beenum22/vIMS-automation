@@ -36,7 +36,7 @@ service influxdb start
 service influxdb start
 service telegraf start
 service grafana-server start
-grafana-server web -homepath=/usr/share/grafana
+#grafana-server web -homepath=/usr/share/grafana
 iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 3000
 
 service influxdb enable

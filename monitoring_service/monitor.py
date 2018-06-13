@@ -225,14 +225,19 @@ class Monitor(object):
 
     def trigger_alarm(self, alarm, parameter):
         alarm_logger.info("Yoo! I got triggered due to '%s'...", parameter)
+        alarm_logger.info("Triggering alarm...")
+        #Utilities.run_cmd("curl -XPOST -i '%s'" % alarm)
 
     def check_upper_threshold(self, output, threshold, alarm, parameter):
         try:
             #alarm_logger.info("Upper threshold - %s/ %s", output, threshold)
             if threshold.isdigit():
                 threshold = int(threshold)
+                output = int(output)
             else:
                 threshold = float(threshold)
+                output = float(output)
+            #print "Types: %s - %s" % (type(output), type(threshold))
             assert output < threshold, self.trigger_alarm(alarm, parameter)
         except AssertionError:
             alarm_logger.info("Threshold hit. %s >= %s. Scaling Up...",
@@ -242,8 +247,10 @@ class Monitor(object):
         try:
             if threshold.isdigit():
                 threshold = int(threshold)
+                output = int(output)
             else:
                 threshold = float(threshold)
+                output = float(output)
             #alarm_logger.info("Lower threshold - %s / %s", output, threshold)
             assert output > threshold, self.trigger_alarm(alarm, parameter)
         except AssertionError:
@@ -292,6 +299,8 @@ class Monitor(object):
             else:
                 alarm_logger.warning(
                     "vIMS Cluster info is updating. Skipping Sprout Cluster monitoring...")
+            alarm_logger.info(
+                "Sprout Cluster monitor sleeping for %d seconds...", MONITOR_DELAY)
             time.sleep(MONITOR_DELAY)
 
     def monitor_dime(self):
@@ -313,6 +322,8 @@ class Monitor(object):
             else:
                 alarm_logger.warning(
                     "vIMS Cluster info is updating. Skipping Dime Cluster monitoring...")
+            alarm_logger.info(
+                "Dime Cluster monitor sleeping for %d seconds...", MONITOR_DELAY)
             time.sleep(MONITOR_DELAY)
 
     def monitor_vellum(self):
@@ -334,6 +345,8 @@ class Monitor(object):
             else:
                 alarm_logger.warning(
                     "vIMS Cluster info is updating. Skipping Vellum Cluster monitoring...")
+            alarm_logger.info(
+                "Vellum Cluster monitor sleeping for %d seconds...", MONITOR_DELAY)
             time.sleep(MONITOR_DELAY)
 
     def monitor_homer(self):

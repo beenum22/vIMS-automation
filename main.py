@@ -22,12 +22,13 @@ def main():
                         action="store_true")
     args, ignore = parser.parse_known_args()
     try:
+        Utilities._create_dir("./logs")
         logging.config.fileConfig(
             'logging_conf.ini', disable_existing_loggers=False)
         vims_logger = logging.getLogger()
         if args.debug:
             vims_logger.setLevel('DEBUG')
-        vims = vIMS('clearwater-vIMS', 'clearwater-heat/clearwater.yaml', 'clearwater-heat/environment.yaml', args.settings_file)
+        vims = vIMS('clearwater-vIMS-test', 'clearwater-heat/clearwater.yaml', 'clearwater-heat/environment.yaml', args.settings_file)
         vims.setup_env()
     except IOError as err:
         sys.exit("Failed to create the log file. %s: %s" % (err.strerror, err.filename))
