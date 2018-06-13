@@ -103,14 +103,26 @@ resources:
     properties:
       cloud_config:
         write_files:
+        - path: /root/monitoring_data/service/main.py
+          content: { get_file: "../monitoring_service/main.py"}
         - path: /root/monitoring_data/service/monitor.py
           content: { get_file: "../monitoring_service/monitor.py"}
         - path: /root/monitoring_data/service/utilities.py
           content: { get_file: "../monitoring_service/utilities.py"}
-        - path: /root/monitoring_data/service/constants.ini
-          content: { get_file: "../monitoring_service/constants.ini"}
+        - path: /root/monitoring_data/service/config.ini
+          content: { get_file: "../monitoring_service/config.ini"}
+        - path: /root/monitoring_data/service/settings.py
+          content: { get_file: "../monitoring_service/settings.py"}
+        - path: /root/monitoring_data/service/logging.ini
+          content: { get_file: "../monitoring_service/logging.ini"}
+        - path: /root/monitoring_data/samples/sample_bono_snmp.conf
+          content: { get_file: "../monitoring_service/samples/sample_bono_snmp.conf"}
+        - path: /root/monitoring_data/samples/sample_sprout_snmp.conf
+          content: { get_file: "../monitoring_service/samples/sample_sprout_snmp.conf"}
+        - path: /root/monitoring_data/samples/sample_snmp.conf
+          content: { get_file: "../monitoring_service/samples/sample_snmp.conf"}
 
-  update_webhooks:
+  update_config_file:
     type: OS::Heat::SoftwareConfig
     properties:
       group: ungrouped
@@ -127,19 +139,23 @@ resources:
             __homer_down__: { get_param: homer_down }
             __vellum_up__: { get_param: vellum_up }
             __vellum_down__: { get_param: vellum_down }
+            __etcd_ip__ : { get_param: etcd_ip }
           template: |
              #!/bin/sh
-             echo "[webhooks]" >> /root/monitoring_data/service/constants.ini
-             echo "bono_scaleup=__bono_up__" >> /root/monitoring_data/service/constants.ini
-             echo "bono_scaledown=__bono_down__" >> /root/monitoring_data/service/constants.ini
-             echo "sprout_scaleup=__sprout_up__" >> /root/monitoring_data/service/constants.ini
-             echo "sprout_scaledown=__sprout_down__" >> /root/monitoring_data/service/constants.ini
-             echo "dime_scaleup=__dime_up__" >> /root/monitoring_data/service/constants.ini
-             echo "dime_scaledown=__dime_down__" >> /root/monitoring_data/service/constants.ini
-             echo "homer_scaleup=__homer_up__" >> /root/monitoring_data/service/constants.ini
-             echo "homer_scaledown=homer_scaledown" >> /root/monitoring_data/service/constants.ini
-             echo "vellum_scaleup=__vellum_up__" >> /root/monitoring_data/service/constants.ini
-             echo "vellum_scaledown=__vellum_down__" >> /root/monitoring_data/service/constants.ini
+             echo "[webhooks]" >> /root/monitoring_data/service/config.ini
+             echo "bono_scaleup=__bono_up__" >> /root/monitoring_data/service/config.ini
+             echo "bono_scaledown=__bono_down__" >> /root/monitoring_data/service/config.ini
+             echo "sprout_scaleup=__sprout_up__" >> /root/monitoring_data/service/config.ini
+             echo "sprout_scaledown=__sprout_down__" >> /root/monitoring_data/service/config.ini
+             echo "dime_scaleup=__dime_up__" >> /root/monitoring_data/service/config.ini
+             echo "dime_scaledown=__dime_down__" >> /root/monitoring_data/service/config.ini
+             echo "homer_scaleup=__homer_up__" >> /root/monitoring_data/service/config.ini
+             echo "homer_scaledown=homer_scaledown" >> /root/monitoring_data/service/config.ini
+             echo "vellum_scaleup=__vellum_up__" >> /root/monitoring_data/service/config.ini
+             echo "vellum_scaledown=__vellum_down__" >> /root/monitoring_data/service/config.ini
+             echo "[etcd]" >> /root/monitoring_data/service/config.ini
+             echo "ip=__etcd_ip__" >> /root/monitoring_data/service/config.ini
+             echo "port=4000" >> /root/monitoring_data/service/config.ini
 
   setup_node:
     type: OS::Heat::SoftwareConfig
@@ -149,6 +165,7 @@ resources:
         str_replace:
           params:
             __repo_url__: { get_param: repo_url }
+            #__etcd_ip__: { get_param: etcd_ip }
           template: { get_file: config_scripts/monit.sh}
 
   server_init:
@@ -157,7 +174,7 @@ resources:
       parts:
       - config: {get_resource: setup_node}
       - config: {get_resource: copy_scripts}
-      - config: {get_resource: update_webhooks}
+      - config: {get_resource: update_config_file}
         # referencing another OS::Heat::MultipartMime resource will result
         # in each part of that resource being appended to this one.
 

@@ -45,82 +45,13 @@ service grafana-server enable
 
 #mkdir /root/monitoring_data
 #mkdir /root/monitoring_data/service
-cat > /root/monitoring_data/bono_sample_snmp.conf << EOF
-[[inputs.snmp]]
-  agents = [ "<agent_ip:agent_port>" ]
-  version = 2
-  community = "clearwater"
-  name = "<agent_hostname>"
-
-  [[inputs.snmp.field]]
-    name = "bonoConnectedClients"
-    oid = ".1.2.826.0.1.1578918.9.2.1.0"
-
-  [[inputs.snmp.field]]
-    name = "bonoLatencyCount"
-    oid = ".1.2.826.0.1.1578918.9.2.2.1.7.2.4.110.111.100.101"
-
-  [[inputs.snmp.field]]
-    name = "bonoIncomingRequestsCount"
-    oid = ".1.2.826.0.1.1578918.9.2.4.1.3.2.4.110.111.100.101"
-
-  [[inputs.snmp.field]]
-    name = "bonoRejectedOverloadCount"
-    oid = ".1.2.826.0.1.1578918.9.2.5.1.3.2.4.110.111.100.101"
-
-  [[inputs.snmp.field]]
-    name = "bonoQueueSizeAverage"
-    oid = ".1.2.826.0.1.1578918.9.2.6.1.3.2.4.110.111.100.101"
-  [[inputs.snmp.field]]
-    name = "cpuLoad"
-    oid = ".1.3.6.1.4.1.2021.10.1.3.2"
-EOF
-
-cat > /root/monitoring_data/sprout_sample_snmp.conf << EOF
-[[inputs.snmp]]
-  agents = [ "<agent_ip:agent_port>" ]
-  version = 2
-  community = "clearwater"
-  name = "<agent_hostname>"
-
-  [[inputs.snmp.field]]
-    name = "sproutLatencyAverage"
-    oid = ".1.2.826.0.1.1578918.9.3.1.1.3.2.4.110.111.100.101"
-
-  [[inputs.snmp.field]]
-    name = "sproutIncomingRequestsCount"
-    oid = ".1.2.826.0.1.1578918.9.3.6.1.3.2.4.110.111.100.101"
-
-  [[inputs.snmp.field]]
-    name = "sproutRejectedOverloadCount"
-    oid = ".1.2.826.0.1.1578918.9.3.7.1.3.2.4.110.111.100.101"
-
-  [[inputs.snmp.field]]
-    name = "sproutQueueSizeAverage"
-    oid = ".1.2.826.0.1.1578918.9.3.8.1.3.2.4.110.111.100.101"
-  [[inputs.snmp.field]]
-    name = "cpuLoad"
-    oid = ".1.3.6.1.4.1.2021.10.1.3.2"
-EOF
-
-cat > /root/monitoring_data/sample_snmp.conf << EOF
-[[inputs.snmp]]
-  agents = [ "<agent_ip:agent_port>" ]
-  version = 2
-  community = "clearwater"
-  name = "<agent_hostname>"
-
-  [[inputs.snmp.field]]
-    name = "cpuLoad"
-    oid = ".1.3.6.1.4.1.2021.10.1.3.2"
-EOF
 
 cat > /root/monitoring_data/service/test.py << EOF
 from monitor import Monitor
 from utilities import Utilities
 
-m = Monitor('10.10.10.14', None)
-m.update_nodes()
+m = Monitor('config.ini', None)
+m.update_cluster()
 #print m.nodes
 print m.telegraf_config()
 #print m.poll_oid('10.10.10.17', '.1.3.6.1.2.1.1.1.0')
