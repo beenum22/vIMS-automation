@@ -42,7 +42,7 @@ etcd_ip=__etcd_ip__
 [ -n "$etcd_ip" ] || etcd_ip=__private_mgmt_ip__
 cat > /etc/clearwater/local_config << EOF
 signaling_namespace=signaling
-signaling_dns_server=__dns_sig_ip__
+signaling_dns_server=__dns_vip_sig__
 management_local_ip=__private_mgmt_ip__
 local_ip=__private_sig_ip__
 public_ip=__private_sig_ip__
@@ -78,7 +78,31 @@ ip2rr() {
 # Update DNS
 retries=0
 while ! { nsupdate -y "__zone__:__dnssec_key__" -v << EOF
-server __dns_mgmt_ip__
+server __dns_mgmt_ip_1__
+update add sprout-__index__.__zone__. 30 $(ip2rr __private_mgmt_ip__)
+update add __index__.sprout.__zone__. 30 $(ip2rr __private_sig_ip__)
+update add sprout.__zone__. 30 $(ip2rr __private_sig_ip__)
+update add scscf.sprout.__zone__. 30 $(ip2rr __private_sig_ip__)
+update add icscf.sprout.__zone__. 30 $(ip2rr __private_sig_ip__)
+update add sprout.__zone__. 30 NAPTR 0 0 "s" "SIP+D2T" "" _sip._tcp.sprout.__zone__.
+update add _sip._tcp.sprout.__zone__. 30 SRV 0 0 5054 __index__.sprout.__zone__.
+update add icscf.sprout.__zone__. 30 NAPTR 0 0 "s" "SIP+D2T" "" _sip._tcp.icscf.sprout.__zone__.
+update add _sip._tcp.icscf.sprout.__zone__. 30 SRV 0 0 5052 __index__.sprout.__zone__.
+update add scscf.sprout.__zone__. 30 NAPTR 0 0 "s" "SIP+D2T" "" _sip._tcp.scscf.sprout.__zone__.
+update add _sip._tcp.scscf.sprout.__zone__. 30 SRV 0 0 5054 __index__.sprout.__zone__.
+send
+EOF
+} && [ $retries -lt 10 ]
+do
+  retries=$((retries + 1))
+  echo 'nsupdate failed - retrying (retry '$retries')...'
+  sleep 5
+done
+
+# Update DNS-HA
+retries=0
+while ! { nsupdate -y "__zone__:__dnssec_key__" -v << EOF
+server __dns_mgmt_ip_2__
 update add sprout-__index__.__zone__. 30 $(ip2rr __private_mgmt_ip__)
 update add __index__.sprout.__zone__. 30 $(ip2rr __private_sig_ip__)
 update add sprout.__zone__. 30 $(ip2rr __private_sig_ip__)
@@ -100,8 +124,8 @@ do
 done
 
 # Use the DNS server.
-echo 'nameserver __dns_mgmt_ip__' > /etc/dnsmasq.resolv.conf
+echo 'nameserver __dns_vip_mgmt__' > /etc/dnsmasq.resolv.conf
 echo 'RESOLV_CONF=/etc/dnsmasq.resolv.conf' >> /etc/default/dnsmasq
 mkdir -p /etc/netns/signaling
-echo 'nameserver __dns_sig_ip__' > /etc/netns/signaling/resolv.conf
+echo 'nameserver __dns_vip_sig__' > /etc/netns/signaling/resolv.conf
 service dnsmasq force-reload

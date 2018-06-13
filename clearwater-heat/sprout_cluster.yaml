@@ -36,9 +36,13 @@ parameters:
     type: string
   zone:
     type: string
-  dns_mgmt_ip:
+  dns_mgmt_ip_1:
     type: string
-  dns_sig_ip:
+  dns_mgmt_ip_2:
+    type: string
+  dns_virtual_ip_mgmt:
+    type: string
+  dns_virtual_ip_sig:
     type: string
   dnssec_key:
     type: string
@@ -103,8 +107,10 @@ resources:
           sprout_sig_inbound_security_group: { get_param: sprout_sig_inbound_security_group }
           repo_url: { get_param: repo_url }
           zone: { get_param: zone }
-          dns_mgmt_ip: { get_param: dns_mgmt_ip }
-          dns_sig_ip: { get_param: dns_sig_ip }
+          dns_mgmt_ip_1: { get_param: dns_mgmt_ip_1 }
+          dns_mgmt_ip_2: { get_param: dns_mgmt_ip_2 }
+          dns_virtual_ip_mgmt: { get_param: dns_virtual_ip_mgmt }
+          dns_virtual_ip_sig: { get_param: dns_virtual_ip_sig }
           dnssec_key: { get_param: dnssec_key }
           etcd_ip: { get_param: etcd_ip }
           affinity_group: { get_resource: sprout_soft_group}
@@ -130,8 +136,10 @@ resources:
           sprout_sig_inbound_security_group: { get_param: sprout_sig_inbound_security_group }
           repo_url: { get_param: repo_url }
           zone: { get_param: zone }
-          dns_mgmt_ip: { get_param: dns_mgmt_ip }
-          dns_sig_ip: { get_param: dns_sig_ip }
+          dns_mgmt_ip_1: { get_param: dns_mgmt_ip_1 }
+          dns_mgmt_ip_2: { get_param: dns_mgmt_ip_2 }
+          dns_virtual_ip_mgmt: { get_param: dns_virtual_ip_mgmt }
+          dns_virtual_ip_sig: { get_param: dns_virtual_ip_sig }
           dnssec_key: { get_param: dnssec_key }
           etcd_ip: { get_param: etcd_ip }
           affinity_group: { get_resource: sprout_hard_group}

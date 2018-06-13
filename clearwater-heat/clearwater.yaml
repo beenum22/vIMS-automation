@@ -236,40 +236,6 @@ resources:
     properties:
       name_prefix: { get_param: "OS::stack_name" }
 
-  #dns:
-  #  type: ClearwaterIMS::DNS
-  #  properties:
-  #    public_mgmt_net_id: { get_param: public_mgmt_net_id }
-  #    private_mgmt_net_id: { get_attr: [ mgmt_network, net_id ] }
-  #    public_sig_net_id: { get_param: public_sig_net_id }
-  #    private_sig_net_id: { get_attr: [ sig_network, net_id ] }
-  #    private_sig_net_cidr: { get_attr: [ sig_network, subnet_cidr ] }
-  #    flavor: { get_param: flavor }
-  #    image: { get_param: image }
-  #    key_name: { get_param: key_name }
-  #    dns_security_group: { get_attr: [ security_groups, dns ] }
-  #    zone: { get_param: zone }
-  #    dnssec_key: { get_param: dnssec_key }
-  #vip_port_mgmt:
-  #  type: OS::Neutron::Port
-  #  properties:
-  #    network_id: { str_replace: { params: { x: { get_attr: [ mgmt_network, net_id ] } }, template: x } }
-  #    security_groups:
-  #      - { get_attr: [ security_groups, dns ] }
-
-  #vip_port_sig:
-  #  type: OS::Neutron::Port
-  #  properties:
-  #    network_id: { str_replace: { params: { x: { get_attr: [ sig_network, net_id ] } }, template: x } }
-  #    security_groups:
-  #      - { get_attr: [ security_groups, dns ] }
-
-  #vip_floating_ip:
-  #  type: OS::Neutron::FloatingIP
-  #  properties:
-  #    floating_network_id: { get_param: public_sig_net_id }
-  #    port_id: { get_resource: vip_port_mgmt }
-
   dns:
     type: ClearwaterIMS::DNSHA
     properties:
@@ -284,8 +250,6 @@ resources:
       dns_security_group: { get_attr: [ security_groups, dns ] }
       zone: { get_param: zone }
       dnssec_key: { get_param: dnssec_key }
-      #dns_virtual_ip_sig: { get_attr: [ vip_port_sig, fixed_ips, 0, ip_address ] }
-      #dns_virtual_ip_mgmt: { get_attr: [ vip_port_mgmt, fixed_ips, 0, ip_address ]}
       index: { get_param: index}
 
   ellis:
@@ -306,7 +270,6 @@ resources:
       dns_mgmt_ip_1: { get_attr: [ dns, master_private_mgmt_ip ] }
       dns_mgmt_ip_2: { get_attr: [ dns, backup_private_mgmt_ip ] }
       dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
-      #dns_virtual_ip_mgmt: { get_attr: [ vip_port_mgmt, fixed_ips, 0, ip_address ]}
       dnssec_key: { get_param: dnssec_key }
       index: { get_param: name_length}
 
@@ -335,8 +298,6 @@ resources:
       dns_mgmt_ip_2: { get_attr: [ dns, backup_private_mgmt_ip ] }
       dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
       dns_virtual_ip_sig: { get_attr: [ dns, vip_sig ] }
-      #dns_virtual_ip_mgmt: { get_attr: [ vip_port_mgmt, fixed_ips, 0, ip_address ]}
-      #dns_virtual_ip_sig: { get_attr: [ vip_port_sig, fixed_ips, 0, ip_address ] }
       dnssec_key: { get_param: dnssec_key }
       etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }      
 
@@ -360,8 +321,10 @@ resources:
       zone: { get_param: zone }
       #dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
       #dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
-      dns_mgmt_ip: { get_attr: [ dns, master_private_mgmt_ip ] }
-      dns_sig_ip: { get_attr: [ dns, master_private_sig_ip ] }
+      dns_mgmt_ip_1: { get_attr: [ dns, master_private_mgmt_ip ] }
+      dns_mgmt_ip_2: { get_attr: [ dns, backup_private_mgmt_ip ] }
+      dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
+      dns_virtual_ip_sig: { get_attr: [ dns, vip_sig ] }
       dnssec_key: { get_param: dnssec_key }
       etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }  
 
@@ -385,8 +348,10 @@ resources:
       zone: { get_param: zone }
       #dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
       #dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
-      dns_mgmt_ip: { get_attr: [ dns, master_private_mgmt_ip ] }
-      dns_sig_ip: { get_attr: [ dns, master_private_sig_ip ] }      
+      dns_mgmt_ip_1: { get_attr: [ dns, master_private_mgmt_ip ] }
+      dns_mgmt_ip_2: { get_attr: [ dns, backup_private_mgmt_ip ] }
+      dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
+      dns_virtual_ip_sig: { get_attr: [ dns, vip_sig ] }      
       dnssec_key: { get_param: dnssec_key }
       etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
 
@@ -410,8 +375,10 @@ resources:
       zone: { get_param: zone }
       #dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
       #dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
-      dns_mgmt_ip: { get_attr: [ dns, master_private_mgmt_ip ] }
-      dns_sig_ip: { get_attr: [ dns, master_private_sig_ip ] }
+      dns_mgmt_ip_1: { get_attr: [ dns, master_private_mgmt_ip ] }
+      dns_mgmt_ip_2: { get_attr: [ dns, backup_private_mgmt_ip ] }
+      dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
+      dns_virtual_ip_sig: { get_attr: [ dns, vip_sig ] }
       dnssec_key: { get_param: dnssec_key }
       etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
 
@@ -435,8 +402,10 @@ resources:
       zone: { get_param: zone }
       #dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
       #dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
-      dns_mgmt_ip: { get_attr: [ dns, master_private_mgmt_ip ] }
-      dns_sig_ip: { get_attr: [ dns, master_private_sig_ip ] }
+      dns_mgmt_ip_1: { get_attr: [ dns, master_private_mgmt_ip ] }
+      dns_mgmt_ip_2: { get_attr: [ dns, backup_private_mgmt_ip ] }
+      dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
+      dns_virtual_ip_sig: { get_attr: [ dns, vip_sig ] }
       dnssec_key: { get_param: dnssec_key }
       etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
 
