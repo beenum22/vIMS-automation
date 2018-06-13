@@ -115,10 +115,10 @@ resources:
           content: { get_file: "../monitoring_service/settings.py"}
         - path: /root/monitoring_data/service/logging.ini
           content: { get_file: "../monitoring_service/logging.ini"}
-        - path: /root/monitoring_data/samples/sample_bono_snmp.conf
-          content: { get_file: "../monitoring_service/samples/sample_bono_snmp.conf"}
-        - path: /root/monitoring_data/samples/sample_sprout_snmp.conf
-          content: { get_file: "../monitoring_service/samples/sample_sprout_snmp.conf"}
+        - path: /root/monitoring_data/samples/bono_sample_snmp.conf
+          content: { get_file: "../monitoring_service/samples/bono_sample_snmp.conf"}
+        - path: /root/monitoring_data/samples/sprout_sample_snmp.conf
+          content: { get_file: "../monitoring_service/samples/sprout_sample_snmp.conf"}
         - path: /root/monitoring_data/samples/sample_snmp.conf
           content: { get_file: "../monitoring_service/samples/sample_snmp.conf"}
 
