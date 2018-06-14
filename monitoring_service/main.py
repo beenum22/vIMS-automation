@@ -1,19 +1,29 @@
 #!/usr/bin/env python
-from monitor import Monitor
-from utilities import Utilities
+
+from src.monitor import Monitor
+from src.utilities import Utilities
 import logging
 import time
 import logging.config
 import threading
 import sys
+import argparse
 
 def main():
     try:
         Utilities._create_dir("/var/log/vims_cluster")
+        parser = argparse.ArgumentParser(description='vIMS Cluster monitoring service')
+        parser.add_argument("-c", "--config",
+                            help='Service parmeters configuration file',
+                            required=True)
+        parser.add_argument("-l", "--logging",
+                            help='Service logging configuration file',
+                            required=True)
+        args, ignore = parser.parse_known_args()
         logging.config.fileConfig(
-            'logging.ini', disable_existing_loggers=False)
+            args.logging, disable_existing_loggers=False)
         threads = []
-        monitor = Monitor('config.ini')
+        monitor = Monitor(args.config)
         logger = logging.getLogger()
         cluster = threading.Thread(target=monitor.update_cluster)
         bono = threading.Thread(target=monitor.monitor_bono)
