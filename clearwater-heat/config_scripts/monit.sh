@@ -46,13 +46,12 @@ service grafana-server enable
 #mkdir /root/monitoring_data
 #mkdir /root/monitoring_data/service
 
-cat > /root/monitoring_data/service/test.py << EOF
-from monitor import Monitor
-from utilities import Utilities
+cat > /etc/init/monitor-vims.conf << EOF
+description "vIMS cluster monitoring service"
+author      "Muneeb Ahmad"
 
-m = Monitor('config.ini', None)
-m.update_cluster()
-#print m.nodes
-print m.telegraf_config()
-#print m.poll_oid('10.10.10.17', '.1.3.6.1.2.1.1.1.0')
+start on filesystem or runlevel [2345]
+stop on runlevel [!2345]
+
+exec python /root/monitoring_data/service/main.py -l /root/monitoring_data/service/logging.ini -c /root/monitoring_data/service/config.ini
 EOF

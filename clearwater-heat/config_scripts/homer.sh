@@ -55,6 +55,15 @@ EOF
 DEBIAN_FRONTEND=noninteractive apt-get install homer --yes --force-yes
 DEBIAN_FRONTEND=noninteractive apt-get install clearwater-management --yes --force-yes
 
+# Set up SNMP
+apt-get install -y git smitools clearwater-snmpd
+pip install docopt
+git clone https://github.com/Metaswitch/clearwater-snmp-handlers.git $HOME/clearwater-mibs/clearwater-snmp-handlers && python $HOME/clearwater-mibs/clearwater-snmp-handlers/mib-generator/cw_mib_generator.py $HOME/clearwater-mibs
+cp $HOME/clearwater-mibs/PROJECT-CLEARWATER-MIB /etc/snmp && cp $HOME/clearwater-mibs/PROJECT-CLEARWATER-MIB /usr/share/snmp/mibs/
+echo "mibs +PROJECT-CLEARWATER-MIB" > /etc/snmp/snmp.conf
+echo "view clearwater included .1.3.6.1.4.1.2021.10" >> /etc/snmp/snmpd.conf
+service snmpd restart
+
 # Function to give DNS record type and IP address for specified IP address
 ip2rr() {
   if echo $1 | grep -q -e '[^0-9.]' ; then

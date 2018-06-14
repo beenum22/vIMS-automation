@@ -224,9 +224,9 @@ class Monitor(object):
             alarm_logger.error("Failed to query '%s'", node)
 
     def trigger_alarm(self, alarm, parameter):
-        alarm_logger.info("Yoo! I got triggered due to '%s'...", parameter)
+        alarm_logger.info("Alarm trigger request due to '%s'...", parameter)
         alarm_logger.info("Triggering alarm...")
-        #Utilities.run_cmd("curl -XPOST -i '%s'" % alarm)
+        Utilities.run_cmd("curl -XPOST -i %s" % alarm)
 
     def check_upper_threshold(self, output, threshold, alarm, parameter):
         try:
@@ -350,4 +350,24 @@ class Monitor(object):
             time.sleep(MONITOR_DELAY)
 
     def monitor_homer(self):
-        alarm_logger.info("Monitoring Sprout Cluster...")
+        alarm_logger.info("Monitoring Homer Cluster...")
+        while True:
+            if self.cluster_status is True:
+                for node in self.nodes['homer']:
+                    result = self._query_latest_influx(node)
+                    for t in self.settings.homer_upper_thresholds.keys():
+                        alarm_logger.info(
+                            "Checking the '%s' (%s / %s) upper threshold for Homer-node: %s", t, result['last_' + t], self.settings.homer_upper_thresholds[t], node)
+                        self.check_upper_threshold(
+                            result['last_' + t], self.settings.homer_upper_thresholds[t], self.settings.webhooks['homer_scaleup'], t)
+                    for t in self.settings.homer_lower_thresholds.keys():
+                        alarm_logger.info(
+                            "Checking the '%s' (%s / %s) lower threshold for Homer-node: %s", t, result['last_' + t], self.settings.homer_lower_thresholds[t], node)
+                        self.check_down_threshold(
+                            result['last_' + t], self.settings.homer_lower_thresholds[t], self.settings.webhooks['homer_scaledown'], t)
+            else:
+                alarm_logger.warning(
+                    "vIMS Cluster info is updating. Skipping Homer Cluster monitoring...")
+            alarm_logger.info(
+                "Homer Cluster monitor sleeping for %d seconds...", MONITOR_DELAY)
+            time.sleep(MONITOR_DELAY)

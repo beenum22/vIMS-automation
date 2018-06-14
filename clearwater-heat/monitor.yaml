@@ -105,14 +105,16 @@ resources:
         write_files:
         - path: /root/monitoring_data/service/main.py
           content: { get_file: "../monitoring_service/main.py"}
-        - path: /root/monitoring_data/service/monitor.py
-          content: { get_file: "../monitoring_service/monitor.py"}
-        - path: /root/monitoring_data/service/utilities.py
-          content: { get_file: "../monitoring_service/utilities.py"}
+        - path: /root/monitoring_data/service/src/__init__.py
+          content: { get_file: "../monitoring_service/src/__init__.py"}
+        - path: /root/monitoring_data/service/src/monitor.py
+          content: { get_file: "../monitoring_service/src/monitor.py"}
+        - path: /root/monitoring_data/service/src/utilities.py
+          content: { get_file: "../monitoring_service/src/utilities.py"}
         - path: /root/monitoring_data/service/config.ini
           content: { get_file: "../monitoring_service/config.ini"}
-        - path: /root/monitoring_data/service/settings.py
-          content: { get_file: "../monitoring_service/settings.py"}
+        - path: /root/monitoring_data/service/src/settings.py
+          content: { get_file: "../monitoring_service/src/settings.py"}
         - path: /root/monitoring_data/service/logging.ini
           content: { get_file: "../monitoring_service/logging.ini"}
         - path: /root/monitoring_data/samples/bono_sample_snmp.conf
