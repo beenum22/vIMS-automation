@@ -3,49 +3,23 @@ import logging
 import sys
 import re
 import time
-# from pysnmp.entity.rfc3413.oneliner import cmdgen
-# from pysnmp.hlapi import *
 from easysnmp import Session, exceptions
 from utilities import Utilities
 from settings import Settings
 import influxdb
 import threading
 
-# BONO OIDS
-# scopeCurrent5MinutePeriod."node" : 4.110.111.100.101
-
-# bonoConnectedClients : .1.2.826.0.1.1578918.9.2.1.0
-# bonoLatencyCount : .1.2.826.0.1.1578918.9.2.2.1.7.2.4.110.111.100.101
-# bonoSproutConnectionCount = .1.2.826.0.1.1578918.9.2.3.1.1.3.1.4.<sprout_sig_ip>
-# bonoIncomingRequestsCount : .1.2.826.0.1.1578918.9.2.4.1.3.2.4.110.111.100.101
-# bonoRejectedOverloadCount : .1.2.826.0.1.1578918.9.2.5.1.3.2.4.110.111.100.101
-# bonoQueueSizeAverage : .1.2.826.0.1.1578918.9.2.6.1.3.2.4.110.111.100.101
-
-# SPROUT OIDS
-# sproutLatencyAverage : .1.2.826.0.1.1578918.9.3.1.1.3.2.4.110.111.100.101
-# sproutHomerConnectionCount: Not found
-# sproutHomesteadConnectionCount: Not found
-# sproutIncomingRequestsCount : .1.2.826.0.1.1578918.9.3.6.1.3.2.4.110.111.100.101
-# sproutRejectedOverloadCount : .1.2.826.0.1.1578918.9.3.7.1.3.2.4.110.111.100.101
-# sproutQueueSizeAverage : .1.2.826.0.1.1578918.9.3.8.1.3.2.4.110.111.100.101
-#
-
 SYSDESCR_OID = '.1.3.6.1.2.1.1.1.0'
 MONITOR_DELAY = 120
 UPDATE_DELAY = 50
 
-#cluster_logger = logging.getLogger('cluster')
 cluster_logger = logging.getLogger('cluster')
-#cluster_logger.propagate = False
 alarm_logger = logging.getLogger('alarm')
 
 
 class Monitor(object):
 
     def __init__(self, config_file):
-        # self.etcd_ip = etcd_ip
-        # self.etcd_port = etcd_port
-        # self.webhooks = webhooks
         self.cluster_status = False
         self.settings = Settings(config_file)
         self.settings.parse_settings_file()
@@ -71,23 +45,6 @@ class Monitor(object):
             cluster_logger.error("Exiting...")
             sys.exit()
 
-    '''
-    def start_monitoring(self):
-        try:
-            cluster = threading.Thread(target=self.update_cluster)
-            cluster.daemon = True
-            cluster.start()
-            self.threads.append(cluster)
-            while True:
-                time.sleep(2)
-        # Start update_nodes thread in the background
-        # Start a while loop which repeats all the steps
-        except KeyboardInterrupt:
-            logger.info("Keyboard interrupt.")
-            logger.info("Exiting...")
-            sys.exit()
-    '''
-
     def update_cluster(self):
         while True:
             self.cluster_status = False
@@ -106,7 +63,6 @@ class Monitor(object):
         for n in nodes:
             ip = re.search(r"[^(http:\/\/)]+", n).group(0)
             hostname = self._get_hostname(ip)
-            # print "HOSTNAME: %s - IP: %s" % (hostname, ip)
             if hostname != None:
                 tmp_nodes['node_list'].append(hostname)
                 if 'bono' in hostname:
@@ -122,7 +78,6 @@ class Monitor(object):
         self.nodes = tmp_nodes
 
     def update_telegraf_configs(self, path='/etc/telegraf/telegraf.d'):
-        # Reboot the telegraf service in the end
         self.validate_telegraf_configs()
         new_nodes, old_nodes = self.get_node_lists(path)
         if old_nodes == [] and new_nodes == []:
@@ -230,14 +185,12 @@ class Monitor(object):
 
     def check_upper_threshold(self, output, threshold, alarm, parameter):
         try:
-            #alarm_logger.info("Upper threshold - %s/ %s", output, threshold)
             if threshold.isdigit():
                 threshold = int(threshold)
                 output = int(output)
             else:
                 threshold = float(threshold)
                 output = float(output)
-            #print "Types: %s - %s" % (type(output), type(threshold))
             assert output < threshold, self.trigger_alarm(alarm, parameter)
         except AssertionError:
             alarm_logger.info("Threshold hit. %s >= %s. Scaling Up...",
@@ -251,7 +204,6 @@ class Monitor(object):
             else:
                 threshold = float(threshold)
                 output = float(output)
-            #alarm_logger.info("Lower threshold - %s / %s", output, threshold)
             assert output > threshold, self.trigger_alarm(alarm, parameter)
         except AssertionError:
             alarm_logger.info("Threshold hit. %s <= %s. Scaling Down...",
