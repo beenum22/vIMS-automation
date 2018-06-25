@@ -20,7 +20,7 @@ local_ip=__private_mgmt_ip__
 public_ip=__public_mgmt_ip__
 public_hostname=ellis-__index__.__zone__
 etcd_cluster=$etcd_ip
-xdms_hostname=homer-0.__zone__:7888
+xdms_hostname=__homer__:7888
 EOF
 
 # Now install the software.
@@ -111,6 +111,6 @@ done
 
 # Use the DNS server.
 echo 'nameserver __dns_vip_mgmt__' > /etc/dnsmasq.resolv.conf
-echo 'nameserver __dns_vip_mgmt__' | cat - /etc/resolv.conf > temp && mv temp /etc/resolv.conf
+#echo 'nameserver __dns_vip_mgmt__' | cat - /etc/resolv.conf > temp && mv temp /etc/resolv.conf
 echo 'RESOLV_CONF=/etc/dnsmasq.resolv.conf' >> /etc/default/dnsmasq
 service dnsmasq force-reload

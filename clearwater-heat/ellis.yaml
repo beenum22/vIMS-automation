@@ -92,22 +92,31 @@ parameters:
     type: number
     description: Index of this Ellis node in the Ellis cluster
     #default: 0
+  sample_homer:
+    type: string
+    default: homer-0
+  private_mgmt_port:
+    type: string
+  private_mgmt_ip:
+    type: string
 
 resources:
-  mgmt_port:
-    type: OS::Neutron::Port
-    properties:
-      # Specify the network ID by string to work around OpenStack issues - see https://github.com/Metaswitch/clearwater-heat/issues/18.
-      network_id: { str_replace: { params: { x: { get_param: private_mgmt_net_id } }, template: x } }
-      security_groups:
-        - { get_param: base_mgmt_security_group }
-        - { get_param: ellis_mgmt_security_group }
+  #mgmt_port:
+  #  type: OS::Neutron::Port
+  #  properties:
+  #    # Specify the network ID by string to work around OpenStack issues - see https://github.com/Metaswitch/clearwater-heat/issues/18.
+  #    network_id: { str_replace: { params: { x: { get_param: private_mgmt_net_id } }, template: x } }
+  #    fixed_ips: [{"ip_address": 10.10.10.15}]
+  #    security_groups:
+  #      - { get_param: base_mgmt_security_group }
+  #      - { get_param: ellis_mgmt_security_group }
 
   mgmt_floating_ip:
     type: OS::Neutron::FloatingIP
     properties:
       floating_network_id: { get_param: public_mgmt_net_id }
-      port_id: { get_resource: mgmt_port }
+      #port_id: { get_resource: mgmt_port }
+      port_id: { get_param: private_mgmt_port }
 
   rand_name:
     type: OS::Heat::RandomString
@@ -122,7 +131,8 @@ resources:
       flavor: { get_param: flavor }
       key_name: { get_param: key_name }
       networks:
-        - port: { get_resource: mgmt_port }
+        #- port: { get_resource: mgmt_port }
+        - port: { get_param: private_mgmt_port }
       user_data_format: RAW
       user_data:
         str_replace:
@@ -130,7 +140,8 @@ resources:
             __repo_url__: { get_param: repo_url }
             __zone__: { get_param: zone }
             __public_mgmt_ip__: { get_attr: [ mgmt_floating_ip, floating_ip_address ] }
-            __private_mgmt_ip__: { get_attr: [ mgmt_port, fixed_ips, 0, ip_address ] }
+            #__private_mgmt_ip__: { get_attr: [ mgmt_port, fixed_ips, 0, ip_address ] }
+            __private_mgmt_ip__: { get_param: private_mgmt_ip }
             __dn_range_start__: { get_param: dn_range_start }
             __dn_range_length__: { get_param: dn_range_length }
             __dns_mgmt_ip_1__: { get_param: dns_mgmt_ip_1 }
@@ -139,6 +150,7 @@ resources:
             __dnssec_key__: { get_param: dnssec_key }
             __etcd_ip__ : { get_param: etcd_ip }
             __index__ : { get_attr: [rand_name, value] }
+            __homer__ : { get_param: sample_homer }
           template: {get_file: config_scripts/ellis.sh}
 
 outputs:
@@ -147,4 +159,5 @@ outputs:
     value: { get_attr: [ mgmt_floating_ip, floating_ip_address ] }
   private_mgmt_ip:
     description: IP address in private management network
-    value: { get_attr: [ mgmt_port, fixed_ips, 0, ip_address ] }
+    #value: { get_attr: [ mgmt_port, fixed_ips, 0, ip_address ] }
+    value: { get_param: private_mgmt_ip }

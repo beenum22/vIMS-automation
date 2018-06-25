@@ -45,7 +45,6 @@ signaling_namespace=signaling
 signaling_dns_server=__dns_vip_sig__
 management_local_ip=__private_mgmt_ip__
 local_ip=__private_sig_ip__
-#public_ip=__public_sig_ip__
 public_ip=__private_sig_ip__
 public_hostname=homer-__index__.__zone__
 etcd_cluster=$etcd_ip
@@ -105,7 +104,7 @@ done
 
 # Use the DNS server.
 echo 'nameserver __dns_vip_mgmt__' > /etc/dnsmasq.resolv.conf
-echo 'nameserver __dns_vip_mgmt__' | cat - /etc/resolv.conf > temp && mv temp /etc/resolv.conf
+#echo 'nameserver __dns_vip_mgmt__' | cat - /etc/resolv.conf > temp && mv temp /etc/resolv.conf
 echo 'RESOLV_CONF=/etc/dnsmasq.resolv.conf' >> /etc/default/dnsmasq
 mkdir -p /etc/netns/signaling
 echo 'nameserver __dns_vip_sig__' > /etc/netns/signaling/resolv.conf

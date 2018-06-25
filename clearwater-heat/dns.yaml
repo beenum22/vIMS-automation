@@ -82,6 +82,9 @@ parameters:
   name:
     type: string
     description: Name of the DNS
+  priority:
+    type: number
+    description: Priority value for vrrp config
 
 resources:
   mgmt_port:
@@ -126,6 +129,7 @@ resources:
         str_replace:
           params:
             __state__: { get_param: state }
+            __priority__: { get_param: priority }
             __vip_mgmt__: { get_param: dns_virtual_ip_mgmt }
             __vip_sig__: { get_param: dns_virtual_ip_sig }
             __zone__: { get_param: zone }

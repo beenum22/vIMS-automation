@@ -181,6 +181,9 @@ resources:
           template: {get_file: config_scripts/homer.sh}
 
 outputs:
+  name:
+    description: Server name
+    value: { str_replace: { params: { __index__: { get_attr: [rand_name, value] }, __zone__: { get_param: zone } }, template: homer-__index__.__zone__ } }
   # Uncomment if required
   #public_mgmt_ip:
   #  description: IP address in public management network

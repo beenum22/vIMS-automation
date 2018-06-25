@@ -152,3 +152,8 @@ outputs:
   scaledown_webhook:
     description: Homer webhook for scale down policy
     value: {get_attr: [homer_scaledown_policy, alarm_url]}
+  #initial_server_names:
+  #  value: {get_attr: [homer_init, name]}
+  sample_homer:
+    description: Sample homer node name
+    value: { get_attr: [ homer_init, resource.0.name ] }

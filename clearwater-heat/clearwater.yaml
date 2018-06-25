@@ -204,6 +204,11 @@ parameters:
     type: number
     description: Length of random string generated for names
     default: 6
+  etcd_ip:
+    type: string
+    description: Fixed IP selected for etcd master
+    default: 10.10.10.15
+
 resources:
   mgmt_network:
     type: ClearwaterIMS::Network
@@ -252,6 +257,46 @@ resources:
       dnssec_key: { get_param: dnssec_key }
       index: { get_param: index}
 
+  ellis_mgmt_port:
+    type: OS::Neutron::Port
+    properties:
+      # Specify the network ID by string to work around OpenStack issues - see https://github.com/Metaswitch/clearwater-heat/issues/18.
+      network_id: { str_replace: { params: { x: { get_attr: [ mgmt_network, net_id ] } }, template: x } }
+      fixed_ips: [{"ip_address": 10.10.10.15}]
+      security_groups:
+        - { get_attr: [ security_groups, base_mgmt ] }
+        - { get_attr: [ security_groups, ellis_mgmt ] }
+
+  homer_cluster:
+    type: ClearwaterIMS::HomerCluster
+    properties:
+      cluster_size: { get_param: homer_cluster_size}
+      public_mgmt_net_id: { get_param: public_mgmt_net_id }
+      private_mgmt_net_id: { get_attr: [ mgmt_network, net_id ] }
+      public_sig_net_id: { get_param: public_sig_net_id }
+      private_sig_net_id: { get_attr: [ sig_network, net_id ] }
+      private_sig_net_cidr: { get_attr: [ sig_network, subnet_cidr ] }
+      private_sig_net_gateway: { get_attr: [ sig_network, subnet_gateway ] }
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_param: key_name }
+      base_mgmt_security_group: { get_attr: [ security_groups, base_mgmt ] }
+      homer_mgmt_security_group: { get_attr: [ security_groups, homer_mgmt ] }
+      homer_sig_security_group: { get_attr: [ security_groups, homer_sig ] }
+      repo_url: { get_param: repo_url }
+      zone: { get_param: zone }
+      #dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
+      #dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
+      dns_mgmt_ip_1: { get_attr: [ dns, master_private_mgmt_ip ] }
+      dns_mgmt_ip_2: { get_attr: [ dns, backup_private_mgmt_ip ] }
+      #dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
+      #dns_virtual_ip_sig: { get_attr: [ dns, vip_sig ] }
+      dns_virtual_ip_mgmt: { get_attr: [ dns, master_private_mgmt_ip ] }
+      dns_virtual_ip_sig: { get_attr: [ dns, master_private_sig_ip ] }      
+      dnssec_key: { get_param: dnssec_key }
+      #etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
+      etcd_ip: { get_param: etcd_ip }
+
   ellis:
     type: ClearwaterIMS::Ellis
     properties:
@@ -269,9 +314,13 @@ resources:
       #dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
       dns_mgmt_ip_1: { get_attr: [ dns, master_private_mgmt_ip ] }
       dns_mgmt_ip_2: { get_attr: [ dns, backup_private_mgmt_ip ] }
-      dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
+      #dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
+      dns_virtual_ip_mgmt: { get_attr: [ dns, master_private_mgmt_ip ] }
       dnssec_key: { get_param: dnssec_key }
       index: { get_param: name_length}
+      sample_homer: { get_attr : [ homer_cluster, sample_homer ] }
+      private_mgmt_port: { get_resource: ellis_mgmt_port}
+      private_mgmt_ip: { get_attr: [ ellis_mgmt_port, fixed_ips, 0, ip_address ] }
 
   bono_cluster:
     type: ClearwaterIMS::BonoCluster
@@ -296,10 +345,13 @@ resources:
       #dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
       dns_mgmt_ip_1: { get_attr: [ dns, master_private_mgmt_ip ] }
       dns_mgmt_ip_2: { get_attr: [ dns, backup_private_mgmt_ip ] }
-      dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
-      dns_virtual_ip_sig: { get_attr: [ dns, vip_sig ] }
+      #dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
+      #dns_virtual_ip_sig: { get_attr: [ dns, vip_sig ] }
+      dns_virtual_ip_mgmt: { get_attr: [ dns, master_private_mgmt_ip ] }
+      dns_virtual_ip_sig: { get_attr: [ dns, master_private_sig_ip ] }
       dnssec_key: { get_param: dnssec_key }
-      etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }      
+      #etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
+      etcd_ip: { get_param: etcd_ip }      
 
   sprout_cluster:
     type: ClearwaterIMS::SproutCluster
@@ -323,37 +375,13 @@ resources:
       #dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
       dns_mgmt_ip_1: { get_attr: [ dns, master_private_mgmt_ip ] }
       dns_mgmt_ip_2: { get_attr: [ dns, backup_private_mgmt_ip ] }
-      dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
-      dns_virtual_ip_sig: { get_attr: [ dns, vip_sig ] }
+      #dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
+      #dns_virtual_ip_sig: { get_attr: [ dns, vip_sig ] }
+      dns_virtual_ip_mgmt: { get_attr: [ dns, master_private_mgmt_ip ] }
+      dns_virtual_ip_sig: { get_attr: [ dns, master_private_sig_ip ] }
       dnssec_key: { get_param: dnssec_key }
-      etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }  
-
-  homer_cluster:
-    type: ClearwaterIMS::HomerCluster
-    properties:
-      cluster_size: { get_param: homer_cluster_size}
-      public_mgmt_net_id: { get_param: public_mgmt_net_id }
-      private_mgmt_net_id: { get_attr: [ mgmt_network, net_id ] }
-      public_sig_net_id: { get_param: public_sig_net_id }
-      private_sig_net_id: { get_attr: [ sig_network, net_id ] }
-      private_sig_net_cidr: { get_attr: [ sig_network, subnet_cidr ] }
-      private_sig_net_gateway: { get_attr: [ sig_network, subnet_gateway ] }
-      flavor: { get_param: flavor }
-      image: { get_param: image }
-      key_name: { get_param: key_name }
-      base_mgmt_security_group: { get_attr: [ security_groups, base_mgmt ] }
-      homer_mgmt_security_group: { get_attr: [ security_groups, homer_mgmt ] }
-      homer_sig_security_group: { get_attr: [ security_groups, homer_sig ] }
-      repo_url: { get_param: repo_url }
-      zone: { get_param: zone }
-      #dns_mgmt_ip: { get_attr: [ dns, private_mgmt_ip ] }
-      #dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
-      dns_mgmt_ip_1: { get_attr: [ dns, master_private_mgmt_ip ] }
-      dns_mgmt_ip_2: { get_attr: [ dns, backup_private_mgmt_ip ] }
-      dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
-      dns_virtual_ip_sig: { get_attr: [ dns, vip_sig ] }      
-      dnssec_key: { get_param: dnssec_key }
-      etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
+      #etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
+      etcd_ip: { get_param: etcd_ip }
 
   dime_cluster:
     type: ClearwaterIMS::DimeCluster
@@ -377,10 +405,13 @@ resources:
       #dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
       dns_mgmt_ip_1: { get_attr: [ dns, master_private_mgmt_ip ] }
       dns_mgmt_ip_2: { get_attr: [ dns, backup_private_mgmt_ip ] }
-      dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
-      dns_virtual_ip_sig: { get_attr: [ dns, vip_sig ] }
+      #dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
+      #dns_virtual_ip_sig: { get_attr: [ dns, vip_sig ] }
+      dns_virtual_ip_mgmt: { get_attr: [ dns, master_private_mgmt_ip ] }
+      dns_virtual_ip_sig: { get_attr: [ dns, master_private_sig_ip ] }
       dnssec_key: { get_param: dnssec_key }
-      etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
+      #etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
+      etcd_ip: { get_param: etcd_ip }
 
   vellum_cluster:
     type: ClearwaterIMS::VellumCluster
@@ -404,10 +435,13 @@ resources:
       #dns_sig_ip: { get_attr: [ dns, private_sig_ip ] }
       dns_mgmt_ip_1: { get_attr: [ dns, master_private_mgmt_ip ] }
       dns_mgmt_ip_2: { get_attr: [ dns, backup_private_mgmt_ip ] }
-      dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
-      dns_virtual_ip_sig: { get_attr: [ dns, vip_sig ] }
+      #dns_virtual_ip_mgmt: { get_attr: [ dns, vip_mgmt ] }
+      #dns_virtual_ip_sig: { get_attr: [ dns, vip_sig ] }
+      dns_virtual_ip_mgmt: { get_attr: [ dns, master_private_mgmt_ip ] }
+      dns_virtual_ip_sig: { get_attr: [ dns, master_private_sig_ip ] }
       dnssec_key: { get_param: dnssec_key }
-      etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
+      #etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
+      etcd_ip: { get_param: etcd_ip }
 
   monit:
     type: ClearwaterIMS::Monit
@@ -423,7 +457,8 @@ resources:
       dns_mgmt_ip: { get_attr: [ dns, master_private_mgmt_ip ] }
       #dns_sig_ip: { get_attr: [ dns, master_private_sig_ip ] }
       dnssec_key: { get_param: dnssec_key }
-      etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
+      #etcd_ip: { get_attr: [ ellis, private_mgmt_ip ] }
+      etcd_ip: { get_param: etcd_ip }
       bono_up: {get_attr: [bono_cluster, scaleup_webhook]}
       bono_down: {get_attr: [bono_cluster, scaledown_webhook]}
       sprout_up: {get_attr: [sprout_cluster, scaleup_webhook]}

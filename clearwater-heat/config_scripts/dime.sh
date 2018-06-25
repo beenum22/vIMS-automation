@@ -111,8 +111,8 @@ done
 
 # Use the DNS server.
 echo 'nameserver __dns_vip_mgmt__' > /etc/dnsmasq.resolv.conf
-echo 'nameserver __dns_vip_mgmt__' | cat - /etc/resolv.conf > temp && mv temp /etc/resolv.conf
+#echo 'nameserver __dns_vip_mgmt__' | cat - /etc/resolv.conf > temp && mv temp /etc/resolv.conf
 echo 'RESOLV_CONF=/etc/dnsmasq.resolv.conf' >> /etc/default/dnsmasq
 mkdir -p /etc/netns/signaling
-echo 'nameserver __dns_sig_ip__' > /etc/netns/signaling/resolv.conf
+echo 'nameserver __dns_vip_sig__' > /etc/netns/signaling/resolv.conf
 service dnsmasq force-reload

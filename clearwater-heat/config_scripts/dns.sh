@@ -12,6 +12,41 @@ ip link set dev eth1 up
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install bind9 --yes
 
+apt install -y keepalived
+cat > /etc/keepalived/keepalived.conf << EOF
+vrrp_instance dns_ha_mgmt {
+    state __state__
+    interface eth0
+    virtual_router_id 51
+    __priority__
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass supersecretpassword
+    }
+    virtual_ipaddress {
+        __vip_mgmt__
+    }
+}
+
+vrrp_instance dns_ha_sig {
+    state __state__
+    interface eth1
+    virtual_router_id 52
+    priority __priority__
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass supersecretpassword
+    }
+    virtual_ipaddress {
+        __vip_sig__
+    }
+}
+EOF
+
+service keepalived restart
+
 # Update BIND configuration with the specified zone and key.
 cat >> /etc/bind/named.conf.local << EOF
 key __zone__. {
@@ -37,6 +72,7 @@ ip2rr() {
   fi
 }
 
+
 # Create basic zone configuration.
 cat > /var/lib/bind/db.__zone__ << EOF
 \$ORIGIN __zone__.
@@ -49,38 +85,3 @@ chown root:bind /var/lib/bind/db.__zone__
 
 # Now that BIND configuration is correct, kick it to reload.
 service bind9 reload
-
-apt install -y keepalived
-cat > /etc/keepalived/keepalived.conf << EOF
-vrrp_instance dns_ha_mgmt {
-    state __state__
-    interface eth0
-    virtual_router_id 51
-    priority 150
-    advert_int 1
-    authentication {
-        auth_type PASS
-        auth_pass supersecretpassword
-    }
-    virtual_ipaddress {
-        __vip_mgmt__
-    }
-}
-
-vrrp_instance dns_ha_sig {
-    state __state__
-    interface eth1
-    virtual_router_id 51
-    priority 150
-    advert_int 1
-    authentication {
-        auth_type PASS
-        auth_pass supersecretpassword
-    }
-    virtual_ipaddress {
-        __vip_sig__
-    }
-}
-EOF
-
-service keepalived restart
