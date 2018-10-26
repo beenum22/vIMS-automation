@@ -15,6 +15,9 @@ class vIMS(Stack):
         self.env_file = env_file
         self.settings = Settings(settings_file)
         self.settings.parse_settings_file()
+        self.settings.flavor['flavor_metadata'] = self.settings.parse_nested(
+            self.settings.flavor['flavor_metadata'].strip("'")
+            )
         super(vIMS, self).__init__(self.settings.auth[
             'password'], self.settings.auth['auth_url'])
         # self.authenticate_clients()
@@ -64,14 +67,19 @@ class vIMS(Stack):
 
     def setup_env(self):
         try:
-            self.upload_image(self.settings.universal[
-                'image_name'], url=self.settings.universal['image_url'])
+            self.upload_image(self.settings.universal['image_name'],
+                            url=self.settings.universal['image_url'])
             self.create_keypair(self.settings.universal['keypair_name'])
-            self.create_flavor(self.settings.universal[
-                               'flavor_name'], ram=1024, vcpus=1, disk=40)
+            self.create_flavor(
+                self.settings.flavor['flavor_name'],
+                ram=self.settings.flavor['flavor_ram'],
+                vcpus=self.settings.flavor['flavor_cpus'],
+                disk=self.settings.flavor['flavor_disk'],
+                metadata=self.settings.flavor['flavor_metadata']
+                )
             instances_count = int(self.settings.universal['bono_cluster_size']) + int(self.settings.universal[
                             'sprout_cluster_size']) + int(self.settings.universal['dime_cluster_size']) + int(self.settings.universal['vellum_cluster_size']) + int(self.settings.universal['homer_cluster_size']) + 4
-            self.check_resources(instances_count, self.settings.universal['flavor_name'])
+            self.check_resources(instances_count, self.settings.flavor['flavor_name'])
             public_net_id = self.get_net_id(
                 self.settings.universal['public_network'])
             mgmt_net_pool = Utilities.get_ip_range(self.settings.mgmt_net[
@@ -85,7 +93,7 @@ class vIMS(Stack):
                 "public_mgmt_net_id": public_net_id,
                 "public_sig_net_id": public_net_id,
                 "zone": "xflowresearch.com",
-                "flavor":  self.settings.universal['flavor_name'],
+                "flavor":  self.settings.flavor['flavor_name'],
                 "image":  self.settings.universal['image_name'],
                 "dnssec_key": self.settings.universal['dnssec_key'],
                 "key_name": self.settings.universal['keypair_name'],

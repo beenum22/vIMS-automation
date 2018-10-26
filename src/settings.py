@@ -3,6 +3,7 @@ import argparse
 import ConfigParser
 from urlparse import urlparse
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,15 @@ class Settings(object):
         self.__dict__ = settings
 
         return settings
+
+    def parse_nested(self, value):
+        delimiters = list(set(re.findall(r'\W', value)))
+        if not delimiters:
+            return value
+        parsed_value = dict(re.split(
+            delimiters[-2], val) for val in re.split(delimiters[-1], value)
+            )
+        return parsed_value
 
     def _get_settings_section(self, section):
         """ Parse the specfic section/stanza in the settings file"""
