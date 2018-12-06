@@ -485,6 +485,7 @@ class Stack(object):
             # logger.debug(err)
             raise
 
+    # TODO: DEPRECATED, remove
     def check_quotas(self, cores=50, floating_ips=30, security_groups=30, port=100):
         try:
             # check flavor vcpus
@@ -505,6 +506,37 @@ class Stack(object):
             logger.debug(err)
             raise Exception("OpenStack Authorization failed. Verify credentials.")
         except:
+            raise
+
+    def verify_free_quota(self, used, total, required):
+        if (int(total) - int(used)) > int(required):
+            return True
+        else:
+            return False
+
+    def verify_quotas(self,
+                        cores=50,
+                        memory=19456,
+                        floating_ips=30,
+                        security_groups=30,
+                        instances=19,
+                        port=100):
+        try:
+            if not self.project_id:
+                self.project_id = self.openstack.identity.find_project(self.project_name).id
+            nova_limits = self.nova.limits.get().absolute
+            limits = dict(map(lambda x: (x.name, x.value), list(nova_limits)))
+            if not self.verify_free_quota(limits['totalCoresUsed'], limits['maxTotalCores'], cores):
+                self.nova.quotas.update(self.project_id, cores=cores)
+            if not self.verify_free_quota(limits['totalRAMUsed'], limits['maxTotalRAMSize'], memory):
+                self.nova.quotas.update(self.project_id, ram=memory)
+            if not self.verify_free_quota(limits['totalFloatingIpsUsed'], limits['maxTotalFloatingIps'], floating_ips):
+                self.nova.quotas.update(self.project_id, floating_ips=floating_ips)
+            if not self.verify_free_quota(limits['totalSecurityGroupsUsed'], limits['maxSecurityGroups'], security_groups):
+                self.nova.quotas.update(self.project_id, security_groups=security_groups)
+            if not self.verify_free_quota(limits['totalInstancesUsed'], limits['maxTotalInstances'], security_groups):
+                self.nova.quotas.update(self.project_id, instances=instances)
+        except AssertionError:
             raise
 
     @exception_handling

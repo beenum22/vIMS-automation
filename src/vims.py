@@ -136,10 +136,10 @@ class vIMS(Stack):
             resources = self.get_total_available_resources()
             assert (flavor.vcpus * instances) < resources[
                 'vcpus'], "Not enough resources available. Required vcpus: %s - Available vcpus: %s" % (flavor.vcpus * instances, resources['vcpus'])
-            assert (flavor.vcpus * instances) < resources[
-                'vcpus'], "Not enough resources available. Required memory: %s - Available memory: %s" % (flavor.ram * instances, resources['memory'])
-            assert (flavor.vcpus * instances) < resources[
-                'vcpus'], "Not enough resources available. Required storage: %s - Available storage: %s" % (flavor.disk * instances, resources['storage'])
-            self.check_quotas(security_groups=30, floating_ips=50)
+            assert (flavor.ram * instances) < resources[
+                'memory'], "Not enough resources available. Required memory: %s - Available memory: %s" % (flavor.ram * instances, resources['memory'])
+            assert (flavor.disk * instances) < resources[
+                'storage'], "Not enough resources available. Required storage: %s - Available storage: %s" % (flavor.disk * instances, resources['storage'])
+            self.verify_quotas(security_groups=30, floating_ips=50)
         except AssertionError:
             raise
