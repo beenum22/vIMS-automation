@@ -28,7 +28,11 @@ class Stack(object):
                 project_name='admin',
                 project_id=None,
                 project_domain_name='Default',
-                user_domain_name='Default'):
+                user_domain_name='Default',
+                compute_api = '2.1',
+                heat_api = '1',
+                glance_api = '2'
+                ):
         self.username = username
         self.password = password
         self.auth_url = auth_url
@@ -36,6 +40,9 @@ class Stack(object):
         self.project_id = project_id
         self.user_domain_name = user_domain_name
         self.project_domain_name = project_domain_name
+        self.compute_api = compute_api
+        self.heat_api = heat_api
+        self.glance_api = glance_api
         self.authenticate_clients()
 
     def authenticate_clients(self):
@@ -46,8 +53,7 @@ class Stack(object):
             self.glance = self._get_glanceclient(self.sess)
             self.heat = self._get_heatclient(
                 self.auth_url, self.sess, self.auth, 'orchestration')
-            self.openstack = self._get_openstacksdk_client(
-                self.auth_url, self.password)
+            self.openstack = self._get_openstacksdk_client()
             self.openstack.authorize()
         except HttpException as err:
             logger.debug(err)
@@ -91,15 +97,13 @@ class Stack(object):
     def _get_session(self, auth):
         return session.Session(auth=auth)
 
-    def _get_openstacksdk_client(self,
-                                 auth_url, 
-                                 password, 
-                                 username='admin', 
-                                 project_name='admin'):
-        conn = connection.Connection(auth_url=auth_url,
-                                     project_name=project_name,
-                                     username=username,
-                                     password=password)
+    def _get_openstacksdk_client(self):
+        conn = connection.Connection(auth_url=self.auth_url,
+                                     project_name=self.project_name,
+                                     username=self.username,
+                                     password=self.password,
+                                     user_domain_name=self.user_domain_name,
+                                     project_domain_name=self.project_domain_name)
         return conn
 
     def _get_heatclient(self, auth_url, sess, auth, service_type, version='1'):
@@ -109,15 +113,18 @@ class Stack(object):
                               auth=auth,
                               service_type=service_type)
 
-    def _get_novaclient(self, sess, version='2.1'):
+    def _get_novaclient(self):
         try:
-            return nvclient.Client(version, session=sess,)
+            if not self.sess:
+                self._get_auth_sess()
+            return nvclient.Client(self.compute_api, session=self.sess,)
         except UnsupportedVersion as err:
             logger.debug(err)
             raise UnsupportedVersion(
-                "Invalid Nova client version '%s'" % version)
-        #except:
-        #    raise
+                "Invalid Nova client version '%s'" % self.compute_api)
+        except Exception as err:
+            logger.debug(err)
+            raise Exception("Nova client authentication failed")
 
     def _get_neutronclient(self, sess):
         return ntclient.Client(session=sess)
